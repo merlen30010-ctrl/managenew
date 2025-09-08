@@ -19,6 +19,8 @@ from app.api import department
 from app.api import contract
 from app.api import assay_data
 from app.api import material_transaction
+from app.api import employee_document
+from app.api import employee_reward_punishment
 
 # 导入已存在的模块
 from app.api import excel
@@ -100,3 +102,4 @@ def update_production_record_status(record_id):
         'completion_date': record.completion_date.isoformat() if record.completion_date else None,
         'updated_at': record.updated_at.isoformat() if record.updated_at else None
     })
+

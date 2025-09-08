@@ -1,0 +1,816 @@
+{% extends "base.html" %}
+
+{% block title %}员工管理{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">员工管理</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                            <i class="fas fa-plus"></i> 新增员工
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- 搜索和过滤 -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="searchInput" placeholder="搜索工号、姓名、电话...">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" id="departmentFilter">
+                                <option value="">所有部门</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" id="statusFilter">
+                                <option value="">所有状态</option>
+                                <option value="在职">在职</option>
+                                <option value="离职">离职</option>
+                                <option value="试用期">试用期</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-info" onclick="searchEmployees()">
+                                <i class="fas fa-search"></i> 搜索
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 员工列表表格 -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="employeeTable">
+                            <thead>
+                                <tr>
+                                    <th>工号</th>
+                                    <th>姓名</th>
+                                    <th>性别</th>
+                                    <th>部门</th>
+                                    <th>职位</th>
+                                    <th>电话</th>
+                                    <th>在职状态</th>
+                                    <th>入职时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeeTableBody">
+                                <!-- 数据通过AJAX加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="pagination">
+                            <!-- 分页按钮通过JavaScript生成 -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新增员工模态框 -->
+<div class="modal fade" id="addEmployeeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">新增员工</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addEmployeeForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addUserId">关联用户 <span class="text-danger">*</span></label>
+                                <select class="form-control" id="addUserId" name="user_id" required>
+                                    <option value="">请选择用户</option>
+                                    {% for user in users_without_employee %}
+                                    <option value="{{ user.id }}">{{ user.username }} ({{ user.email }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addEmployeeId">工号 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="addEmployeeId" name="employee_id" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addName">姓名 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="addName" name="name" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addDepartmentId">部门</label>
+                                <select class="form-control" id="addDepartmentId" name="department_id">
+                                    <option value="">请选择部门</option>
+                                    {% for dept in departments %}
+                                    <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addJobTitle">职位</label>
+                                <input type="text" class="form-control" id="addJobTitle" name="job_title">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addGender">性别</label>
+                                <select class="form-control" id="addGender" name="gender">
+                                    <option value="">请选择</option>
+                                    <option value="男">男</option>
+                                    <option value="女">女</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addBirthDate">出生日期</label>
+                                <input type="date" class="form-control" id="addBirthDate" name="birth_date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addIdCard">身份证号</label>
+                                <input type="text" class="form-control" id="addIdCard" name="id_card">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addPhone">电话</label>
+                                <input type="text" class="form-control" id="addPhone" name="phone">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addNativePlace">籍贯</label>
+                                <input type="text" class="form-control" id="addNativePlace" name="native_place">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addNationality">民族</label>
+                                <input type="text" class="form-control" id="addNationality" name="nationality">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addEducation">学历</label>
+                                <select class="form-control" id="addEducation" name="education">
+                                    <option value="">请选择</option>
+                                    <option value="小学">小学</option>
+                                    <option value="初中">初中</option>
+                                    <option value="高中">高中</option>
+                                    <option value="中专">中专</option>
+                                    <option value="大专">大专</option>
+                                    <option value="本科">本科</option>
+                                    <option value="硕士">硕士</option>
+                                    <option value="博士">博士</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addMaritalStatus">婚姻状况</label>
+                                <select class="form-control" id="addMaritalStatus" name="marital_status">
+                                    <option value="">请选择</option>
+                                    <option value="未婚">未婚</option>
+                                    <option value="已婚">已婚</option>
+                                    <option value="离异">离异</option>
+                                    <option value="丧偶">丧偶</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addHireDate">入职时间</label>
+                                <input type="date" class="form-control" id="addHireDate" name="hire_date">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addEmploymentStatus">在职状态</label>
+                                <select class="form-control" id="addEmploymentStatus" name="employment_status">
+                                    <option value="在职">在职</option>
+                                    <option value="试用期">试用期</option>
+                                    <option value="离职">离职</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="addAddress">居住地址</label>
+                        <textarea class="form-control" id="addAddress" name="address" rows="2"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addEmergencyContact">紧急联系人</label>
+                                <input type="text" class="form-control" id="addEmergencyContact" name="emergency_contact">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="addEmergencyPhone">紧急联系电话</label>
+                                <input type="text" class="form-control" id="addEmergencyPhone" name="emergency_phone">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑员工模态框 -->
+<div class="modal fade" id="editEmployeeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑员工信息</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editEmployeeForm">
+                <input type="hidden" id="editUserId" name="user_id">
+                <div class="modal-body">
+                    <!-- 编辑表单内容与新增类似，但不包含用户选择 -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editEmployeeId">工号 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editEmployeeId" name="employee_id" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editName">姓名 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editName" name="name" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editDepartmentId">部门</label>
+                                <select class="form-control" id="editDepartmentId" name="department_id">
+                                    <option value="">请选择部门</option>
+                                    {% for dept in departments %}
+                                    <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editJobTitle">职位</label>
+                                <input type="text" class="form-control" id="editJobTitle" name="job_title">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 其他字段与新增表单相同 -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editJobTitle">职位</label>
+                                <input type="text" class="form-control" id="editJobTitle" name="job_title">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editGender">性别</label>
+                                <select class="form-control" id="editGender" name="gender">
+                                    <option value="">请选择</option>
+                                    <option value="男">男</option>
+                                    <option value="女">女</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editBirthDate">出生日期</label>
+                                <input type="date" class="form-control" id="editBirthDate" name="birth_date">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editIdCard">身份证号</label>
+                                <input type="text" class="form-control" id="editIdCard" name="id_card">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editPhone">电话</label>
+                                <input type="text" class="form-control" id="editPhone" name="phone">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editNativePlace">籍贯</label>
+                                <input type="text" class="form-control" id="editNativePlace" name="native_place">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editNationality">民族</label>
+                                <input type="text" class="form-control" id="editNationality" name="nationality">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editEducation">学历</label>
+                                <select class="form-control" id="editEducation" name="education">
+                                    <option value="">请选择</option>
+                                    <option value="小学">小学</option>
+                                    <option value="初中">初中</option>
+                                    <option value="高中">高中</option>
+                                    <option value="中专">中专</option>
+                                    <option value="大专">大专</option>
+                                    <option value="本科">本科</option>
+                                    <option value="硕士">硕士</option>
+                                    <option value="博士">博士</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editMaritalStatus">婚姻状况</label>
+                                <select class="form-control" id="editMaritalStatus" name="marital_status">
+                                    <option value="">请选择</option>
+                                    <option value="未婚">未婚</option>
+                                    <option value="已婚">已婚</option>
+                                    <option value="离异">离异</option>
+                                    <option value="丧偶">丧偶</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editHireDate">入职时间</label>
+                                <input type="date" class="form-control" id="editHireDate" name="hire_date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editEmploymentStatus">在职状态</label>
+                                <select class="form-control" id="editEmploymentStatus" name="employment_status">
+                                    <option value="在职">在职</option>
+                                    <option value="试用期">试用期</option>
+                                    <option value="离职">离职</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAddress">居住地址</label>
+                        <textarea class="form-control" id="editAddress" name="address" rows="2"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editEmergencyContact">紧急联系人</label>
+                                <input type="text" class="form-control" id="editEmergencyContact" name="emergency_contact">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editEmergencyPhone">紧急联系电话</label>
+                                <input type="text" class="form-control" id="editEmergencyPhone" name="emergency_phone">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 员工详情模态框 -->
+<div class="modal fade" id="viewEmployeeModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">员工详情</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="employeeDetails">
+                <!-- 员工详情内容通过JavaScript填充 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 页面加载完成后初始化
+$(document).ready(function() {
+    loadEmployees();
+    
+    // 搜索框回车事件
+    $('#searchInput').on('keypress', function(e) {
+        if (e.which === 13) {
+            searchEmployees();
+        }
+    });
+    
+    // 新增员工表单提交
+    $('#addEmployeeForm').on('submit', function(e) {
+        e.preventDefault();
+        addEmployee();
+    });
+    
+    // 编辑员工表单提交
+    $('#editEmployeeForm').on('submit', function(e) {
+        e.preventDefault();
+        updateEmployee();
+    });
+});
+
+// 当前页码
+let currentPage = 1;
+let totalPages = 1;
+
+// 加载员工列表
+function loadEmployees(page = 1) {
+    const search = $('#searchInput').val();
+    const departmentId = $('#departmentFilter').val();
+    const employmentStatus = $('#statusFilter').val();
+    
+    const params = new URLSearchParams({
+        page: page,
+        per_page: 20
+    });
+    
+    if (search) params.append('search', search);
+    if (departmentId) params.append('department_id', departmentId);
+    if (employmentStatus) params.append('employment_status', employmentStatus);
+    
+    $.ajax({
+        url: '/api/employees?' + params.toString(),
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                renderEmployeeTable(response.data.items);
+                renderPagination(response.data);
+                currentPage = page;
+                totalPages = response.data.pages;
+            } else {
+                showAlert('error', response.message || '加载员工列表失败');
+            }
+        },
+        error: function(xhr) {
+            showAlert('error', '加载员工列表失败');
+        }
+    });
+}
+
+// 渲染员工表格
+function renderEmployeeTable(employees) {
+    const tbody = $('#employeeTableBody');
+    tbody.empty();
+    
+    if (employees.length === 0) {
+        tbody.append('<tr><td colspan="9" class="text-center">暂无数据</td></tr>');
+        return;
+    }
+    
+    employees.forEach(function(employee) {
+        const row = `
+            <tr>
+                <td>${employee.employee_id || '-'}</td>
+                <td>${employee.name || '-'}</td>
+                <td>${employee.gender || '-'}</td>
+                <td>${employee.department_name || '-'}</td>
+                <td>${employee.job_title || '-'}</td>
+                <td>${employee.phone || '-'}</td>
+                <td>
+                    <span class="badge badge-${getStatusBadgeClass(employee.employment_status)}">
+                        ${employee.employment_status || '-'}
+                    </span>
+                </td>
+                <td>${employee.hire_date || '-'}</td>
+                <td>
+                    <button class="btn btn-sm btn-info" onclick="viewEmployee(${employee.user_id})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning" onclick="editEmployee(${employee.user_id})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteEmployee(${employee.user_id}, '${employee.name}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        tbody.append(row);
+    });
+}
+
+// 获取状态徽章样式
+function getStatusBadgeClass(status) {
+    switch(status) {
+        case '在职': return 'success';
+        case '试用期': return 'warning';
+        case '离职': return 'secondary';
+        default: return 'secondary';
+    }
+}
+
+// 渲染分页
+function renderPagination(data) {
+    const pagination = $('#pagination');
+    pagination.empty();
+    
+    if (data.pages <= 1) return;
+    
+    // 上一页
+    if (data.has_prev) {
+        pagination.append(`
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadEmployees(${data.prev_num})">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `);
+    }
+    
+    // 页码
+    for (let i = 1; i <= data.pages; i++) {
+        const active = i === data.page ? 'active' : '';
+        pagination.append(`
+            <li class="page-item ${active}">
+                <a class="page-link" href="#" onclick="loadEmployees(${i})">${i}</a>
+            </li>
+        `);
+    }
+    
+    // 下一页
+    if (data.has_next) {
+        pagination.append(`
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadEmployees(${data.next_num})">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `);
+    }
+}
+
+// 搜索员工
+function searchEmployees() {
+    loadEmployees(1);
+}
+
+// 新增员工
+function addEmployee() {
+    const formData = new FormData($('#addEmployeeForm')[0]);
+    const data = Object.fromEntries(formData.entries());
+    
+    $.ajax({
+        url: '/api/employees',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', '员工信息创建成功');
+                $('#addEmployeeModal').modal('hide');
+                $('#addEmployeeForm')[0].reset();
+                loadEmployees(currentPage);
+            } else {
+                showAlert('error', response.message || '创建员工信息失败');
+            }
+        },
+        error: function(xhr) {
+            const response = xhr.responseJSON;
+            showAlert('error', response?.message || '创建员工信息失败');
+        }
+    });
+}
+
+// 查看员工详情
+function viewEmployee(userId) {
+    $.ajax({
+        url: `/api/employees/${userId}`,
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                renderEmployeeDetails(response.data);
+                $('#viewEmployeeModal').modal('show');
+            } else {
+                showAlert('error', response.message || '获取员工信息失败');
+            }
+        },
+        error: function(xhr) {
+            showAlert('error', '获取员工信息失败');
+        }
+    });
+}
+
+// 渲染员工详情
+function renderEmployeeDetails(employee) {
+    const details = $('#employeeDetails');
+    details.html(`
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr><th>工号:</th><td>${employee.employee_id || '-'}</td></tr>
+                    <tr><th>姓名:</th><td>${employee.user_name || '-'}</td></tr>
+                    <tr><th>性别:</th><td>${employee.gender || '-'}</td></tr>
+                    <tr><th>出生日期:</th><td>${employee.birth_date || '-'}</td></tr>
+                    <tr><th>身份证号:</th><td>${employee.id_card || '-'}</td></tr>
+                    <tr><th>籍贯:</th><td>${employee.native_place || '-'}</td></tr>
+                    <tr><th>民族:</th><td>${employee.nationality || '-'}</td></tr>
+                    <tr><th>学历:</th><td>${employee.education || '-'}</td></tr>
+                    <tr><th>婚姻状况:</th><td>${employee.marital_status || '-'}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-borderless">
+                    <tr><th>姓名:</th><td>${employee.name || '-'}</td></tr>
+                    <tr><th>部门:</th><td>${employee.department_name || '-'}</td></tr>
+                    <tr><th>职位:</th><td>${employee.job_title || '-'}</td></tr>
+                    <tr><th>入职时间:</th><td>${employee.hire_date || '-'}</td></tr>
+                    <tr><th>工作年限:</th><td>${employee.work_years || '-'}</td></tr>
+                    <tr><th>在职状态:</th><td>
+                        <span class="badge badge-${getStatusBadgeClass(employee.employment_status)}">
+                            ${employee.employment_status || '-'}
+                        </span>
+                    </td></tr>
+                    <tr><th>电话:</th><td>${employee.phone || '-'}</td></tr>
+                    <tr><th>居住地址:</th><td>${employee.address || '-'}</td></tr>
+                    <tr><th>紧急联系人:</th><td>${employee.emergency_contact || '-'}</td></tr>
+                    <tr><th>紧急联系电话:</th><td>${employee.emergency_phone || '-'}</td></tr>
+                </table>
+            </div>
+        </div>
+    `);
+}
+
+// 编辑员工
+function editEmployee(userId) {
+    $.ajax({
+        url: `/api/employees/${userId}`,
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                fillEditForm(response.data);
+                $('#editEmployeeModal').modal('show');
+            } else {
+                showAlert('error', response.message || '获取员工信息失败');
+            }
+        },
+        error: function(xhr) {
+            showAlert('error', '获取员工信息失败');
+        }
+    });
+}
+
+// 填充编辑表单
+function fillEditForm(employee) {
+    $('#editUserId').val(employee.user_id);
+    $('#editEmployeeId').val(employee.employee_id);
+    $('#editName').val(employee.name);
+    $('#editDepartmentId').val(employee.department_id);
+    $('#editJobTitle').val(employee.job_title);
+    $('#editGender').val(employee.gender);
+    $('#editBirthDate').val(employee.birth_date);
+    $('#editIdCard').val(employee.id_card);
+    $('#editPhone').val(employee.phone);
+    $('#editNativePlace').val(employee.native_place);
+    $('#editNationality').val(employee.nationality);
+    $('#editEducation').val(employee.education);
+    $('#editMaritalStatus').val(employee.marital_status);
+    $('#editHireDate').val(employee.hire_date);
+    $('#editEmploymentStatus').val(employee.employment_status);
+    $('#editAddress').val(employee.address);
+    $('#editEmergencyContact').val(employee.emergency_contact);
+    $('#editEmergencyPhone').val(employee.emergency_phone);
+}
+
+// 更新员工信息
+function updateEmployee() {
+    const userId = $('#editUserId').val();
+    const formData = new FormData($('#editEmployeeForm')[0]);
+    const data = Object.fromEntries(formData.entries());
+    delete data.user_id; // 移除user_id，不允许修改
+    
+    $.ajax({
+        url: `/api/employees/${userId}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', '员工信息更新成功');
+                $('#editEmployeeModal').modal('hide');
+                loadEmployees(currentPage);
+            } else {
+                showAlert('error', response.message || '更新员工信息失败');
+            }
+        },
+        error: function(xhr) {
+            const response = xhr.responseJSON;
+            showAlert('error', response?.message || '更新员工信息失败');
+        }
+    });
+}
+
+// 删除员工
+function deleteEmployee(userId, userName) {
+    if (confirm(`确定要删除员工 "${userName}" 的信息吗？此操作不可恢复。`)) {
+        $.ajax({
+            url: `/api/employees/${userId}`,
+            method: 'DELETE',
+            success: function(response) {
+                if (response.success) {
+                    showAlert('success', '员工信息删除成功');
+                    loadEmployees(currentPage);
+                } else {
+                    showAlert('error', response.message || '删除员工信息失败');
+                }
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                showAlert('error', response?.message || '删除员工信息失败');
+            }
+        });
+    }
+}
+
+// 显示提示信息
+function showAlert(type, message) {
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    const alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    `;
+    
+    // 移除现有的提示
+    $('.alert').remove();
+    
+    // 添加新提示到页面顶部
+    $('.container-fluid').prepend(alertHtml);
+    
+    // 3秒后自动隐藏
+    setTimeout(function() {
+        $('.alert').fadeOut();
+    }, 3000);
+}
+</script>
+{% endblock %}

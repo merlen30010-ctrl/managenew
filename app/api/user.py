@@ -22,7 +22,7 @@ def get_current_user():
             'id': current_user.id,
             'username': current_user.username,
             'email': current_user.email,
-            'name': current_user.name,
+            # name字段已移至Employee表
             'roles': [role.name for role in current_user.roles] if hasattr(current_user, 'roles') else []
         }
     })
@@ -40,7 +40,7 @@ def get_users():
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
-                'name': user.name
+                # name字段已移至Employee表
             } for user in users]
         })
     except Exception as e:
@@ -63,7 +63,7 @@ def get_user(user_id):
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
-                'name': user.name
+                # name字段已移至Employee表
             }
         })
     except Exception as e:
@@ -105,8 +105,7 @@ def create_user():
         user = User()
         user.username = data['username']
         user.email = data['email']
-        user.name = data.get('name', '')
-        user.phone = data.get('phone', '')
+        # name和phone字段已移至Employee表，此处不再处理
         
         if data.get('password'):
             user.set_password(data['password'])
@@ -121,7 +120,7 @@ def create_user():
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
-                'name': user.name
+                # name字段已移至Employee表
             }
         }), 201
     except Exception as e:
@@ -168,11 +167,7 @@ def update_user(user_id):
                 }), 400
             user.email = data['email']
         
-        if 'name' in data:
-            user.name = data['name']
-        
-        if 'phone' in data:
-            user.phone = data['phone']
+        # name和phone字段已移至Employee表，此处不再处理
         
         if 'password' in data:
             user.set_password(data['password'])
@@ -186,7 +181,7 @@ def update_user(user_id):
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
-                'name': user.name
+                # name字段已移至Employee表
             }
         })
     except Exception as e:

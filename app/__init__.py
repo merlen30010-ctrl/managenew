@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from flask_migrate import Migrate
 from config import Config
 import os
 from datetime import datetime
@@ -11,6 +12,7 @@ from datetime import datetime
 db = SQLAlchemy()
 login_manager = LoginManager()
 jwt = JWTManager()
+migrate = Migrate()
 
 # 导入缓存服务和查询监控
 from app.utils.cache_service import cache_service
@@ -22,6 +24,7 @@ def create_app():
     
     # 初始化扩展
     db.init_app(app)
+    migrate.init_app(app, db)
     login_manager.init_app(app)
     jwt.init_app(app)
     cache_service.init_app(app)
@@ -56,6 +59,7 @@ def create_app():
     from app.views.production_record import production_record_bp
     from app.views.metal_price import metal_price_bp
     from app.views.vehicle import vehicle_bp
+    from app.views.employee import employee_view_bp
     from app.api import api_bp
     from app.api.auth import api_auth_bp
     from app.api.user import api_user_bp
@@ -66,6 +70,7 @@ def create_app():
     from app.api.assay_data import api_assay_data_bp
     from app.api.material_transaction import api_material_transaction_bp
     from app.api.metal_price import api_metal_price_bp
+    from app.api.employee import employee_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -83,6 +88,7 @@ def create_app():
     app.register_blueprint(production_record_bp, url_prefix='/production-records')
     app.register_blueprint(metal_price_bp, url_prefix='/metal-prices')
     app.register_blueprint(vehicle_bp, url_prefix='/vehicles')
+    app.register_blueprint(employee_view_bp, url_prefix='/employees')
     # 注册API蓝图
     app.register_blueprint(api_auth_bp)
     app.register_blueprint(api_user_bp)
@@ -93,6 +99,7 @@ def create_app():
     app.register_blueprint(api_assay_data_bp)
     app.register_blueprint(api_material_transaction_bp)
     app.register_blueprint(api_metal_price_bp)
+    app.register_blueprint(employee_bp, url_prefix='/api')
     app.register_blueprint(api_bp, url_prefix='/api')
     
     # 设置缓存失效钩子

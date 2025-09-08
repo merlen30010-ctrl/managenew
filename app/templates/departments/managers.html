@@ -20,7 +20,7 @@
                                 <input class="form-check-input" type="checkbox" name="managers" value="{{ user.id }}" id="user_{{ user.id }}"
                                     {% if user in department.managers %}checked{% endif %}>
                                 <label class="form-check-label" for="user_{{ user.id }}">
-                                    {{ user.name or user.username }} ({{ user.username }})
+                                    {{ user.username }} ({{ user.email }})
                                 </label>
                             </div>
                             {% endfor %}

@@ -1,0 +1,388 @@
+{% extends "base.html" %}
+
+{% block title %}个人档案{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">个人档案</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-primary" onclick="editProfile()">
+                            <i class="fas fa-edit"></i> 编辑资料
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- 左侧：基本信息 -->
+                        <div class="col-md-6">
+                            <h5 class="mb-3"><i class="fas fa-user"></i> 基本信息</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="30%">工号:</th>
+                                    <td>{{ employee.employee_id or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>姓名:</th>
+                                    <td>{{ employee.name or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>性别:</th>
+                                    <td>{{ employee.gender or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>出生日期:</th>
+                                    <td>{{ employee.birth_date or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>身份证号:</th>
+                                    <td>{{ employee.id_card or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>籍贯:</th>
+                                    <td>{{ employee.native_place or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>民族:</th>
+                                    <td>{{ employee.nationality or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>学历:</th>
+                                    <td>{{ employee.education or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>婚姻状况:</th>
+                                    <td>{{ employee.marital_status or '-' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <!-- 右侧：工作信息 -->
+                        <div class="col-md-6">
+                            <h5 class="mb-3"><i class="fas fa-briefcase"></i> 工作信息</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="30%">部门:</th>
+                                    <td>{{ employee.department.name if employee.department else '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>职位:</th>
+                                    <td>{{ employee.job_title or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>入职时间:</th>
+                                    <td>{{ employee.hire_date or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>工作年限:</th>
+                                    <td>{{ employee.work_years or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>在职状态:</th>
+                                    <td>
+                                        {% if employee.employment_status %}
+                                            {% if employee.employment_status == '在职' %}
+                                                <span class="badge badge-success">{{ employee.employment_status }}</span>
+                                            {% elif employee.employment_status == '试用期' %}
+                                                <span class="badge badge-warning">{{ employee.employment_status }}</span>
+                                            {% elif employee.employment_status == '离职' %}
+                                                <span class="badge badge-secondary">{{ employee.employment_status }}</span>
+                                            {% else %}
+                                                <span class="badge badge-secondary">{{ employee.employment_status }}</span>
+                                            {% endif %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <h5 class="mb-3 mt-4"><i class="fas fa-phone"></i> 联系信息</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="30%">电话:</th>
+                                    <td>{{ employee.phone or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>居住地址:</th>
+                                    <td>{{ employee.address or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>紧急联系人:</th>
+                                    <td>{{ employee.emergency_contact or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>紧急联系电话:</th>
+                                    <td>{{ employee.emergency_phone or '-' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- 头像上传区域 -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5 class="mb-3"><i class="fas fa-image"></i> 头像</h5>
+                            <div class="text-center">
+                                {% if employee.avatar_path %}
+                                    <img src="{{ url_for('static', filename=employee.avatar_path) }}" 
+                                         alt="头像" class="img-thumbnail" style="max-width: 200px; max-height: 200px;">
+                                {% else %}
+                                    <div class="bg-light border rounded d-inline-block p-4">
+                                        <i class="fas fa-user fa-5x text-muted"></i>
+                                        <p class="mt-2 text-muted">暂无头像</p>
+                                    </div>
+                                {% endif %}
+                                <div class="mt-3">
+                                    <input type="file" id="avatarFile" accept="image/*" style="display: none;" onchange="uploadAvatar()">
+                                    <button type="button" class="btn btn-outline-primary" onclick="$('#avatarFile').click()">
+                                        <i class="fas fa-upload"></i> 上传头像
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑个人资料模态框 -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑个人资料</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form id="editProfileForm">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editGender">性别</label>
+                                <select class="form-control" id="editGender" name="gender">
+                                    <option value="">请选择</option>
+                                    <option value="男" {{ 'selected' if employee.gender == '男' else '' }}>男</option>
+                                    <option value="女" {{ 'selected' if employee.gender == '女' else '' }}>女</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editBirthDate">出生日期</label>
+                                <input type="date" class="form-control" id="editBirthDate" name="birth_date" 
+                                       value="{{ employee.birth_date or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editIdCard">身份证号</label>
+                                <input type="text" class="form-control" id="editIdCard" name="id_card" 
+                                       value="{{ employee.id_card or '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editPhone">电话</label>
+                                <input type="text" class="form-control" id="editPhone" name="phone" 
+                                       value="{{ employee.phone or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editNativePlace">籍贯</label>
+                                <input type="text" class="form-control" id="editNativePlace" name="native_place" 
+                                       value="{{ employee.native_place or '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editNationality">民族</label>
+                                <input type="text" class="form-control" id="editNationality" name="nationality" 
+                                       value="{{ employee.nationality or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editEducation">学历</label>
+                                <select class="form-control" id="editEducation" name="education">
+                                    <option value="">请选择</option>
+                                    <option value="小学" {{ 'selected' if employee.education == '小学' else '' }}>小学</option>
+                                    <option value="初中" {{ 'selected' if employee.education == '初中' else '' }}>初中</option>
+                                    <option value="高中" {{ 'selected' if employee.education == '高中' else '' }}>高中</option>
+                                    <option value="中专" {{ 'selected' if employee.education == '中专' else '' }}>中专</option>
+                                    <option value="大专" {{ 'selected' if employee.education == '大专' else '' }}>大专</option>
+                                    <option value="本科" {{ 'selected' if employee.education == '本科' else '' }}>本科</option>
+                                    <option value="硕士" {{ 'selected' if employee.education == '硕士' else '' }}>硕士</option>
+                                    <option value="博士" {{ 'selected' if employee.education == '博士' else '' }}>博士</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editMaritalStatus">婚姻状况</label>
+                                <select class="form-control" id="editMaritalStatus" name="marital_status">
+                                    <option value="">请选择</option>
+                                    <option value="未婚" {{ 'selected' if employee.marital_status == '未婚' else '' }}>未婚</option>
+                                    <option value="已婚" {{ 'selected' if employee.marital_status == '已婚' else '' }}>已婚</option>
+                                    <option value="离异" {{ 'selected' if employee.marital_status == '离异' else '' }}>离异</option>
+                                    <option value="丧偶" {{ 'selected' if employee.marital_status == '丧偶' else '' }}>丧偶</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAddress">居住地址</label>
+                        <textarea class="form-control" id="editAddress" name="address" rows="2">{{ employee.address or '' }}</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editEmergencyContact">紧急联系人</label>
+                                <input type="text" class="form-control" id="editEmergencyContact" name="emergency_contact" 
+                                       value="{{ employee.emergency_contact or '' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="editEmergencyPhone">紧急联系电话</label>
+                                <input type="text" class="form-control" id="editEmergencyPhone" name="emergency_phone" 
+                                       value="{{ employee.emergency_phone or '' }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 编辑个人资料
+function editProfile() {
+    $('#editProfileModal').modal('show');
+}
+
+// 提交个人资料编辑
+$('#editProfileForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData.entries());
+    
+    $.ajax({
+        url: '/api/employees/{{ employee.user_id }}',
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', '个人资料更新成功');
+                $('#editProfileModal').modal('hide');
+                // 刷新页面显示更新后的信息
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            } else {
+                showAlert('error', response.message || '更新个人资料失败');
+            }
+        },
+        error: function(xhr) {
+            const response = xhr.responseJSON;
+            showAlert('error', response?.message || '更新个人资料失败');
+        }
+    });
+});
+
+// 上传头像
+function uploadAvatar() {
+    const fileInput = document.getElementById('avatarFile');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        return;
+    }
+    
+    // 检查文件类型
+    if (!file.type.startsWith('image/')) {
+        showAlert('error', '请选择图片文件');
+        return;
+    }
+    
+    // 检查文件大小（限制为5MB）
+    if (file.size > 5 * 1024 * 1024) {
+        showAlert('error', '图片文件大小不能超过5MB');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    $.ajax({
+        url: '/api/employees/{{ employee.user_id }}/avatar',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', '头像上传成功');
+                // 刷新页面显示新头像
+                setTimeout(function() {
+                    location.reload();
+                }, 1000);
+            } else {
+                showAlert('error', response.message || '头像上传失败');
+            }
+        },
+        error: function(xhr) {
+            const response = xhr.responseJSON;
+            showAlert('error', response?.message || '头像上传失败');
+        }
+    });
+}
+
+// 显示提示信息
+function showAlert(type, message) {
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    const alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    `;
+    
+    // 移除现有的提示
+    $('.alert').remove();
+    
+    // 添加新提示到页面顶部
+    $('.container-fluid').prepend(alertHtml);
+    
+    // 3秒后自动隐藏
+    setTimeout(function() {
+        $('.alert').fadeOut();
+    }, 3000);
+}
+</script>
+{% endblock %}

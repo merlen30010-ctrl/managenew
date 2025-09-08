@@ -10,8 +10,7 @@
             <div class="card-body">
                 <p><strong>用户名：</strong>{{ user.username }}</p>
                 <p><strong>邮箱：</strong>{{ user.email }}</p>
-                <p><strong>姓名：</strong>{{ user.name or '未设置' }}</p>
-                <p><strong>电话：</strong>{{ user.phone or '未设置' }}</p>
+                <!-- 姓名和电话信息已移至员工信息中 -->
                 <p><strong>注册时间：</strong>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
                 
                 <a href="{{ url_for('main.change_password') }}" class="btn btn-primary">修改密码</a>

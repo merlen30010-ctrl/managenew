@@ -236,6 +236,597 @@
 
 ---
 
+## 员工管理接口
+
+### 获取员工列表
+
+**接口地址**: `GET /api/employees`
+
+**权限要求**: `admin_required`
+
+**查询参数**:
+- `search` (string): 搜索关键词，支持员工工号、姓名、电话搜索（可选）
+- `department_id` (integer): 部门ID过滤（可选）
+- `employment_status` (string): 在职状态过滤（可选）
+- `page` (integer): 页码，默认为1（可选）
+- `per_page` (integer): 每页数量，默认为20（可选）
+- `sort` (string): 排序字段（可选）
+- `order` (string): 排序方向，asc或desc（可选）
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "user_id": 1,
+        "employee_id": "EMP001",
+        "name": "张三",
+        "department_id": 1,
+        "department_name": "技术部",
+        "job_title": "工程师",
+        "hire_date": "2024-01-01",
+        "work_years": 1,
+        "gender": "男",
+        "birth_date": "1990-01-01",
+        "id_card": "110101199001011234",
+        "phone": "13800138000",
+        "employment_status": "在职",
+        "created_at": "2024-01-01T00:00:00",
+        "updated_at": "2024-01-01T00:00:00"
+      }
+    ],
+    "total": 100,
+    "pages": 5,
+    "current_page": 1,
+    "per_page": 20
+  }
+}
+```
+
+### 获取单个员工信息
+
+**接口地址**: `GET /api/employees/{user_id}`
+
+**权限要求**: 管理员或本人
+
+**路径参数**:
+- `user_id` (integer): 用户ID
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "user_id": 1,
+    "employee_id": "EMP001",
+    "name": "张三",
+    "department_id": 1,
+    "department_name": "技术部",
+    "job_title": "工程师",
+    "hire_date": "2024-01-01",
+    "work_years": 1,
+    "gender": "男",
+    "birth_date": "1990-01-01",
+    "id_card": "110101199001011234",
+    "native_place": "北京市",
+    "nationality": "汉族",
+    "education": "本科",
+    "marital_status": "未婚",
+    "phone": "13800138000",
+    "address": "北京市朝阳区",
+    "employment_status": "在职",
+    "emergency_contact": "李四",
+    "emergency_phone": "13900139000",
+    "avatar_path": "/uploads/avatars/emp001.jpg",
+    "created_at": "2024-01-01T00:00:00",
+    "updated_at": "2024-01-01T00:00:00"
+  }
+}
+```
+
+### 创建员工信息
+
+**接口地址**: `POST /api/employees`
+
+**权限要求**: `admin_required`
+
+**请求参数**:
+```json
+{
+  "user_id": 1,
+  "employee_id": "EMP001",
+  "department_id": 1,
+  "job_title": "工程师",
+  "hire_date": "2024-01-01",
+  "work_years": 1,
+  "name": "张三",
+  "gender": "男",
+  "birth_date": "1990-01-01",
+  "id_card": "110101199001011234",
+  "native_place": "北京市",
+  "nationality": "汉族",
+  "education": "本科",
+  "marital_status": "未婚",
+  "phone": "13800138000",
+  "address": "北京市朝阳区",
+  "employment_status": "在职",
+  "emergency_contact": "李四",
+  "emergency_phone": "13900139000"
+}
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "员工信息创建成功",
+  "data": {
+    "user_id": 1,
+    "employee_id": "EMP001",
+    "name": "张三",
+    "department_id": 1,
+    "job_title": "工程师"
+  }
+}
+```
+
+### 更新员工信息
+
+**接口地址**: `PUT /api/employees/{user_id}`
+
+**权限要求**: 管理员或本人
+
+**路径参数**:
+- `user_id` (integer): 用户ID
+
+**请求参数**:
+```json
+{
+  "employee_id": "EMP002",
+  "department_id": 2,
+  "job_title": "高级工程师",
+  "hire_date": "2024-01-01",
+  "work_years": 2,
+  "name": "张三",
+  "gender": "男",
+  "birth_date": "1990-01-01",
+  "id_card": "110101199001011234",
+  "native_place": "北京市",
+  "nationality": "汉族",
+  "education": "硕士",
+  "marital_status": "已婚",
+  "phone": "13800138001",
+  "address": "北京市海淀区",
+  "employment_status": "在职",
+  "emergency_contact": "王五",
+  "emergency_phone": "13900139001"
+}
+```
+
+### 删除员工信息
+
+**接口地址**: `DELETE /api/employees/{user_id}`
+
+**权限要求**: `admin_required`
+
+**路径参数**:
+- `user_id` (integer): 用户ID
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "员工信息删除成功"
+}
+```
+
+### 上传员工头像
+
+**接口地址**: `POST /api/employees/{user_id}/avatar`
+
+**权限要求**: 管理员或本人
+
+**路径参数**:
+- `user_id` (integer): 用户ID
+
+**请求参数**: 
+- `file` (file): 头像文件，支持PNG、JPG、JPEG、GIF格式
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "头像上传成功",
+  "data": {
+    "avatar_path": "/uploads/avatars/emp001_20240101_120000_avatar.jpg"
+  }
+}
+```
+
+### 获取员工统计信息
+
+**接口地址**: `GET /api/employees/statistics`
+
+**权限要求**: `admin_required`
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "total_count": 150,
+    "active_count": 145,
+    "department_stats": [
+      {
+        "name": "技术部",
+        "count": 50
+      },
+      {
+        "name": "销售部",
+        "count": 30
+      }
+    ],
+    "gender_stats": [
+      {
+        "gender": "男",
+        "count": 90
+      },
+      {
+        "gender": "女",
+        "count": 60
+      }
+    ],
+    "education_stats": [
+      {
+        "education": "本科",
+        "count": 80
+      },
+      {
+        "education": "硕士",
+        "count": 50
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 员工证件管理接口
+
+### 获取员工证件列表
+
+**接口地址**: `GET /api/employee-documents`
+
+**权限要求**: 需要登录
+
+**查询参数**:
+- `employee_id` (string): 员工工号过滤（可选）
+- `document_type` (string): 证件类型过滤（可选）
+- `status` (string): 证件状态过滤（可选）
+- `page` (integer): 页码，默认为1（可选）
+- `per_page` (integer): 每页数量，默认为20（可选）
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "获取成功",
+  "data": {
+    "documents": [
+      {
+        "id": 1,
+        "employee_id": "EMP001",
+        "document_type": "身份证",
+        "document_name": "居民身份证",
+        "document_number": "110101199001011234",
+        "issuing_authority": "北京市公安局",
+        "issue_date": "2010-01-01",
+        "expiry_date": "2030-01-01",
+        "status": "有效",
+        "is_original": true,
+        "file_path": "/uploads/documents/emp001_idcard.jpg",
+        "notes": "身份证正反面",
+        "created_at": "2024-01-01T00:00:00",
+        "updated_at": "2024-01-01T00:00:00"
+      }
+    ],
+    "total": 50,
+    "pages": 3,
+    "current_page": 1,
+    "per_page": 20
+  }
+}
+```
+
+### 获取单个员工证件详情
+
+**接口地址**: `GET /api/employee-documents/{document_id}`
+
+**权限要求**: 需要登录
+
+**路径参数**:
+- `document_id` (integer): 证件ID
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "获取成功",
+  "data": {
+    "id": 1,
+    "employee_id": "EMP001",
+    "document_type": "身份证",
+    "document_name": "居民身份证",
+    "document_number": "110101199001011234",
+    "issuing_authority": "北京市公安局",
+    "issue_date": "2010-01-01",
+    "expiry_date": "2030-01-01",
+    "status": "有效",
+    "is_original": true,
+    "file_path": "/uploads/documents/emp001_idcard.jpg",
+    "file_name": "身份证.jpg",
+    "file_size": 1024000,
+    "notes": "身份证正反面",
+    "created_at": "2024-01-01T00:00:00",
+    "updated_at": "2024-01-01T00:00:00"
+  }
+}
+```
+
+### 创建员工证件
+
+**接口地址**: `POST /api/employee-documents`
+
+**权限要求**: `admin_required`
+
+**请求参数**:
+```json
+{
+  "employee_id": "EMP001",
+  "document_type": "身份证",
+  "document_name": "居民身份证",
+  "document_number": "110101199001011234",
+  "issuing_authority": "北京市公安局",
+  "issue_date": "2010-01-01",
+  "expiry_date": "2030-01-01",
+  "status": "有效",
+  "is_original": true,
+  "notes": "身份证正反面"
+}
+```
+
+### 更新员工证件
+
+**接口地址**: `PUT /api/employee-documents/{document_id}`
+
+**权限要求**: `admin_required`
+
+**路径参数**:
+- `document_id` (integer): 证件ID
+
+### 删除员工证件
+
+**接口地址**: `DELETE /api/employee-documents/{document_id}`
+
+**权限要求**: `admin_required`
+
+**路径参数**:
+- `document_id` (integer): 证件ID
+
+### 获取证件类型列表
+
+**接口地址**: `GET /api/document-types`
+
+**权限要求**: 需要登录
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "获取成功",
+  "data": [
+    {
+      "id": 1,
+      "type_code": "ID_CARD",
+      "type_name": "身份证",
+      "category": "身份证明",
+      "is_required": true,
+      "has_expiry": true,
+      "reminder_days": 30,
+      "description": "居民身份证",
+      "created_at": "2024-01-01T00:00:00",
+      "updated_at": "2024-01-01T00:00:00"
+    }
+  ]
+}
+```
+
+### 获取即将过期的证件
+
+**接口地址**: `GET /api/employee-documents/expiring`
+
+**权限要求**: 需要登录
+
+**查询参数**:
+- `days` (integer): 提前天数，默认为30天（可选）
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "获取成功",
+  "data": [
+    {
+      "id": 1,
+      "employee_id": "EMP001",
+      "document_type": "驾驶证",
+      "document_name": "机动车驾驶证",
+      "expiry_date": "2024-02-01",
+      "days_to_expiry": 15,
+      "is_expired": false,
+      "status": "有效"
+    }
+  ]
+}
+```
+
+---
+
+## 员工奖惩管理接口
+
+### 获取员工奖惩记录列表
+
+**接口地址**: `GET /api/employee-reward-punishments`
+
+**权限要求**: 需要登录
+
+**查询参数**:
+- `employee_id` (string): 员工工号过滤（可选）
+- `type` (string): 奖惩类型过滤，奖励/惩罚（可选）
+- `category` (string): 奖惩分类过滤（可选）
+- `status` (string): 状态过滤（可选）
+- `start_date` (string): 开始日期，格式：YYYY-MM-DD（可选）
+- `end_date` (string): 结束日期，格式：YYYY-MM-DD（可选）
+- `page` (integer): 页码，默认为1（可选）
+- `per_page` (integer): 每页数量，默认为20（可选）
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "获取成功",
+  "data": {
+    "records": [
+      {
+        "id": 1,
+        "employee_id": "EMP001",
+        "type": "奖励",
+        "category": "工作表现",
+        "title": "优秀员工",
+        "description": "工作认真负责，表现优秀",
+        "reason": "月度考核第一名",
+        "amount": 1000.00,
+        "decision_date": "2024-01-15",
+        "status": "已执行",
+        "created_at": "2024-01-15T00:00:00",
+        "updated_at": "2024-01-15T00:00:00"
+      }
+    ],
+    "pagination": {
+      "total": 100,
+      "pages": 5,
+      "page": 1,
+      "per_page": 20
+    }
+  }
+}
+```
+
+### 获取单个员工奖惩记录详情
+
+**接口地址**: `GET /api/employee-reward-punishments/{record_id}`
+
+**权限要求**: 需要登录
+
+**路径参数**:
+- `record_id` (integer): 奖惩记录ID
+
+### 创建员工奖惩记录
+
+**接口地址**: `POST /api/employee-reward-punishments`
+
+**权限要求**: `admin_required`
+
+**请求参数**:
+```json
+{
+  "employee_id": "EMP001",
+  "type": "奖励",
+  "category": "工作表现",
+  "title": "优秀员工",
+  "description": "工作认真负责，表现优秀",
+  "reason": "月度考核第一名",
+  "amount": 1000.00,
+  "decision_date": "2024-01-15"
+}
+```
+
+### 更新员工奖惩记录
+
+**接口地址**: `PUT /api/employee-reward-punishments/{record_id}`
+
+**权限要求**: `admin_required`
+
+### 删除员工奖惩记录
+
+**接口地址**: `DELETE /api/employee-reward-punishments/{record_id}`
+
+**权限要求**: `admin_required`
+
+### 获取奖惩类型列表
+
+**接口地址**: `GET /api/reward-punishment-types`
+
+**权限要求**: 需要登录
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "获取成功",
+  "data": [
+    {
+      "id": 1,
+      "type_name": "工作表现奖",
+      "category": "奖励",
+      "description": "工作表现优秀的奖励",
+      "created_at": "2024-01-01T00:00:00",
+      "updated_at": "2024-01-01T00:00:00"
+    }
+  ]
+}
+```
+
+### 获取员工奖惩统计摘要
+
+**接口地址**: `GET /api/employee-reward-punishments/summary`
+
+**权限要求**: 需要登录
+
+**查询参数**:
+- `employee_id` (string): 员工工号过滤（可选）
+- `year` (integer): 年份过滤，默认为当前年份（可选）
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "获取成功",
+  "data": {
+    "total_records": 10,
+    "rewards": 8,
+    "punishments": 2,
+    "total_reward_amount": 5000.00,
+    "total_punishment_amount": 500.00,
+    "categories": {
+      "工作表现": {
+        "count": 6,
+        "type": "奖励"
+      },
+      "迟到早退": {
+        "count": 2,
+        "type": "惩罚"
+      }
+    }
+  }
+}
+```
+
+---
+
 ## 物料管理接口
 
 ### 获取物料列表

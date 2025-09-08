@@ -23,3 +23,11 @@ def validate_password(password):
     if not re.search(r'[a-zA-Z]', password) or not re.search(r'\d', password):
         return False
     return True
+
+def validate_required_fields(data, required_fields):
+    """验证必填字段"""
+    missing_fields = []
+    for field in required_fields:
+        if field not in data or not data[field]:
+            missing_fields.append(field)
+    return missing_fields

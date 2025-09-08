@@ -163,7 +163,7 @@ def init_db():
             admin_user = User()
             admin_user.username = 'admin'
             admin_user.email = 'admin@example.com'
-            admin_user.name = '管理员'
+            # name字段已移至Employee表
             admin_user.set_password('admin123')
             db.session.add(admin_user)
             db.session.commit()

@@ -10,6 +10,7 @@ class Department(db.Model):
     level = db.Column(db.Integer, default=1)  # 级别：1为分厂，2为部门
     parent_id = db.Column(db.Integer, db.ForeignKey('departments.id'))  # 父级部门ID
     phone = db.Column(db.String(20))
+    is_active = db.Column(db.Boolean, default=True, nullable=False)  # 是否启用
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
     

@@ -8,3 +8,6 @@ from .department import Department, DepartmentManager
 from .contract import Contract, ContractFile
 from .attachment import Attachment
 from .assay_data import AssayData
+from .employee import Employee
+from .employee_document import EmployeeDocument, DocumentType
+from .employee_reward_punishment import EmployeeRewardPunishment, RewardPunishmentType

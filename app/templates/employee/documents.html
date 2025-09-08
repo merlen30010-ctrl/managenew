@@ -1,0 +1,578 @@
+{% extends "base.html" %}
+
+{% block title %}员工证件管理{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">员工证件管理</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
+                            <i class="fas fa-plus"></i> 新增证件
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- 搜索和过滤 -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="searchInput" placeholder="搜索员工姓名、证件号码...">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" id="documentTypeFilter">
+                                <option value="">所有证件类型</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" id="statusFilter">
+                                <option value="">所有状态</option>
+                                <option value="有效">有效</option>
+                                <option value="即将过期">即将过期</option>
+                                <option value="已过期">已过期</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-info" onclick="searchDocuments()">
+                                <i class="fas fa-search"></i> 搜索
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-warning" onclick="checkExpiring()">
+                                <i class="fas fa-exclamation-triangle"></i> 即将过期
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 证件列表表格 -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="documentTable">
+                            <thead>
+                                <tr>
+                                    <th>员工姓名</th>
+                                    <th>员工工号</th>
+                                    <th>证件类型</th>
+                                    <th>证件号码</th>
+                                    <th>发证机关</th>
+                                    <th>发证日期</th>
+                                    <th>有效期至</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="documentTableBody">
+                                <!-- 动态加载数据 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="row">
+                        <div class="col-sm-12 col-md-5">
+                            <div class="dataTables_info" id="documentTable_info"></div>
+                        </div>
+                        <div class="col-sm-12 col-md-7">
+                            <div class="dataTables_paginate paging_simple_numbers" id="documentTable_paginate">
+                                <ul class="pagination" id="pagination"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新增证件模态框 -->
+<div class="modal fade" id="addDocumentModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">新增证件</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addDocumentForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="employee_id">员工 <span class="text-danger">*</span></label>
+                                <select class="form-control" id="employee_id" name="employee_id" required>
+                                    <option value="">请选择员工</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="document_type_id">证件类型 <span class="text-danger">*</span></label>
+                                <select class="form-control" id="document_type_id" name="document_type_id" required>
+                                    <option value="">请选择证件类型</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="document_number">证件号码 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="document_number" name="document_number" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="issuing_authority">发证机关</label>
+                                <input type="text" class="form-control" id="issuing_authority" name="issuing_authority">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="issue_date">发证日期</label>
+                                <input type="date" class="form-control" id="issue_date" name="issue_date">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="expiry_date">有效期至</label>
+                                <input type="date" class="form-control" id="expiry_date" name="expiry_date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">备注</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addDocument()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑证件模态框 -->
+<div class="modal fade" id="editDocumentModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑证件</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editDocumentForm">
+                    <input type="hidden" id="edit_document_id" name="document_id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_employee_id">员工 <span class="text-danger">*</span></label>
+                                <select class="form-control" id="edit_employee_id" name="employee_id" required>
+                                    <option value="">请选择员工</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_document_type_id">证件类型 <span class="text-danger">*</span></label>
+                                <select class="form-control" id="edit_document_type_id" name="document_type_id" required>
+                                    <option value="">请选择证件类型</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_document_number">证件号码 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="edit_document_number" name="document_number" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_issuing_authority">发证机关</label>
+                                <input type="text" class="form-control" id="edit_issuing_authority" name="issuing_authority">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_issue_date">发证日期</label>
+                                <input type="date" class="form-control" id="edit_issue_date" name="issue_date">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_expiry_date">有效期至</label>
+                                <input type="date" class="form-control" id="edit_expiry_date" name="expiry_date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_notes">备注</label>
+                        <textarea class="form-control" id="edit_notes" name="notes" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="updateDocument()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 查看证件详情模态框 -->
+<div class="modal fade" id="viewDocumentModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">证件详情</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="documentDetailContent">
+                <!-- 动态加载证件详情 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentPage = 1;
+let pageSize = 10;
+let totalPages = 0;
+
+// 页面加载完成后初始化
+$(document).ready(function() {
+    loadDocumentTypes();
+    loadEmployees();
+    loadDocuments();
+});
+
+// 加载证件类型
+function loadDocumentTypes() {
+    $.get('/api/document-types', function(response) {
+        if (response.code === 200) {
+            const types = response.data;
+            const typeSelect = $('#documentTypeFilter, #document_type_id, #edit_document_type_id');
+            typeSelect.find('option:not(:first)').remove();
+            
+            types.forEach(function(type) {
+                typeSelect.append(`<option value="${type.id}">${type.type_name}</option>`);
+            });
+        }
+    });
+}
+
+// 加载员工列表
+function loadEmployees() {
+    $.get('/api/employees', function(response) {
+        if (response.success) {
+            const employees = response.data.items;
+            const employeeSelect = $('#employee_id, #edit_employee_id');
+            employeeSelect.find('option:not(:first)').remove();
+            
+            employees.forEach(function(employee) {
+                employeeSelect.append(`<option value="${employee.user_id}">${employee.name} (${employee.employee_id})</option>`);
+            });
+        }
+    });
+}
+
+// 加载证件列表
+function loadDocuments(page = 1) {
+    const searchTerm = $('#searchInput').val();
+    const documentType = $('#documentTypeFilter').val();
+    const status = $('#statusFilter').val();
+    
+    const params = {
+        page: page,
+        per_page: pageSize,
+        search: searchTerm,
+        document_type_id: documentType,
+        status: status
+    };
+    
+    $.get('/api/employee-documents', params, function(response) {
+        if (response.code === 200) {
+            const data = response.data;
+            displayDocuments(data.documents);
+            // 构造分页对象
+            const pagination = {
+                page: data.current_page,
+                pages: data.pages,
+                total: data.total,
+                per_page: data.per_page,
+                has_prev: data.current_page > 1,
+                has_next: data.current_page < data.pages,
+                prev_num: data.current_page - 1,
+                next_num: data.current_page + 1
+            };
+            updatePagination(pagination);
+        } else {
+            showAlert('加载证件列表失败：' + response.message, 'danger');
+        }
+    });
+}
+
+// 显示证件列表
+function displayDocuments(documents) {
+    const tbody = $('#documentTableBody');
+    tbody.empty();
+    
+    if (documents.length === 0) {
+        tbody.append('<tr><td colspan="9" class="text-center">暂无数据</td></tr>');
+        return;
+    }
+    
+    documents.forEach(function(doc) {
+        const statusBadge = getStatusBadge(doc.status);
+        const row = `
+            <tr>
+                <td>${doc.employee_name}</td>
+                <td>${doc.employee_number}</td>
+                <td>${doc.document_type_name}</td>
+                <td>${doc.document_number}</td>
+                <td>${doc.issuing_authority || '-'}</td>
+                <td>${doc.issue_date || '-'}</td>
+                <td>${doc.expiry_date || '-'}</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <button class="btn btn-sm btn-info" onclick="viewDocument(${doc.id})" title="查看">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning" onclick="editDocument(${doc.id})" title="编辑">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteDocument(${doc.id})" title="删除">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        tbody.append(row);
+    });
+}
+
+// 获取状态徽章
+function getStatusBadge(status) {
+    switch(status) {
+        case '有效':
+            return '<span class="badge badge-success">有效</span>';
+        case '即将过期':
+            return '<span class="badge badge-warning">即将过期</span>';
+        case '已过期':
+            return '<span class="badge badge-danger">已过期</span>';
+        default:
+            return '<span class="badge badge-secondary">未知</span>';
+    }
+}
+
+// 搜索证件
+function searchDocuments() {
+    currentPage = 1;
+    loadDocuments(currentPage);
+}
+
+// 检查即将过期的证件
+function checkExpiring() {
+    $.get('/api/employee-documents/expiring', function(response) {
+        if (response.code === 200) {
+            const documents = response.data;
+            if (documents.length === 0) {
+                showAlert('没有即将过期的证件', 'info');
+            } else {
+                displayDocuments(documents);
+                showAlert(`找到 ${documents.length} 个即将过期的证件`, 'warning');
+            }
+        } else {
+            showAlert('查询失败：' + response.message, 'danger');
+        }
+    });
+}
+
+// 新增证件
+function addDocument() {
+    const formData = $('#addDocumentForm').serialize();
+    
+    $.post('/api/employee-documents', formData, function(response) {
+        if (response.code === 200) {
+            $('#addDocumentModal').modal('hide');
+            $('#addDocumentForm')[0].reset();
+            loadDocuments(currentPage);
+            showAlert('证件添加成功', 'success');
+        } else {
+            showAlert('添加失败：' + response.message, 'danger');
+        }
+    });
+}
+
+// 编辑证件
+function editDocument(documentId) {
+    $.get(`/api/employee-documents/${documentId}`, function(response) {
+        if (response.code === 200) {
+            const doc = response.data;
+            $('#edit_document_id').val(doc.id);
+            $('#edit_employee_id').val(doc.employee_id);
+            $('#edit_document_type_id').val(doc.document_type_id);
+            $('#edit_document_number').val(doc.document_number);
+            $('#edit_issuing_authority').val(doc.issuing_authority);
+            $('#edit_issue_date').val(doc.issue_date);
+            $('#edit_expiry_date').val(doc.expiry_date);
+            $('#edit_notes').val(doc.notes);
+            $('#editDocumentModal').modal('show');
+        } else {
+            showAlert('加载证件信息失败：' + response.message, 'danger');
+        }
+    });
+}
+
+// 更新证件
+function updateDocument() {
+    const documentId = $('#edit_document_id').val();
+    const formData = $('#editDocumentForm').serialize();
+    
+    $.ajax({
+        url: `/api/employee-documents/${documentId}`,
+        type: 'PUT',
+        data: formData,
+        success: function(response) {
+            if (response.code === 200) {
+                $('#editDocumentModal').modal('hide');
+                loadDocuments(currentPage);
+                showAlert('证件更新成功', 'success');
+            } else {
+                showAlert('更新失败：' + response.message, 'danger');
+            }
+        }
+    });
+}
+
+// 查看证件详情
+function viewDocument(documentId) {
+    $.get(`/api/employee-documents/${documentId}`, function(response) {
+        if (response.code === 200) {
+            const doc = response.data;
+            const content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>员工姓名：</strong>${doc.employee_name}</p>
+                        <p><strong>员工工号：</strong>${doc.employee_number}</p>
+                        <p><strong>证件类型：</strong>${doc.document_type_name}</p>
+                        <p><strong>证件号码：</strong>${doc.document_number}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>发证机关：</strong>${doc.issuing_authority || '-'}</p>
+                        <p><strong>发证日期：</strong>${doc.issue_date || '-'}</p>
+                        <p><strong>有效期至：</strong>${doc.expiry_date || '-'}</p>
+                        <p><strong>状态：</strong>${getStatusBadge(doc.status)}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p><strong>备注：</strong></p>
+                        <p>${doc.notes || '无'}</p>
+                    </div>
+                </div>
+            `;
+            $('#documentDetailContent').html(content);
+            $('#viewDocumentModal').modal('show');
+        } else {
+            showAlert('加载证件详情失败：' + response.message, 'danger');
+        }
+    });
+}
+
+// 删除证件
+function deleteDocument(documentId) {
+    if (confirm('确定要删除这个证件记录吗？')) {
+        $.ajax({
+            url: `/api/employee-documents/${documentId}`,
+            type: 'DELETE',
+            success: function(response) {
+                if (response.code === 200) {
+                    loadDocuments(currentPage);
+                    showAlert('证件删除成功', 'success');
+                } else {
+                    showAlert('删除失败：' + response.message, 'danger');
+                }
+            }
+        });
+    }
+}
+
+// 更新分页
+function updatePagination(pagination) {
+    currentPage = pagination.page;
+    totalPages = pagination.pages;
+    
+    const info = `显示第 ${pagination.page} 页，共 ${pagination.pages} 页，总计 ${pagination.total} 条记录`;
+    $('#documentTable_info').text(info);
+    
+    const paginationHtml = generatePaginationHtml(pagination);
+    $('#pagination').html(paginationHtml);
+}
+
+// 生成分页HTML
+function generatePaginationHtml(pagination) {
+    let html = '';
+    
+    // 上一页
+    if (pagination.has_prev) {
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="loadDocuments(${pagination.prev_num})">上一页</a></li>`;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link">上一页</span></li>';
+    }
+    
+    // 页码
+    for (let i = 1; i <= pagination.pages; i++) {
+        if (i === pagination.page) {
+            html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadDocuments(${i})">${i}</a></li>`;
+        }
+    }
+    
+    // 下一页
+    if (pagination.has_next) {
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="loadDocuments(${pagination.next_num})">下一页</a></li>`;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link">下一页</span></li>';
+    }
+    
+    return html;
+}
+
+// 显示提示信息
+function showAlert(message, type) {
+    const alertHtml = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    `;
+    
+    // 移除现有的提示
+    $('.alert').remove();
+    
+    // 添加新提示到页面顶部
+    $('.container-fluid').prepend(alertHtml);
+    
+    // 3秒后自动隐藏
+    setTimeout(function() {
+        $('.alert').fadeOut();
+    }, 3000);
+}
+</script>
+{% endblock %}

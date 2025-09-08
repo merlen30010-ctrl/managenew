@@ -1,0 +1,697 @@
+{% extends "base.html" %}
+
+{% block title %}员工奖惩管理{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">员工奖惩管理</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRecordModal">
+                            <i class="fas fa-plus"></i> 新增记录
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="showSummary()">
+                            <i class="fas fa-chart-bar"></i> 统计摘要
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- 搜索和过滤 -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="searchInput" placeholder="搜索员工姓名、工号...">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" id="typeFilter">
+                                <option value="">所有类型</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-control" id="categoryFilter">
+                                <option value="">所有分类</option>
+                                <option value="奖励">奖励</option>
+                                <option value="惩罚">惩罚</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" class="form-control" id="dateFrom" placeholder="开始日期">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" class="form-control" id="dateTo" placeholder="结束日期">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-info" onclick="searchRecords()">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 奖惩记录列表表格 -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="recordTable">
+                            <thead>
+                                <tr>
+                                    <th>员工姓名</th>
+                                    <th>员工工号</th>
+                                    <th>奖惩类型</th>
+                                    <th>分类</th>
+                                    <th>奖惩原因</th>
+                                    <th>金额</th>
+                                    <th>决定日期</th>
+                                    <th>生效日期</th>
+                                    <th>决定人</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recordTableBody">
+                                <!-- 动态加载数据 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页 -->
+                    <div class="row">
+                        <div class="col-sm-12 col-md-5">
+                            <div class="dataTables_info" id="recordTable_info"></div>
+                        </div>
+                        <div class="col-sm-12 col-md-7">
+                            <div class="dataTables_paginate paging_simple_numbers" id="recordTable_paginate">
+                                <ul class="pagination" id="pagination"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 新增奖惩记录模态框 -->
+<div class="modal fade" id="addRecordModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">新增奖惩记录</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addRecordForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="employee_id">员工 <span class="text-danger">*</span></label>
+                                <select class="form-control" id="employee_id" name="employee_id" required>
+                                    <option value="">请选择员工</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="type_id">奖惩类型 <span class="text-danger">*</span></label>
+                                <select class="form-control" id="type_id" name="type_id" required>
+                                    <option value="">请选择奖惩类型</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reason">奖惩原因 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="amount">金额</label>
+                                <input type="number" class="form-control" id="amount" name="amount" step="0.01" min="0">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="decision_date">决定日期 <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="decision_date" name="decision_date" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="effective_date">生效日期</label>
+                                <input type="date" class="form-control" id="effective_date" name="effective_date">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="decided_by">决定人</label>
+                                <input type="text" class="form-control" id="decided_by" name="decided_by">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">备注</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addRecord()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑奖惩记录模态框 -->
+<div class="modal fade" id="editRecordModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">编辑奖惩记录</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editRecordForm">
+                    <input type="hidden" id="edit_record_id" name="record_id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_employee_id">员工 <span class="text-danger">*</span></label>
+                                <select class="form-control" id="edit_employee_id" name="employee_id" required>
+                                    <option value="">请选择员工</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_type_id">奖惩类型 <span class="text-danger">*</span></label>
+                                <select class="form-control" id="edit_type_id" name="type_id" required>
+                                    <option value="">请选择奖惩类型</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_reason">奖惩原因 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="edit_reason" name="reason" rows="3" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_amount">金额</label>
+                                <input type="number" class="form-control" id="edit_amount" name="amount" step="0.01" min="0">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_decision_date">决定日期 <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="edit_decision_date" name="decision_date" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_effective_date">生效日期</label>
+                                <input type="date" class="form-control" id="edit_effective_date" name="effective_date">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="edit_decided_by">决定人</label>
+                                <input type="text" class="form-control" id="edit_decided_by" name="decided_by">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_notes">备注</label>
+                        <textarea class="form-control" id="edit_notes" name="notes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="updateRecord()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 查看奖惩记录详情模态框 -->
+<div class="modal fade" id="viewRecordModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">奖惩记录详情</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="recordDetailContent">
+                <!-- 动态加载记录详情 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 统计摘要模态框 -->
+<div class="modal fade" id="summaryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">奖惩统计摘要</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="summaryContent">
+                <!-- 动态加载统计摘要 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentPage = 1;
+let pageSize = 10;
+let totalPages = 0;
+
+// 页面加载完成后初始化
+$(document).ready(function() {
+    loadRewardPunishmentTypes();
+    loadEmployees();
+    loadRecords();
+    
+    // 设置默认日期
+    const today = new Date().toISOString().split('T')[0];
+    $('#decision_date').val(today);
+});
+
+// 加载奖惩类型
+function loadRewardPunishmentTypes() {
+    $.get('/api/reward-punishment-types', function(response) {
+        if (response.code === 200) {
+            const types = response.data;
+            const typeSelect = $('#typeFilter, #type_id, #edit_type_id');
+            typeSelect.find('option:not(:first)').remove();
+            
+            types.forEach(function(type) {
+                typeSelect.append(`<option value="${type.id}">${type.type_name} (${type.category})</option>`);
+            });
+        }
+    });
+}
+
+// 加载员工列表
+function loadEmployees() {
+    $.get('/api/employees', function(response) {
+        if (response.success) {
+            const employees = response.data.items;
+            const employeeSelect = $('#employee_id, #edit_employee_id');
+            employeeSelect.find('option:not(:first)').remove();
+            
+            employees.forEach(function(employee) {
+                employeeSelect.append(`<option value="${employee.user_id}">${employee.name} (${employee.employee_id})</option>`);
+            });
+        }
+    });
+}
+
+// 加载奖惩记录列表
+function loadRecords(page = 1) {
+    const searchTerm = $('#searchInput').val();
+    const typeId = $('#typeFilter').val();
+    const category = $('#categoryFilter').val();
+    const dateFrom = $('#dateFrom').val();
+    const dateTo = $('#dateTo').val();
+    
+    const params = {
+        page: page,
+        per_page: pageSize,
+        search: searchTerm,
+        type_id: typeId,
+        category: category,
+        date_from: dateFrom,
+        date_to: dateTo
+    };
+    
+    $.get('/api/employee-reward-punishments', params, function(response) {
+        if (response.code === 200) {
+            const data = response.data;
+            displayRecords(data.records);
+            updatePagination(data.pagination);
+        } else {
+            showAlert('加载奖惩记录失败：' + response.message, 'danger');
+        }
+    });
+}
+
+// 显示奖惩记录列表
+function displayRecords(records) {
+    const tbody = $('#recordTableBody');
+    tbody.empty();
+    
+    if (records.length === 0) {
+        tbody.append('<tr><td colspan="10" class="text-center">暂无数据</td></tr>');
+        return;
+    }
+    
+    records.forEach(function(record) {
+        const categoryBadge = getCategoryBadge(record.category);
+        const amount = record.amount ? `¥${parseFloat(record.amount).toFixed(2)}` : '-';
+        const row = `
+            <tr>
+                <td>${record.employee_name}</td>
+                <td>${record.employee_number}</td>
+                <td>${record.type_name}</td>
+                <td>${categoryBadge}</td>
+                <td>${record.reason}</td>
+                <td>${amount}</td>
+                <td>${record.decision_date}</td>
+                <td>${record.effective_date || '-'}</td>
+                <td>${record.decided_by || '-'}</td>
+                <td>
+                    <button class="btn btn-sm btn-info" onclick="viewRecord(${record.id})" title="查看">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-warning" onclick="editRecord(${record.id})" title="编辑">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteRecord(${record.id})" title="删除">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        tbody.append(row);
+    });
+}
+
+// 获取分类徽章
+function getCategoryBadge(category) {
+    switch(category) {
+        case '奖励':
+            return '<span class="badge badge-success">奖励</span>';
+        case '惩罚':
+            return '<span class="badge badge-danger">惩罚</span>';
+        default:
+            return '<span class="badge badge-secondary">未知</span>';
+    }
+}
+
+// 搜索奖惩记录
+function searchRecords() {
+    currentPage = 1;
+    loadRecords(currentPage);
+}
+
+// 新增奖惩记录
+function addRecord() {
+    const formData = $('#addRecordForm').serialize();
+    
+    $.post('/api/employee-reward-punishments', formData, function(response) {
+        if (response.code === 200) {
+            $('#addRecordModal').modal('hide');
+            $('#addRecordForm')[0].reset();
+            // 重新设置默认日期
+            const today = new Date().toISOString().split('T')[0];
+            $('#decision_date').val(today);
+            loadRecords(currentPage);
+            showAlert('奖惩记录添加成功', 'success');
+        } else {
+            showAlert('添加失败：' + response.message, 'danger');
+        }
+    });
+}
+
+// 编辑奖惩记录
+function editRecord(recordId) {
+    $.get(`/api/employee-reward-punishments/${recordId}`, function(response) {
+        if (response.code === 200) {
+            const record = response.data;
+            $('#edit_record_id').val(record.id);
+            $('#edit_employee_id').val(record.employee_id);
+            $('#edit_type_id').val(record.type_id);
+            $('#edit_reason').val(record.reason);
+            $('#edit_amount').val(record.amount);
+            $('#edit_decision_date').val(record.decision_date);
+            $('#edit_effective_date').val(record.effective_date);
+            $('#edit_decided_by').val(record.decided_by);
+            $('#edit_notes').val(record.notes);
+            $('#editRecordModal').modal('show');
+        } else {
+            showAlert('加载奖惩记录失败：' + response.message, 'danger');
+        }
+    });
+}
+
+// 更新奖惩记录
+function updateRecord() {
+    const recordId = $('#edit_record_id').val();
+    const formData = $('#editRecordForm').serialize();
+    
+    $.ajax({
+        url: `/api/employee-reward-punishments/${recordId}`,
+        type: 'PUT',
+        data: formData,
+        success: function(response) {
+            if (response.code === 200) {
+                $('#editRecordModal').modal('hide');
+                loadRecords(currentPage);
+                showAlert('奖惩记录更新成功', 'success');
+            } else {
+                showAlert('更新失败：' + response.message, 'danger');
+            }
+        }
+    });
+}
+
+// 查看奖惩记录详情
+function viewRecord(recordId) {
+    $.get(`/api/employee-reward-punishments/${recordId}`, function(response) {
+        if (response.code === 200) {
+            const record = response.data;
+            const amount = record.amount ? `¥${parseFloat(record.amount).toFixed(2)}` : '无';
+            const content = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>员工姓名：</strong>${record.employee_name}</p>
+                        <p><strong>员工工号：</strong>${record.employee_number}</p>
+                        <p><strong>奖惩类型：</strong>${record.type_name}</p>
+                        <p><strong>分类：</strong>${getCategoryBadge(record.category)}</p>
+                        <p><strong>金额：</strong>${amount}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>决定日期：</strong>${record.decision_date}</p>
+                        <p><strong>生效日期：</strong>${record.effective_date || '无'}</p>
+                        <p><strong>决定人：</strong>${record.decided_by || '无'}</p>
+                        <p><strong>创建时间：</strong>${record.created_at}</p>
+                        <p><strong>更新时间：</strong>${record.updated_at}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p><strong>奖惩原因：</strong></p>
+                        <p>${record.reason}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <p><strong>备注：</strong></p>
+                        <p>${record.notes || '无'}</p>
+                    </div>
+                </div>
+            `;
+            $('#recordDetailContent').html(content);
+            $('#viewRecordModal').modal('show');
+        } else {
+            showAlert('加载奖惩记录详情失败：' + response.message, 'danger');
+        }
+    });
+}
+
+// 删除奖惩记录
+function deleteRecord(recordId) {
+    if (confirm('确定要删除这个奖惩记录吗？')) {
+        $.ajax({
+            url: `/api/employee-reward-punishments/${recordId}`,
+            type: 'DELETE',
+            success: function(response) {
+                if (response.code === 200) {
+                    loadRecords(currentPage);
+                    showAlert('奖惩记录删除成功', 'success');
+                } else {
+                    showAlert('删除失败：' + response.message, 'danger');
+                }
+            }
+        });
+    }
+}
+
+// 显示统计摘要
+function showSummary() {
+    $.get('/api/employee-reward-punishments/summary', function(response) {
+        if (response.code === 200) {
+            const summary = response.data;
+            const content = `
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="info-box bg-success">
+                            <span class="info-box-icon"><i class="fas fa-award"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">奖励总数</span>
+                                <span class="info-box-number">${summary.total_rewards}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box bg-danger">
+                            <span class="info-box-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">惩罚总数</span>
+                                <span class="info-box-number">${summary.total_punishments}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box bg-info">
+                            <span class="info-box-icon"><i class="fas fa-money-bill"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">奖励金额</span>
+                                <span class="info-box-number">¥${parseFloat(summary.total_reward_amount || 0).toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="info-box bg-warning">
+                            <span class="info-box-icon"><i class="fas fa-minus-circle"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">惩罚金额</span>
+                                <span class="info-box-number">¥${parseFloat(summary.total_punishment_amount || 0).toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h5>按类型统计</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>类型名称</th>
+                                        <th>分类</th>
+                                        <th>记录数量</th>
+                                        <th>总金额</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+            `;
+            
+            let tableRows = '';
+            if (summary.by_type && summary.by_type.length > 0) {
+                summary.by_type.forEach(function(item) {
+                    const categoryBadge = getCategoryBadge(item.category);
+                    const amount = item.total_amount ? `¥${parseFloat(item.total_amount).toFixed(2)}` : '¥0.00';
+                    tableRows += `
+                        <tr>
+                            <td>${item.type_name}</td>
+                            <td>${categoryBadge}</td>
+                            <td>${item.count}</td>
+                            <td>${amount}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                tableRows = '<tr><td colspan="4" class="text-center">暂无数据</td></tr>';
+            }
+            
+            const finalContent = content + tableRows + `
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            $('#summaryContent').html(finalContent);
+            $('#summaryModal').modal('show');
+        } else {
+            showAlert('加载统计摘要失败：' + response.message, 'danger');
+        }
+    });
+}
+
+// 更新分页
+function updatePagination(pagination) {
+    currentPage = pagination.page;
+    totalPages = pagination.pages;
+    
+    const info = `显示第 ${pagination.page} 页，共 ${pagination.pages} 页，总计 ${pagination.total} 条记录`;
+    $('#recordTable_info').text(info);
+    
+    const paginationHtml = generatePaginationHtml(pagination);
+    $('#pagination').html(paginationHtml);
+}
+
+// 生成分页HTML
+function generatePaginationHtml(pagination) {
+    let html = '';
+    
+    // 上一页
+    if (pagination.has_prev) {
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="loadRecords(${pagination.prev_num})">上一页</a></li>`;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link">上一页</span></li>';
+    }
+    
+    // 页码
+    for (let i = 1; i <= pagination.pages; i++) {
+        if (i === pagination.page) {
+            html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadRecords(${i})">${i}</a></li>`;
+        }
+    }
+    
+    // 下一页
+    if (pagination.has_next) {
+        html += `<li class="page-item"><a class="page-link" href="#" onclick="loadRecords(${pagination.next_num})">下一页</a></li>`;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link">下一页</span></li>';
+    }
+    
+    return html;
+}
+
+// 显示提示信息
+function showAlert(message, type) {
+    const alertHtml = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    `;
+    
+    // 移除现有的提示
+    $('.alert').remove();
+    
+    // 添加新提示到页面顶部
+    $('.container-fluid').prepend(alertHtml);
+    
+    // 3秒后自动隐藏
+    setTimeout(function() {
+        $('.alert').fadeOut();
+    }, 3000);
+}
+</script>
+{% endblock %}

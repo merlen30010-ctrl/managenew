@@ -43,7 +43,7 @@ def api_login():
                     'id': user.id,
                     'username': user.username,
                     'email': user.email,
-                    'name': user.name
+                    # name字段已移至Employee表
                 }
             }
         })
@@ -96,7 +96,7 @@ def api_register():
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
-                'name': user.name
+                # name字段已移至Employee表
             }
         }
     })

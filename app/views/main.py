@@ -118,8 +118,7 @@ def edit_user(user_id):
     if request.method == 'POST':
         user.username = request.form.get('username')
         user.email = request.form.get('email')
-        user.name = request.form.get('name')
-        user.phone = request.form.get('phone')
+        # name和phone字段已移至Employee表，此处不再处理
         
         # 如果提供了新密码，则更新密码
         password = request.form.get('password')
