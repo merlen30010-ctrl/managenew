@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}保养记录{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">保养记录</h3>
+                    <a href="{{ url_for('vehicle.list_vehicles') }}" class="btn btn-primary">
+                        <i class="fas fa-car"></i> 车辆管理
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>车牌号</th>
+                                    <th>保养日期</th>
+                                    <th>保养类型</th>
+                                    <th>费用</th>
+                                    <th>服务商</th>
+                                    <th>下次保养日期</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in records %}
+                                <tr>
+                                    <td>{{ record.vehicle.license_plate }}</td>
+                                    <td>{{ record.maintenance_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>{{ record.maintenance_type }}</td>
+                                    <td>{{ record.cost }} 元</td>
+                                    <td>{{ record.service_provider }}</td>
+                                    <td>{{ record.next_maintenance_date.strftime('%Y-%m-%d') if record.next_maintenance_date else '' }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('vehicle.edit_maintenance_record', record_id=record.id) }}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i> 编辑
+                                            </a>
+                                            <form method="POST" action="{{ url_for('vehicle.delete_maintenance_record', record_id=record.id) }}" 
+                                                  style="display: inline;" 
+                                                  onsubmit="return confirm('确定要删除这条保养记录吗？');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i> 删除
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

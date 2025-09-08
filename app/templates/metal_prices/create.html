@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}新增金属价格 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">新增金属价格</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="metal_type" class="form-label">金属种类 *</label>
+                                <select class="form-select" id="metal_type" name="metal_type" required>
+                                    <option value="1#锌" selected>1#锌</option>
+                                    <option value="1#铜">1#铜</option>
+                                    <option value="1#铅">1#铅</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quote_date" class="form-label">报价日期 *</label>
+                                <input type="date" class="form-control" id="quote_date" name="quote_date" value="{{ today }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="high_price" class="form-label">最高价</label>
+                                <input type="number" class="form-control" id="high_price" name="high_price" step="0.01" placeholder="如果不填写，默认等于均价">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="low_price" class="form-label">最低价</label>
+                                <input type="number" class="form-control" id="low_price" name="low_price" step="0.01" placeholder="如果不填写，默认等于均价">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="average_price" class="form-label">均价 *</label>
+                                <input type="number" class="form-control" id="average_price" name="average_price" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="price_change" class="form-label">涨跌 *</label>
+                                <input type="number" class="form-control" id="price_change" name="price_change" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <strong>说明：</strong>
+                        <ul>
+                            <li>最高价和最低价为可选字段，如果不填写，默认等于均价</li>
+                            <li>最高价应大于等于最低价</li>
+                            <li>均价应介于最高价和最低价之间</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                        <a href="{{ url_for('metal_price.list_prices') }}" class="btn btn-secondary">返回列表</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

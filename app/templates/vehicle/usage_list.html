@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}车辆借还记录{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">车辆借还记录</h3>
+                    <a href="{{ url_for('vehicle.list_vehicles') }}" class="btn btn-primary">
+                        <i class="fas fa-car"></i> 车辆管理
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>车牌号</th>
+                                    <th>使用类型</th>
+                                    <th>借车人</th>
+                                    <th>借车时间</th>
+                                    <th>还车时间</th>
+                                    <th>借车里程</th>
+                                    <th>还车里程</th>
+                                    <th>用途</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in records %}
+                                <tr>
+                                    <td>{{ record.vehicle.license_plate }}</td>
+                                    <td>
+                                        {% if record.usage_type == '借车' %}
+                                            <span class="badge bg-success">{{ record.usage_type }}</span>
+                                        {% else %}
+                                            <span class="badge bg-primary">{{ record.usage_type }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ record.borrower }}</td>
+                                    <td>{{ record.borrow_time.strftime('%Y-%m-%d %H:%M') if record.borrow_time else '' }}</td>
+                                    <td>{{ record.return_time.strftime('%Y-%m-%d %H:%M') if record.return_time else '' }}</td>
+                                    <td>{{ record.borrow_mileage }}</td>
+                                    <td>{{ record.return_mileage }}</td>
+                                    <td>{{ record.purpose }}</td>
+                                    <td>
+                                        {% if record.usage_type == '借车' and not record.return_record %}
+                                            <a href="{{ url_for('vehicle.return_vehicle', record_id=record.id) }}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-undo"></i> 还车
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

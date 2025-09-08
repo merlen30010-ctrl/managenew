@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}个人资料 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>个人资料</h2>
+        <div class="card">
+            <div class="card-body">
+                <p><strong>用户名：</strong>{{ user.username }}</p>
+                <p><strong>邮箱：</strong>{{ user.email }}</p>
+                <p><strong>姓名：</strong>{{ user.name or '未设置' }}</p>
+                <p><strong>电话：</strong>{{ user.phone or '未设置' }}</p>
+                <p><strong>注册时间：</strong>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                
+                <a href="{{ url_for('main.change_password') }}" class="btn btn-primary">修改密码</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

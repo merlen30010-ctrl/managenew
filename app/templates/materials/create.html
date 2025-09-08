@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}创建物料 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">创建物料</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">物料名称</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="code" class="form-label">物料代码</label>
+                        <input type="text" class="form-control" id="code" name="code" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">全称</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="purpose" class="form-label">用途</label>
+                        <select class="form-select" id="purpose" name="purpose" required>
+                            <option value="">请选择用途</option>
+                            <option value="原料">原料</option>
+                            <option value="辅料">辅料</option>
+                            <option value="产品">产品</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">创建物料</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('material.list_materials') }}">返回物料列表</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

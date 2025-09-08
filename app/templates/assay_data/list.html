@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}化验数据列表{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">化验数据列表</h3>
+                    <div class="card-tools">
+                        <a href="{{ url_for('assay_data.create_assay_data') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> 新增化验数据
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>样品名称</th>
+                                <th>分厂</th>
+                                <th>水含量</th>
+                                <th>锌含量</th>
+                                <th>铅含量</th>
+                                <th>氯含量</th>
+                                <th>创建时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in assay_data_list %}
+                            <tr>
+                                <td>{{ data.sample_name }}</td>
+                                <td>{{ data.factory_id }}</td>
+                                <td>{{ data.water_content or 0 }}</td>
+                                <td>{{ data.zinc_content or 0 }}</td>
+                                <td>{{ data.lead_content or 0 }}</td>
+                                <td>{{ data.chlorine_content or 0 }}</td>
+                                <td>{{ data.created_at.strftime('%Y-%m-%d %H:%M') if data.created_at else '' }}</td>
+                                <td>
+                                    <a href="{{ url_for('assay_data.edit_assay_data', id=data.id) }}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> 编辑
+                                    </a>
+                                    <form action="{{ url_for('assay_data.delete_assay_data', id=data.id) }}" method="post" 
+                                          style="display: inline-block;" 
+                                          onsubmit="return confirm('确定要删除这条化验数据吗？');">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i> 删除
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt-3">
+    <div class="alert alert-info">
+        <strong>使用说明：</strong>
+        <ul>
+            <li>点击"编辑"按钮可以查看和管理化验数据的附件</li>
+            <li>系统支持上传图片文件（jpg, jpeg, png, gif）作为化验数据的附件</li>
+            <li>附件文件将按日期归类存储，命名规则为：样品名称+扩展名</li>
+            <li>如需查看附件，请点击对应化验数据的"编辑"按钮</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}新增化验数据{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">新增化验数据</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="sample_name">样品名称 *</label>
+                            <input type="text" class="form-control" id="sample_name" name="sample_name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="factory_id">分厂 *</label>
+                            <select class="form-control" id="factory_id" name="factory_id" required>
+                                <option value="">请选择分厂</option>
+                                {% for factory in factories %}
+                                <option value="{{ factory.id }}">{{ factory.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- 常用指标 -->
+                        <h4>常用指标</h4>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="water_content">水含量</label>
+                                    <input type="number" class="form-control" id="water_content" name="water_content" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="zinc_content">锌含量</label>
+                                    <input type="number" class="form-control" id="zinc_content" name="zinc_content" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="lead_content">铅含量</label>
+                                    <input type="number" class="form-control" id="lead_content" name="lead_content" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="chlorine_content">氯含量</label>
+                                    <input type="number" class="form-control" id="chlorine_content" name="chlorine_content" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 其他指标 -->
+                        <h4>其他指标</h4>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="fluorine_content">氟含量</label>
+                                    <input type="number" class="form-control" id="fluorine_content" name="fluorine_content" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="iron_content">铁含量</label>
+                                    <input type="number" class="form-control" id="iron_content" name="iron_content" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="silicon_content">硅含量</label>
+                                    <input type="number" class="form-control" id="silicon_content" name="silicon_content" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="sulfur_content">硫含量</label>
+                                    <input type="number" class="form-control" id="sulfur_content" name="sulfur_content" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="high_heat">高热值</label>
+                                    <input type="number" class="form-control" id="high_heat" name="high_heat" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="low_heat">低热值</label>
+                                    <input type="number" class="form-control" id="low_heat" name="low_heat" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="silver_content">银含量</label>
+                                    <input type="number" class="form-control" id="silver_content" name="silver_content" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="recovery_rate">回收率</label>
+                                    <input type="number" class="form-control" id="recovery_rate" name="recovery_rate" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 备注 -->
+                        <div class="form-group">
+                            <label for="remarks">备注</label>
+                            <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                        </div>
+                        
+                        <!-- 附件上传 -->
+                        <div class="form-group">
+                            <label for="attachment">附件（可选，只允许图片文件）</label>
+                            <input type="file" class="form-control-file" id="attachment" name="attachment" accept="image/*">
+                            <small class="form-text text-muted">支持格式：jpg, jpeg, png, gif。文件将按日期归类存储，命名规则为：样品名称+扩展名。</small>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">保存</button>
+                        <a href="{{ url_for('assay_data.list_assay_data') }}" class="btn btn-secondary">取消</a>
+                    </form>
+                    
+                    <div class="alert alert-info mt-3">
+                        <strong>提示：</strong>您可以只填写样品名称和上传附件来创建化验数据，其他指标可以在后续编辑时补充。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

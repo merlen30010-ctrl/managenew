@@ -1,0 +1,16 @@
+[Unit]
+Description=Factory Management System
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/path/to/your/factory-manager
+Environment=PATH=/path/to/your/factory-manager/venv/bin
+ExecStart=/path/to/your/factory-manager/venv/bin/python run.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

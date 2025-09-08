@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}角色权限分配 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>角色权限分配 - {{ role.name }}</h2>
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('permission.update_role_permissions', role_id=role.id) }}">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>权限名称</th>
+                                    <th>描述</th>
+                                    <th>模块</th>
+                                    <th>操作</th>
+                                    <th>分配</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for permission in permissions %}
+                                <tr>
+                                    <td>{{ permission.name }}</td>
+                                    <td>{{ permission.description }}</td>
+                                    <td>{{ permission.module }}</td>
+                                    <td>{{ permission.action }}</td>
+                                    <td>
+                                        <input type="checkbox" name="permissions" value="{{ permission.id }}" 
+                                               {% if role.has_permission(permission) %}checked{% endif %}>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">更新权限</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('main.roles') }}" class="btn btn-secondary">返回角色列表</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

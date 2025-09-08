@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}创建权限 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">创建权限</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">权限名称</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">描述</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="module" class="form-label">模块</label>
+                        <input type="text" class="form-control" id="module" name="module">
+                    </div>
+                    <div class="mb-3">
+                        <label for="action" class="form-label">操作</label>
+                        <select class="form-select" id="action" name="action">
+                            <option value="create">创建</option>
+                            <option value="read">读取</option>
+                            <option value="update">更新</option>
+                            <option value="delete">删除</option>
+                            <option value="manage">管理</option>
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">创建权限</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('permission.list_permissions') }}">返回权限列表</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

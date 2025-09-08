@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}编辑权限 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">编辑权限</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">权限名称</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ permission.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">描述</label>
+                        <textarea class="form-control" id="description" name="description" rows="3">{{ permission.description }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="module" class="form-label">模块</label>
+                        <input type="text" class="form-control" id="module" name="module" value="{{ permission.module }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="action" class="form-label">操作</label>
+                        <select class="form-select" id="action" name="action">
+                            <option value="create" {% if permission.action == 'create' %}selected{% endif %}>创建</option>
+                            <option value="read" {% if permission.action == 'read' %}selected{% endif %}>读取</option>
+                            <option value="update" {% if permission.action == 'update' %}selected{% endif %}>更新</option>
+                            <option value="delete" {% if permission.action == 'delete' %}selected{% endif %}>删除</option>
+                            <option value="manage" {% if permission.action == 'manage' %}selected{% endif %}>管理</option>
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">更新权限</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('permission.list_permissions') }}">返回权限列表</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

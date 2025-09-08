@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}车辆管理{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">车辆列表</h3>
+                    <a href="{{ url_for('vehicle.create_vehicle') }}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> 添加车辆
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>车牌号</th>
+                                    <th>品牌</th>
+                                    <th>型号</th>
+                                    <th>颜色</th>
+                                    <th>购买日期</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for vehicle in vehicles %}
+                                <tr>
+                                    <td>{{ vehicle.plate_number }}</td>
+                                    <td>{{ vehicle.brand }}</td>
+                                    <td>{{ vehicle.model }}</td>
+                                    <td>{{ vehicle.color }}</td>
+                                    <td>{{ vehicle.purchase_date.strftime('%Y-%m-%d') if vehicle.purchase_date else '' }}</td>
+                                    <td>
+                                        {% if vehicle.status == '可用' %}
+                                            <span class="badge bg-success">{{ vehicle.status }}</span>
+                                        {% elif vehicle.status == '使用中' %}
+                                            <span class="badge bg-warning">{{ vehicle.status }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ vehicle.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ url_for('vehicle.edit_vehicle', vehicle_id=vehicle.id) }}" 
+                                               class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i> 编辑
+                                            </a>
+                                            <a href="{{ url_for('vehicle.borrow_vehicle', vehicle_id=vehicle.id) }}" 
+                                               class="btn btn-sm btn-outline-success">
+                                                <i class="fas fa-car"></i> 借车
+                                            </a>
+                                            <a href="{{ url_for('vehicle.create_maintenance_record', vehicle_id=vehicle.id) }}" 
+                                               class="btn btn-sm btn-outline-info">
+                                                <i class="fas fa-wrench"></i> 保养
+                                            </a>
+                                            <a href="{{ url_for('vehicle.create_insurance_record', vehicle_id=vehicle.id) }}" 
+                                               class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-shield-alt"></i> 保险
+                                            </a>
+                                            <form method="POST" action="{{ url_for('vehicle.delete_vehicle', vehicle_id=vehicle.id) }}" 
+                                                  style="display: inline;" 
+                                                  onsubmit="return confirm('确定要删除这辆车吗？');">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i> 删除
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">功能导航</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="{{ url_for('vehicle.list_usage_records') }}" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-history"></i> 借还记录
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('vehicle.list_maintenance_records') }}" class="btn btn-outline-info btn-block">
+                                <i class="fas fa-wrench"></i> 保养记录
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('vehicle.list_insurance_records') }}" class="btn btn-outline-secondary btn-block">
+                                <i class="fas fa-shield-alt"></i> 保险记录
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

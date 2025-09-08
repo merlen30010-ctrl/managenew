@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}物料进出厂管理 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>物料进出厂管理</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{{ url_for('material_transaction.create_transaction') }}" class="btn btn-primary">创建记录</a>
+            <div>
+                <a href="{{ url_for('excel.download_template', module_name='material_transaction') }}" class="btn btn-info">下载模板</a>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">导入数据</button>
+                <a href="{{ url_for('excel.export_excel_data', module_name='material_transaction') }}" class="btn btn-warning">导出数据</a>
+            </div>
+        </div>
+        
+        <!-- 筛选表单 -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="customer" class="form-label">客户</label>
+                        <input type="text" class="form-control" id="customer" name="customer" value="{{ customer_filter }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="material" class="form-label">物料</label>
+                        <input type="text" class="form-control" id="material" name="material" value="{{ material_filter }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="factory" class="form-label">分厂</label>
+                        <select class="form-select" id="factory" name="factory">
+                            <option value="">全部</option>
+                            {% for factory in factories %}
+                            <option value="{{ factory.id }}" {% if factory_filter == factory.id|string() %}selected{% endif %}>{{ factory.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="transaction_type" class="form-label">类型</label>
+                        <select class="form-select" id="transaction_type" name="transaction_type">
+                            <option value="">全部</option>
+                            <option value="进厂" {% if transaction_type_filter == '进厂' %}selected{% endif %}>进厂</option>
+                            <option value="出厂" {% if transaction_type_filter == '出厂' %}selected{% endif %}>出厂</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">筛选</button>
+                        <a href="{{ url_for('material_transaction.list_transactions') }}" class="btn btn-secondary">重置</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 数据表格 -->
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>客户</th>
+                            <th>物料</th>
+                            <th>分厂</th>
+                            <th>类型</th>
+                            <th>发数</th>
+                            <th>到数</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction.date.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ transaction.customer }}</td>
+                            <td>{{ transaction.material_name }}</td>
+                            <td>{{ transaction.factory.name if transaction.factory else '' }}</td>
+                            <td>{{ transaction.transaction_type }}</td>
+                            <td>{{ transaction.shipped_quantity }}</td>
+                            <td>{{ transaction.received_quantity }}</td>
+                            <td>
+                                <a href="{{ url_for('material_transaction.edit_transaction', transaction_id=transaction.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                                <form action="{{ url_for('material_transaction.delete_transaction', transaction_id=transaction.id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这条记录吗？')">删除</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 导入数据模态框 -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('excel.import_excel_data', module_name='material_transaction') }}" method="POST" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importModalLabel">导入Excel数据</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">选择Excel文件</label>
+                        <input class="form-control" type="file" id="file" name="file" accept=".xlsx,.xls">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">导入</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

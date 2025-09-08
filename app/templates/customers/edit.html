@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}编辑客户 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">编辑客户</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">客户名称</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{ customer.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="code" class="form-label">客户代码</label>
+                        <input type="text" class="form-control" id="code" name="code" value="{{ customer.code }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">全称</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" value="{{ customer.full_name or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="customer_type" class="form-label">类型</label>
+                        <select class="form-select" id="customer_type" name="customer_type" required>
+                            <option value="原料供应" {% if customer.customer_type == '原料供应' %}selected{% endif %}>原料供应</option>
+                            <option value="产品采购" {% if customer.customer_type == '产品采购' %}selected{% endif %}>产品采购</option>
+                            <option value="辅料供应" {% if customer.customer_type == '辅料供应' %}selected{% endif %}>辅料供应</option>
+                            <option value="其他" {% if customer.customer_type == '其他' %}selected{% endif %}>其他</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">电话</label>
+                        <input type="text" class="form-control" id="phone" name="phone" value="{{ customer.phone or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">地址</label>
+                        <input type="text" class="form-control" id="address" name="address" value="{{ customer.address or '' }}">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">更新客户</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('customer.list_customers') }}">返回客户列表</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

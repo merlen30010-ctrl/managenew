@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}创建物料进出厂记录 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">创建物料进出厂记录</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="date" class="form-label">日期 *</label>
+                                <input type="date" class="form-control" id="date" name="date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="customer" class="form-label">客户 *</label>
+                                <select class="form-select" id="customer" name="customer" required>
+                                    <option value="">请选择客户</option>
+                                    {% for customer in customers %}
+                                    <option value="{{ customer.name }}">{{ customer.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="material_id" class="form-label">物料 *</label>
+                                <select class="form-select" id="material_id" name="material_id" required>
+                                    <option value="">请选择物料</option>
+                                    {% for material in materials %}
+                                    <option value="{{ material.id }}">{{ material.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="factory_id" class="form-label">分厂 *</label>
+                                <select class="form-select" id="factory_id" name="factory_id" required>
+                                    <option value="">请选择分厂</option>
+                                    {% for factory in factories %}
+                                    <option value="{{ factory.id }}">{{ factory.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="contract_id" class="form-label">合同</label>
+                                <select class="form-select" id="contract_id" name="contract_id">
+                                    <option value="">请选择合同</option>
+                                    {% for contract in contracts %}
+                                    <option value="{{ contract.id }}">{{ contract.contract_number }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="transaction_type" class="form-label">类型 *</label>
+                                <select class="form-select" id="transaction_type" name="transaction_type" required>
+                                    <option value="">请选择类型</option>
+                                    <option value="进厂">进厂</option>
+                                    <option value="出厂">出厂</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="packaging" class="form-label">包装</label>
+                                <input type="text" class="form-control" id="packaging" name="packaging">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="vehicle_number" class="form-label">车号</label>
+                                <input type="text" class="form-control" id="vehicle_number" name="vehicle_number">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="shipped_quantity" class="form-label">发数 *</label>
+                                <input type="number" class="form-control" id="shipped_quantity" name="shipped_quantity" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="received_quantity" class="form-label">到数 *</label>
+                                <input type="number" class="form-control" id="received_quantity" name="received_quantity" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5>化验指标</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="water_content" class="form-label">水含量 (%)</label>
+                                <input type="number" class="form-control" id="water_content" name="water_content" step="0.01" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="zinc_content" class="form-label">锌含量 (%)</label>
+                                <input type="number" class="form-control" id="zinc_content" name="zinc_content" step="0.01" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="lead_content" class="form-label">铅含量 (%)</label>
+                                <input type="number" class="form-control" id="lead_content" name="lead_content" step="0.01" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="chlorine_content" class="form-label">氯含量 (%)</label>
+                                <input type="number" class="form-control" id="chlorine_content" name="chlorine_content" step="0.01" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="fluorine_content" class="form-label">氟含量 (%)</label>
+                                <input type="number" class="form-control" id="fluorine_content" name="fluorine_content" step="0.01" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="remarks" class="form-label">备注</label>
+                                <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">创建记录</button>
+                        <a href="{{ url_for('material_transaction.list_transactions') }}" class="btn btn-secondary">返回列表</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

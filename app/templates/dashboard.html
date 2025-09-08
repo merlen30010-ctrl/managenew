@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}控制台 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>控制台</h2>
+        <p>欢迎，{{ user.username }}！</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">个人中心</h5>
+                <p class="card-text">修改密码，查看通知和成绩。</p>
+                <a href="{{ url_for('main.profile') }}" class="btn btn-primary">进入</a>
+            </div>
+        </div>
+    </div>
+    
+    {% if current_user.has_role('管理员') or current_user.has_permission('user_read') %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">用户管理</h5>
+                <p class="card-text">管理用户、权限组和权限分配。</p>
+                <a href="{{ url_for('main.users') }}" class="btn btn-primary">进入</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if current_user.has_role('管理员') or current_user.has_permission('material_read') %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">基础字典</h5>
+                <p class="card-text">管理物料、客户和部门信息。</p>
+                <a href="{{ url_for('material.list_materials') }}" class="btn btn-primary">进入</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row mt-4">
+    {% if current_user.has_role('管理员') or current_user.has_permission('contract_read') %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">合同管理</h5>
+                <p class="card-text">创建和管理合同信息。</p>
+                <a href="{{ url_for('contract.list_contracts') }}" class="btn btn-primary">进入</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if current_user.has_role('管理员') or current_user.has_permission('material_transaction_read') %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">物料进出厂</h5>
+                <p class="card-text">管理物料进出厂记录。</p>
+                <a href="{{ url_for('material_transaction.list_transactions') }}" class="btn btn-primary">进入</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if current_user.has_role('管理员') or current_user.has_permission('production_record_read') %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">产品产能</h5>
+                <p class="card-text">管理产品产能记录。</p>
+                <a href="{{ url_for('production_record.list_records') }}" class="btn btn-primary">进入</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row mt-4">
+    {% if current_user.has_role('管理员') or current_user.has_permission('assay_data_read') %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">化验数据</h5>
+                <p class="card-text">管理化验数据记录。</p>
+                <a href="{{ url_for('assay_data.list_assay_data') }}" class="btn btn-primary">进入</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if current_user.has_role('管理员') or current_user.has_permission('metal_price_read') %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">金属价格</h5>
+                <p class="card-text">管理金属价格记录。</p>
+                <a href="{{ url_for('metal_price.list_prices') }}" class="btn btn-primary">进入</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

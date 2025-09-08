@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}创建产能记录 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">创建产能记录</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="date" class="form-label">日期 *</label>
+                                <input type="date" class="form-control" id="date" name="date" value="{{ today }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="factory_id" class="form-label">分厂 *</label>
+                                <select class="form-select" id="factory_id" name="factory_id" required>
+                                    <option value="">请选择分厂</option>
+                                    {% for factory in factories %}
+                                    <option value="{{ factory.id }}">{{ factory.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="team_id" class="form-label">班组</label>
+                                <select class="form-select" id="team_id" name="team_id">
+                                    <option value="">请选择班组</option>
+                                    {% for team in teams %}
+                                    <option value="{{ team.id }}">{{ team.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="material_id" class="form-label">物料 *</label>
+                                <select class="form-select" id="material_id" name="material_id" required>
+                                    <option value="">请选择物料</option>
+                                    {% for material in materials %}
+                                    <option value="{{ material.id }}">{{ material.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">产量 *</label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5>元素含量</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="water_content" class="form-label">水含量 (%)</label>
+                                <input type="number" class="form-control" id="water_content" name="water_content" step="0.01" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="zinc_content" class="form-label">锌含量 (%)</label>
+                                <input type="number" class="form-control" id="zinc_content" name="zinc_content" step="0.01" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="lead_content" class="form-label">铅含量 (%)</label>
+                                <input type="number" class="form-control" id="lead_content" name="lead_content" step="0.01" min="0" max="100">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="chlorine_content" class="form-label">氯含量 (%)</label>
+                                <input type="number" class="form-control" id="chlorine_content" name="chlorine_content" step="0.01" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="fluorine_content" class="form-label">氟含量 (%)</label>
+                                <input type="number" class="form-control" id="fluorine_content" name="fluorine_content" step="0.01" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="remarks" class="form-label">备注</label>
+                                <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">创建记录</button>
+                        <a href="{{ url_for('production_record.list_records') }}" class="btn btn-secondary">返回列表</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

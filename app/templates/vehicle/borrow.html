@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}借车登记{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">借车登记 - {{ vehicle.license_plate }}</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="borrower" class="form-label">借车人 *</label>
+                                    <input type="text" class="form-control" id="borrower" name="borrower" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="borrow_time" class="form-label">借车时间</label>
+                                    <input type="datetime-local" class="form-control" id="borrow_time" name="borrow_time" 
+                                           value="{{ datetime.now().strftime('%Y-%m-%dT%H:%M') }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="borrow_mileage" class="form-label">借车里程(公里)</label>
+                                    <input type="number" class="form-control" id="borrow_mileage" name="borrow_mileage" step="0.1">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="purpose" class="form-label">用途</label>
+                                    <input type="text" class="form-control" id="purpose" name="purpose">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="remarks" class="form-label">备注</label>
+                                    <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('vehicle.list_vehicles') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> 返回
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-car"></i> 借车
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

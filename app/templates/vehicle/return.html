@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}还车登记{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">还车登记 - {{ vehicle.license_plate }}</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-header">
+                                    <h5>借车信息</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>借车人:</strong> {{ borrow_record.borrower }}</p>
+                                    <p><strong>借车时间:</strong> {{ borrow_record.borrow_time.strftime('%Y-%m-%d %H:%M') }}</p>
+                                    <p><strong>借车里程:</strong> {{ borrow_record.borrow_mileage }} 公里</p>
+                                    <p><strong>用途:</strong> {{ borrow_record.purpose }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="return_time" class="form-label">还车时间</label>
+                                    <input type="datetime-local" class="form-control" id="return_time" name="return_time" 
+                                           value="{{ datetime.now().strftime('%Y-%m-%dT%H:%M') }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="return_mileage" class="form-label">还车里程(公里)</label>
+                                    <input type="number" class="form-control" id="return_mileage" name="return_mileage" step="0.1">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="remarks" class="form-label">备注</label>
+                                    <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('vehicle.list_usage_records') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> 返回
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-undo"></i> 还车
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

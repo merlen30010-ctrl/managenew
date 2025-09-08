@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}编辑合同 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">编辑合同</h3>
+                <p class="text-center text-muted">合同编号: {{ contract.contract_number }}</p>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="contract_type" class="form-label">合同类型</label>
+                        <select class="form-select" id="contract_type" name="contract_type" required>
+                            <option value="原料采购" {% if contract.contract_type == '原料采购' %}selected{% endif %}>原料采购</option>
+                            <option value="辅料采购" {% if contract.contract_type == '辅料采购' %}selected{% endif %}>辅料采购</option>
+                            <option value="产品销售" {% if contract.contract_type == '产品销售' %}selected{% endif %}>产品销售</option>
+                            <option value="其他" {% if contract.contract_type == '其他' %}selected{% endif %}>其他</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contract_number" class="form-label">合同编号</label>
+                        <input type="text" class="form-control" id="contract_number" name="contract_number" value="{{ contract.contract_number }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customer_id" class="form-label">客户</label>
+                        <select class="form-select" id="customer_id" name="customer_id" required>
+                            <option value="">请选择客户</option>
+                            {% for customer in customers %}
+                            <option value="{{ customer.id }}" {% if contract.customer_id == customer.id %}selected{% endif %}>{{ customer.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="material_id" class="form-label">物料</label>
+                        <select class="form-select" id="material_id" name="material_id" required>
+                            <option value="">请选择物料</option>
+                            {% for material in materials %}
+                            <option value="{{ material.id }}" {% if contract.material_id == material.id %}selected{% endif %}>{{ material.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="factory_id" class="form-label">分厂</label>
+                        <select class="form-select" id="factory_id" name="factory_id" required>
+                            <option value="">请选择分厂</option>
+                            {% for factory in factories %}
+                            <option value="{{ factory.id }}" {% if contract.factory_id == factory.id %}selected{% endif %}>{{ factory.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="responsible_id" class="form-label">负责人</label>
+                        <select class="form-select" id="responsible_id" name="responsible_id" required>
+                            <option value="">请选择负责人</option>
+                            {% for user in users %}
+                            <option value="{{ user.id }}" {% if contract.responsible_id == user.id %}selected{% endif %}>{{ user.name or user.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sign_date" class="form-label">签订日期</label>
+                        <input type="date" class="form-control" id="sign_date" name="sign_date" value="{{ contract.sign_date.strftime('%Y-%m-%d') if contract.sign_date else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="expiry_date" class="form-label">到期日期</label>
+                        <input type="date" class="form-control" id="expiry_date" name="expiry_date" value="{{ contract.expiry_date.strftime('%Y-%m-%d') if contract.expiry_date else '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="tax_rate" class="form-label">税率</label>
+                        <input type="number" class="form-control" id="tax_rate" name="tax_rate" step="0.01" value="{{ contract.tax_rate }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="pricing_method" class="form-label">计价方式</label>
+                        <select class="form-select" id="pricing_method" name="pricing_method">
+                            <option value="">请选择计价方式</option>
+                            <option value="weight" {% if contract.pricing_method == 'weight' %}selected{% endif %}>金吨计价</option>
+                            <option value="content" {% if contract.pricing_method == 'content' %}selected{% endif %}>含量加点</option>
+                            <option value="processing" {% if contract.pricing_method == 'processing' %}selected{% endif %}>加工费用</option>
+                            <option value="gross_weight" {% if contract.pricing_method == 'gross_weight' %}selected{% endif %}>毛吨计价</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="coefficient" class="form-label">系数</label>
+                        <input type="number" class="form-control" id="coefficient" name="coefficient" step="0.01" value="{{ contract.coefficient or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">状态</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="执行" {% if contract.status == '执行' %}selected{% endif %}>执行</option>
+                            <option value="归档" {% if contract.status == '归档' %}selected{% endif %}>归档</option>
+                        </select>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">更新合同</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('contract.list_contracts') }}">返回合同列表</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

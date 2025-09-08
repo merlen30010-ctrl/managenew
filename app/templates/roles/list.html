@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}角色管理 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>角色管理</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{{ url_for('main.create_role') }}" class="btn btn-primary">创建角色</a>
+            <a href="{{ url_for('permission.list_permissions') }}" class="btn btn-secondary">权限管理</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>角色名称</th>
+                            <th>描述</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for role in roles %}
+                        <tr>
+                            <td>{{ role.id }}</td>
+                            <td>{{ role.name }}</td>
+                            <td>{{ role.description or '无描述' }}</td>
+                            <td>{{ role.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>
+                                <a href="{{ url_for('main.edit_role', role_id=role.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                                <a href="{{ url_for('permission.role_permissions', role_id=role.id) }}" class="btn btn-sm btn-info">权限分配</a>
+                                <form action="{{ url_for('main.delete_role', role_id=role.id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这个角色吗？')">删除</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

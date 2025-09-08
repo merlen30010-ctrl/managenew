@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}创建部门 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">创建部门</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">部门名称</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="short_name" class="form-label">简称</label>
+                        <input type="text" class="form-control" id="short_name" name="short_name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">全称</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="level" class="form-label">级别</label>
+                        <select class="form-select" id="level" name="level" required>
+                            <option value="1">分厂（一级）</option>
+                            <option value="2">部门（二级）</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="parent_div" style="display: none;">
+                        <label for="parent_id" class="form-label">所属分厂</label>
+                        <select class="form-select" id="parent_id" name="parent_id">
+                            <option value="0">请选择分厂</option>
+                            {% for factory in factories %}
+                            <option value="{{ factory.id }}">{{ factory.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">电话</label>
+                        <input type="text" class="form-control" id="phone" name="phone">
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">创建部门</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('department.list_departments') }}">返回部门列表</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('level').addEventListener('change', function() {
+    var parentDiv = document.getElementById('parent_div');
+    if (this.value == '2') {
+        parentDiv.style.display = 'block';
+    } else {
+        parentDiv.style.display = 'none';
+    }
+});
+</script>
+{% endblock %}

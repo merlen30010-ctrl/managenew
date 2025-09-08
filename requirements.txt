@@ -1,0 +1,12 @@
+Flask==2.3.2
+Flask-SQLAlchemy==3.0.5
+Flask-Login==0.6.2
+Flask-WTF==1.1.1
+Flask-CORS==4.0.0
+Flask-JWT-Extended==4.5.2
+WTForms==3.0.1
+PyJWT==2.10.1
+python-docx==0.8.11
+weasyprint==59.0
+docxtopdf==0.5b0
+comtypes==1.4.12; sys_platform == "win32"

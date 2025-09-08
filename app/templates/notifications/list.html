@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}我的通知 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>我的通知</h2>
+        <div class="card">
+            <div class="card-body">
+                {% if notifications %}
+                <div class="list-group">
+                    {% for notification in notifications %}
+                    <div class="list-group-item {% if not notification.is_read %}list-group-item-primary{% endif %}">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ notification.title }}</h5>
+                            <small>{{ notification.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        <p class="mb-1">{{ notification.content }}</p>
+                        {% if not notification.is_read %}
+                        <small class="text-muted">未读</small>
+                        {% else %}
+                        <small class="text-muted">已读于 {{ notification.read_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p>暂无通知</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">返回控制台</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

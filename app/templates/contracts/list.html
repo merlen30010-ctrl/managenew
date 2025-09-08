@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}合同管理 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>合同管理</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{{ url_for('contract.create_contract') }}" class="btn btn-primary">创建合同</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>合同编号</th>
+                            <th>类型</th>
+                            <th>客户</th>
+                            <th>物料</th>
+                            <th>分厂</th>
+                            <th>负责人</th>
+                            <th>签订日期</th>
+                            <th>计价方式</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contract in contracts %}
+                        <tr>
+                            <td>{{ contract.contract_number }}</td>
+                            <td>{{ contract.contract_type }}</td>
+                            <td>{{ contract.customer.name }}</td>
+                            <td>{{ contract.material.name }}</td>
+                            <td>{{ contract.factory.name }}</td>
+                            <td>{{ contract.responsible.name or contract.responsible.username }}</td>
+                            <td>{{ contract.sign_date.strftime('%Y-%m-%d') if contract.sign_date else '未设置' }}</td>
+                            <td>{{ contract.pricing_method_display }}</td>
+                            <td>{{ contract.status }}</td>
+                            <td>
+                                <a href="{{ url_for('contract.edit_contract', contract_id=contract.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                                <a href="{{ url_for('contract.upload_contract_file', contract_id=contract.id) }}" class="btn btn-sm btn-secondary">上传文件</a>
+                                <form action="{{ url_for('contract.delete_contract', contract_id=contract.id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这个合同吗？')">删除</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% if contract.files %}
+                        <tr>
+                            <td colspan="10">
+                                <strong>合同文件:</strong>
+                                {% for file in contract.files %}
+                                <span class="badge bg-info">{{ file.file_name }}</span>
+                                <a href="{{ url_for('contract.download_contract_file', file_id=file.id) }}" class="btn btn-sm btn-outline-primary">下载</a>
+                                {% if file.file_type in ['.pdf', '.jpg', '.jpeg', '.png', '.gif', '.txt'] %}
+                                <a href="{{ url_for('contract.preview_contract_file', file_id=file.id) }}" class="btn btn-sm btn-outline-secondary" target="_blank">预览</a>
+                                {% elif file.file_type in ['.doc', '.docx'] %}
+                                    {% set pdf_version = contract.files | selectattr('file_type', 'equalto', '.pdf') | first %}
+                                    {% if pdf_version %}
+                                    <a href="{{ url_for('contract.preview_contract_file', file_id=pdf_version.id) }}" class="btn btn-sm btn-outline-secondary" target="_blank">预览</a>
+                                    {% else %}
+                                    <button class="btn btn-sm btn-outline-secondary" disabled>预览(需PDF)</button>
+                                    {% endif %}
+                                {% else %}
+                                <button class="btn btn-sm btn-outline-secondary" disabled>不支持预览</button>
+                                {% endif %}
+                                <form action="{{ url_for('contract.delete_contract_file', file_id=file.id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定要删除这个文件吗？')">删除</button>
+                                </form>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

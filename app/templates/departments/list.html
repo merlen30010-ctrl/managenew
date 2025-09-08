@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}部门管理 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>部门管理</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{{ url_for('department.create_department') }}" class="btn btn-primary">创建部门</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                {% for factory in factories %}
+                <div class="mb-4">
+                    <h4>
+                        {{ factory.name }}
+                        <small class="text-muted">({{ factory.short_name }})</small>
+                        <div class="float-end">
+                            <a href="{{ url_for('department.edit_department', department_id=factory.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                            <a href="{{ url_for('department.manage_managers', department_id=factory.id) }}" class="btn btn-sm btn-secondary">设置管理员</a>
+                            <form action="{{ url_for('department.delete_department', department_id=factory.id) }}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这个分厂吗？')">删除</button>
+                            </form>
+                        </div>
+                    </h4>
+                    <p>{{ factory.full_name or '未设置全称' }} | 电话: {{ factory.phone or '未设置' }}</p>
+                    
+                    {% if factory.children %}
+                    <ul class="list-group">
+                        {% for dept in factory.children %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong>{{ dept.name }}</strong>
+                                    <small class="text-muted">({{ dept.short_name }})</small>
+                                    <br>
+                                    {{ dept.full_name or '未设置全称' }} | 电话: {{ dept.phone or '未设置' }}
+                                </div>
+                                <div>
+                                    <a href="{{ url_for('department.edit_department', department_id=dept.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                                    <a href="{{ url_for('department.manage_managers', department_id=dept.id) }}" class="btn btn-sm btn-secondary">设置管理员</a>
+                                    <form action="{{ url_for('department.delete_department', department_id=dept.id) }}" method="POST" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这个部门吗？')">删除</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

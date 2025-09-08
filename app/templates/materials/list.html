@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}物料管理 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>物料管理</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{{ url_for('material.create_material') }}" class="btn btn-primary">创建物料</a>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>物料名称</th>
+                            <th>物料代码</th>
+                            <th>全称</th>
+                            <th>用途</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for material in materials %}
+                        <tr>
+                            <td>{{ material.id }}</td>
+                            <td>{{ material.name }}</td>
+                            <td>{{ material.code }}</td>
+                            <td>{{ material.full_name or '未设置' }}</td>
+                            <td>{{ material.purpose }}</td>
+                            <td>{{ material.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>
+                                <a href="{{ url_for('material.edit_material', material_id=material.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                                <form action="{{ url_for('material.delete_material', material_id=material.id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这个物料吗？')">删除</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
