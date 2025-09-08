@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}通知管理 - 工厂管理系统{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>通知管理</h2>
+        <div class="d-flex justify-content-between mb-3">
+            <a href="{{ url_for('notification.admin_create_notification') }}" class="btn btn-primary">创建通知</a>
+            <form method="GET" class="d-flex">
+                <select name="user_id" class="form-select me-2" style="width: auto;">
+                    <option value="">所有用户</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}" {% if user.id == selected_user_id %}selected{% endif %}>
+                        {{ user.username }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-outline-secondary">筛选</button>
+            </form>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                {% if notifications.items %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>标题</th>
+                                <th>接收用户</th>
+                                <th>状态</th>
+                                <th>创建时间</th>
+                                <th>已读时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for notification in notifications.items %}
+                            <tr>
+                                <td>
+                                    <strong>{{ notification.title }}</strong>
+                                    {% if notification.content %}
+                                    <br><small class="text-muted">{{ notification.content[:50] }}{% if notification.content|length > 50 %}...{% endif %}</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ notification.user.username if notification.user else '未知用户' }}</td>
+                                <td>
+                                    {% if notification.is_read %}
+                                    <span class="badge bg-success">已读</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">未读</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ notification.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    {% if notification.read_at %}
+                                    {{ notification.read_at.strftime('%Y-%m-%d %H:%M') }}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form action="{{ url_for('notification.admin_delete_notification', notification_id=notification.id) }}" method="POST" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这条通知吗？')">删除</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页 -->
+                {% if notifications.pages > 1 %}
+                <nav aria-label="通知分页">
+                    <ul class="pagination justify-content-center">
+                        {% if notifications.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('notification.admin_list_notifications', page=notifications.prev_num, user_id=selected_user_id) }}">上一页</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for page_num in notifications.iter_pages() %}
+                        {% if page_num %}
+                        {% if page_num != notifications.page %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('notification.admin_list_notifications', page=page_num, user_id=selected_user_id) }}">{{ page_num }}</a>
+                        </li>
+                        {% else %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                        
+                        {% if notifications.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('notification.admin_list_notifications', page=notifications.next_num, user_id=selected_user_id) }}">下一页</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                
+                {% else %}
+                <p>暂无通知</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="text-center mt-3">
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">返回控制台</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -29,7 +29,8 @@ def profile():
 def notifications():
     """查看个人通知"""
     user_notifications = Notification.query.filter_by(user_id=current_user.id).order_by(Notification.created_at.desc()).all()
-    return render_template('notifications/list.html', notifications=user_notifications)
+    unread_count = Notification.query.filter_by(user_id=current_user.id, is_read=False).count()
+    return render_template('notifications/list.html', notifications=user_notifications, unread_count=unread_count)
 
 @main_bp.route('/exam-results')
 @login_required

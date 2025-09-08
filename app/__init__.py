@@ -60,6 +60,7 @@ def create_app():
     from app.views.metal_price import metal_price_bp
     from app.views.vehicle import vehicle_bp
     from app.views.employee import employee_view_bp
+    from app.views.notification import notification_bp
     from app.api import api_bp
     from app.api.auth import api_auth_bp
     from app.api.user import api_user_bp
@@ -71,6 +72,7 @@ def create_app():
     from app.api.material_transaction import api_material_transaction_bp
     from app.api.metal_price import api_metal_price_bp
     from app.api.employee import employee_bp
+    from app.api.notification import notification_bp as api_notification_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -89,6 +91,7 @@ def create_app():
     app.register_blueprint(metal_price_bp, url_prefix='/metal-prices')
     app.register_blueprint(vehicle_bp, url_prefix='/vehicles')
     app.register_blueprint(employee_view_bp, url_prefix='/employees')
+    app.register_blueprint(notification_bp, url_prefix='/notification')
     # 注册API蓝图
     app.register_blueprint(api_auth_bp)
     app.register_blueprint(api_user_bp)
@@ -100,6 +103,7 @@ def create_app():
     app.register_blueprint(api_material_transaction_bp)
     app.register_blueprint(api_metal_price_bp)
     app.register_blueprint(employee_bp, url_prefix='/api')
+    app.register_blueprint(api_notification_bp, url_prefix='/api')
     app.register_blueprint(api_bp, url_prefix='/api')
     
     # 设置缓存失效钩子

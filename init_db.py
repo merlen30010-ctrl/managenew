@@ -123,6 +123,13 @@ def init_db():
             {'name': 'vehicle_insurance_create', 'description': '创建保险记录', 'module': 'vehicle_insurance', 'action': 'create'},
             {'name': 'vehicle_insurance_update', 'description': '更新保险记录', 'module': 'vehicle_insurance', 'action': 'update'},
             {'name': 'vehicle_insurance_delete', 'description': '删除保险记录', 'module': 'vehicle_insurance', 'action': 'delete'},
+            
+            # 通知管理权限
+            {'name': 'notification_read', 'description': '查看通知', 'module': 'notification', 'action': 'read'},
+            {'name': 'notification_create', 'description': '创建通知', 'module': 'notification', 'action': 'create'},
+            {'name': 'notification_update', 'description': '更新通知', 'module': 'notification', 'action': 'update'},
+            {'name': 'notification_delete', 'description': '删除通知', 'module': 'notification', 'action': 'delete'},
+            {'name': 'notification_manage', 'description': '通知管理', 'module': 'notification', 'action': 'manage'},
         ]
         
         # 创建权限

@@ -1150,7 +1150,234 @@
 }
 ```
 
+---
 
+## 通知管理接口
+
+### 获取当前用户通知列表
+
+**接口地址**: `GET /api/notifications`
+
+**权限要求**: `notification_read`
+
+**查询参数**:
+- `page` (integer): 页码，默认为1（可选）
+- `per_page` (integer): 每页数量，默认为10（可选）
+- `is_read` (boolean): 是否已读，true/false（可选）
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "notifications": [
+      {
+        "id": 1,
+        "title": "系统维护通知",
+        "content": "系统将于今晚22:00-24:00进行维护",
+        "is_read": false,
+        "created_at": "2024-01-15T10:00:00",
+        "read_at": null
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "pages": 5,
+      "per_page": 10,
+      "total": 45
+    }
+  }
+}
+```
+
+### 标记通知为已读
+
+**接口地址**: `PUT /api/notifications/{notification_id}/read`
+
+**权限要求**: `notification_read`
+
+**路径参数**:
+- `notification_id` (integer): 通知ID
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "通知已标记为已读",
+  "data": {
+    "id": 1,
+    "is_read": true,
+    "read_at": "2024-01-15T14:30:00"
+  }
+}
+```
+
+### 标记所有通知为已读
+
+**接口地址**: `PUT /api/notifications/mark-all-read`
+
+**权限要求**: `notification_read`
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "成功标记 5 条通知为已读",
+  "data": {
+    "count": 5
+  }
+}
+```
+
+### 删除通知
+
+**接口地址**: `DELETE /api/notifications/{notification_id}`
+
+**权限要求**: `notification_delete`
+
+**路径参数**:
+- `notification_id` (integer): 通知ID
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "通知删除成功"
+}
+```
+
+### 获取未读通知数量
+
+**接口地址**: `GET /api/notifications/unread-count`
+
+**权限要求**: `notification_read`
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "unread_count": 3
+  }
+}
+```
+
+### 管理员获取所有通知
+
+**接口地址**: `GET /api/admin/notifications`
+
+**权限要求**: `notification_manage`
+
+**查询参数**:
+- `page` (integer): 页码，默认为1（可选）
+- `per_page` (integer): 每页数量，默认为20（可选）
+- `user_id` (integer): 用户ID，筛选特定用户的通知（可选）
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "data": {
+    "notifications": [
+      {
+        "id": 1,
+        "title": "系统维护通知",
+        "content": "系统将于今晚22:00-24:00进行维护",
+        "user_id": 2,
+        "username": "user1",
+        "is_read": false,
+        "created_at": "2024-01-15T10:00:00",
+        "read_at": null
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "pages": 10,
+      "per_page": 20,
+      "total": 200
+    }
+  }
+}
+```
+
+### 管理员创建通知
+
+**接口地址**: `POST /api/admin/notifications`
+
+**权限要求**: `notification_create`
+
+**请求参数**:
+```json
+{
+  "title": "通知标题",
+  "content": "通知内容",
+  "user_ids": [1, 2, 3],
+  "send_to_all": false
+}
+```
+
+**参数说明**:
+- `title` (string): 通知标题，必填，最大200字符
+- `content` (string): 通知内容，可选
+- `user_ids` (array): 接收用户ID列表，当send_to_all为false时必填
+- `send_to_all` (boolean): 是否发送给所有用户，默认false
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "成功创建 3 条通知",
+  "data": {
+    "count": 3,
+    "notification_ids": [10, 11, 12]
+  }
+}
+```
+
+### 管理员删除通知
+
+**接口地址**: `DELETE /api/admin/notifications/{notification_id}`
+
+**权限要求**: `notification_delete`
+
+**路径参数**:
+- `notification_id` (integer): 通知ID
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "通知删除成功"
+}
+```
+
+### 管理员广播通知
+
+**接口地址**: `POST /api/admin/notifications/broadcast`
+
+**权限要求**: `notification_create`
+
+**请求参数**:
+```json
+{
+  "title": "系统公告",
+  "content": "重要系统更新通知"
+}
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "广播通知发送成功",
+  "data": {
+    "count": 50,
+    "title": "系统公告"
+  }
+}
+```
+
+---
 
 ## 数据模型
 
