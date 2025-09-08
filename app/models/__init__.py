@@ -11,3 +11,5 @@ from .assay_data import AssayData
 from .employee import Employee
 from .employee_document import EmployeeDocument, DocumentType
 from .employee_reward_punishment import EmployeeRewardPunishment, RewardPunishmentType
+from .article_category import ArticleCategory
+from .article import Article

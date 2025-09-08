@@ -16,6 +16,8 @@ from app.models.customer import Customer
 from app.models.department import Department
 from app.models.contract import Contract, ContractFile
 from app.models.attachment import Attachment
+from app.models.article import Article
+from app.models.article_category import ArticleCategory
 
 def init_db():
     """初始化数据库"""
@@ -130,6 +132,20 @@ def init_db():
             {'name': 'notification_update', 'description': '更新通知', 'module': 'notification', 'action': 'update'},
             {'name': 'notification_delete', 'description': '删除通知', 'module': 'notification', 'action': 'delete'},
             {'name': 'notification_manage', 'description': '通知管理', 'module': 'notification', 'action': 'manage'},
+            
+            # 文章管理权限
+            {'name': 'article_read', 'description': '查看文章', 'module': 'article', 'action': 'read'},
+            {'name': 'article_create', 'description': '创建文章', 'module': 'article', 'action': 'create'},
+            {'name': 'article_update', 'description': '更新文章', 'module': 'article', 'action': 'update'},
+            {'name': 'article_delete', 'description': '删除文章', 'module': 'article', 'action': 'delete'},
+            {'name': 'article_publish', 'description': '发布文章', 'module': 'article', 'action': 'publish'},
+            {'name': 'article_manage', 'description': '文章管理', 'module': 'article', 'action': 'manage'},
+            
+            # 文章分类权限
+            {'name': 'article_category_read', 'description': '查看文章分类', 'module': 'article_category', 'action': 'read'},
+            {'name': 'article_category_create', 'description': '创建文章分类', 'module': 'article_category', 'action': 'create'},
+            {'name': 'article_category_update', 'description': '更新文章分类', 'module': 'article_category', 'action': 'update'},
+            {'name': 'article_category_delete', 'description': '删除文章分类', 'module': 'article_category', 'action': 'delete'},
         ]
         
         # 创建权限

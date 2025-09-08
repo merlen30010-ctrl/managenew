@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}分类管理{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>分类管理</h2>
+        {% if current_user.has_permission_name('article_category_create') %}
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#categoryModal">
+            <i class="fas fa-plus"></i> 新建分类
+        </button>
+        {% endif %}
+    </div>
+    
+    <!-- 分类列表 -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>分类名称</th>
+                            <th>描述</th>
+                            <th>文章数量</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                        <tr>
+                            <td>{{ category.id }}</td>
+                            <td>{{ category.name }}</td>
+                            <td>{{ category.description or '-' }}</td>
+                            <td>{{ category.articles.count() }}</td>
+                            <td>{{ category.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                {% if current_user.has_permission_name('article_category_update') %}
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-outline-primary" 
+                                            onclick="editCategory({{ category.id }}, '{{ category.name }}', '{{ category.description or '' }}')"
+                                            title="编辑">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    {% if current_user.has_permission_name('article_category_delete') %}
+                                    <button class="btn btn-outline-danger" 
+                                            onclick="deleteCategory({{ category.id }}, '{{ category.name }}')"
+                                            title="删除">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 分类模态框 -->
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryModalTitle">新建分类</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="categoryForm">
+                <div class="modal-body">
+                    <input type="hidden" id="categoryId" name="id">
+                    <div class="form-group">
+                        <label for="categoryName">分类名称 *</label>
+                        <input type="text" class="form-control" id="categoryName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoryDescription">描述</label>
+                        <textarea class="form-control" id="categoryDescription" name="description" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function editCategory(id, name, description) {
+    $('#categoryModalTitle').text('编辑分类');
+    $('#categoryId').val(id);
+    $('#categoryName').val(name);
+    $('#categoryDescription').val(description);
+    var modal = new bootstrap.Modal(document.getElementById('categoryModal'));
+    modal.show();
+}
+
+function deleteCategory(id, name) {
+    if (confirm('确定要删除分类 "' + name + '" 吗？')) {
+        $.ajax({
+            url: '/api/article-categories/' + id,
+            type: 'DELETE',
+            success: function(response) {
+                if (response.success) {
+                    location.reload();
+                } else {
+                    alert('删除失败：' + response.message);
+                }
+            },
+            error: function() {
+                alert('删除失败，请重试');
+            }
+        });
+    }
+}
+
+$('#categoryForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        name: $('#categoryName').val(),
+        description: $('#categoryDescription').val()
+    };
+    
+    const categoryId = $('#categoryId').val();
+    const url = categoryId ? '/api/article-categories/' + categoryId : '/api/article-categories';
+    const method = categoryId ? 'PUT' : 'POST';
+    
+    $.ajax({
+        url: url,
+        type: method,
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        success: function(response) {
+            if (response.success) {
+                var modal = bootstrap.Modal.getInstance(document.getElementById('categoryModal'));
+                modal.hide();
+                location.reload();
+            } else {
+                alert('保存失败：' + response.message);
+            }
+        },
+        error: function() {
+            alert('保存失败，请重试');
+        }
+    });
+});
+
+// 重置模态框
+document.getElementById('categoryModal').addEventListener('hidden.bs.modal', function() {
+    $('#categoryForm')[0].reset();
+    $('#categoryId').val('');
+    $('#categoryModalTitle').text('新建分类');
+});
+</script>
+{% endblock %}

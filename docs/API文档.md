@@ -945,6 +945,227 @@
 
 ---
 
+## 文章管理接口
+
+### 获取文章列表
+
+**接口地址**: `GET /api/articles`
+
+**权限要求**: `article_read`
+
+**查询参数**:
+- `page` (integer): 页码，默认为1（可选）
+- `per_page` (integer): 每页数量，默认为10（可选）
+- `category_id` (integer): 分类ID过滤（可选）
+- `status` (string): 状态过滤（draft/published）（可选）
+- `search` (string): 搜索关键词（可选）
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "获取成功",
+  "data": {
+    "articles": [
+      {
+        "id": 1,
+        "title": "文章标题",
+        "content": "文章内容",
+        "summary": "文章摘要",
+        "category_id": 1,
+        "category_name": "技术分享",
+        "author_id": 1,
+        "author_name": "张三",
+        "status": "published",
+        "view_count": 100,
+        "created_at": "2024-01-15T10:30:00",
+        "updated_at": "2024-01-15T10:30:00",
+        "published_at": "2024-01-15T10:30:00"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "per_page": 10,
+      "total": 50,
+      "pages": 5
+    }
+  }
+}
+```
+
+### 获取单个文章信息
+
+**接口地址**: `GET /api/articles/{article_id}`
+
+**权限要求**: `article_read`
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "获取成功",
+  "data": {
+    "id": 1,
+    "title": "文章标题",
+    "content": "文章内容",
+    "summary": "文章摘要",
+    "category_id": 1,
+    "category_name": "技术分享",
+    "author_id": 1,
+    "author_name": "张三",
+    "status": "published",
+    "view_count": 100,
+    "created_at": "2024-01-15T10:30:00",
+    "updated_at": "2024-01-15T10:30:00",
+    "published_at": "2024-01-15T10:30:00",
+    "attachments": [
+      {
+        "id": 1,
+        "filename": "document.pdf",
+        "original_filename": "原始文档.pdf",
+        "file_size": 1024000,
+        "file_type": "application/pdf",
+        "upload_time": "2024-01-15T10:30:00"
+      }
+    ]
+  }
+}
+```
+
+### 创建文章
+
+**接口地址**: `POST /api/articles`
+
+**权限要求**: `article_create`
+
+**请求参数**:
+```json
+{
+  "title": "文章标题",
+  "content": "文章内容",
+  "summary": "文章摘要（可选）",
+  "category_id": 1,
+  "status": "draft"
+}
+```
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "创建成功",
+  "data": {
+    "id": 1,
+    "title": "文章标题",
+    "status": "draft"
+  }
+}
+```
+
+### 更新文章信息
+
+**接口地址**: `PUT /api/articles/{article_id}`
+
+**权限要求**: `article_update`
+
+**请求参数**:
+```json
+{
+  "title": "更新的文章标题",
+  "content": "更新的文章内容",
+  "summary": "更新的文章摘要",
+  "category_id": 2,
+  "status": "published"
+}
+```
+
+### 删除文章
+
+**接口地址**: `DELETE /api/articles/{article_id}`
+
+**权限要求**: `article_delete`
+
+### 发布文章
+
+**接口地址**: `POST /api/articles/{article_id}/publish`
+
+**权限要求**: `article_publish`
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "发布成功",
+  "data": {
+    "id": 1,
+    "status": "published",
+    "published_at": "2024-01-15T10:30:00"
+  }
+}
+```
+
+---
+
+## 文章分类管理接口
+
+### 获取分类列表
+
+**接口地址**: `GET /api/article-categories`
+
+**权限要求**: `article_category_read`
+
+**响应示例**:
+```json
+{
+  "success": true,
+  "message": "获取成功",
+  "data": [
+    {
+      "id": 1,
+      "name": "技术分享",
+      "description": "技术相关文章",
+      "article_count": 10,
+      "created_at": "2024-01-15T10:30:00",
+      "updated_at": "2024-01-15T10:30:00"
+    }
+  ]
+}
+```
+
+### 获取单个分类信息
+
+**接口地址**: `GET /api/article-categories/{category_id}`
+
+**权限要求**: `article_category_read`
+
+### 创建分类
+
+**接口地址**: `POST /api/article-categories`
+
+**权限要求**: `article_category_create`
+
+**请求参数**:
+```json
+{
+  "name": "分类名称",
+  "description": "分类描述（可选）"
+}
+```
+
+### 更新分类信息
+
+**接口地址**: `PUT /api/article-categories/{category_id}`
+
+**权限要求**: `article_category_update`
+
+### 删除分类
+
+**接口地址**: `DELETE /api/article-categories/{category_id}`
+
+**权限要求**: `article_category_delete`
+
+---
+
 ## 部门管理接口
 
 ### 获取部门列表
@@ -1518,6 +1739,16 @@
 | attachment_read | 附件查看 | 查看和下载附件 |
 | attachment_create | 附件上传 | 上传新附件 |
 | metal_price_read | 金属价格查看 | 查看金属价格 |
+| article_read | 文章查看 | 查看文章信息 |
+| article_create | 文章创建 | 创建新文章 |
+| article_update | 文章更新 | 更新文章信息 |
+| article_delete | 文章删除 | 删除文章 |
+| article_publish | 文章发布 | 发布文章 |
+| article_manage | 文章管理 | 管理所有文章 |
+| article_category_read | 文章分类查看 | 查看文章分类 |
+| article_category_create | 文章分类创建 | 创建文章分类 |
+| article_category_update | 文章分类更新 | 更新文章分类 |
+| article_category_delete | 文章分类删除 | 删除文章分类 |
 
 ### 角色系统
 

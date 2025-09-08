@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- 主内容区 -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <!-- 文章标题 -->
+                    <h1 class="mb-3">
+                        {{ article.title }}
+                        {% if article.is_featured %}
+                        <span class="badge badge-warning ml-2">置顶</span>
+                        {% endif %}
+                    </h1>
+                    
+                    <!-- 文章信息 -->
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                        <div>
+                            <small class="text-muted">
+                                {% if article.category_name %}
+                                <span class="badge badge-info mr-2">{{ article.category_name }}</span>
+                                {% endif %}
+                                <i class="fas fa-user"></i> {{ article.author_name }}
+                                <span class="mx-2">|</span>
+                                <i class="fas fa-calendar"></i> {{ article.published_at.strftime('%Y年%m月%d日') if article.published_at }}
+                                <span class="mx-2">|</span>
+                                <i class="fas fa-eye"></i> {{ article.view_count }} 次浏览
+                            </small>
+                        </div>
+                        <div>
+                            <a href="{{ url_for('article.user_list') }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-arrow-left"></i> 返回列表
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 文章摘要 -->
+                    {% if article.summary %}
+                    <div class="alert alert-light mb-4">
+                        <h6 class="mb-2">文章摘要</h6>
+                        <p class="mb-0">{{ article.summary }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- 文章内容 -->
+                    <div class="article-content">
+                        {{ article.content | safe }}
+                    </div>
+                    
+                    <!-- 附件列表 -->
+                    <div id="attachment-list" class="mt-4">
+                        <!-- 附件将通过AJAX加载 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 操作按钮 -->
+            {% if current_user.has_permission_name('article_edit') and (article.author_id == current_user.id or current_user.has_permission_name('article_manage')) %}
+            <div class="mt-3">
+                <a href="{{ url_for('article.admin_edit', article_id=article.id) }}" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> 编辑文章
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- 侧边栏 -->
+        <div class="col-md-4">
+            <!-- 相关文章 -->
+            {% if related_articles %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">相关文章</h5>
+                </div>
+                <div class="card-body">
+                    {% for related in related_articles %}
+                    <div class="mb-3">
+                        <a href="{{ url_for('article.user_detail', article_id=related.id) }}" 
+                           class="text-decoration-none">
+                            <h6 class="mb-1">{{ related.title }}</h6>
+                        </a>
+                        <small class="text-muted">
+                            <i class="fas fa-calendar"></i> {{ related.published_at.strftime('%Y-%m-%d') if related.published_at }}
+                            <span class="mx-2">|</span>
+                            <i class="fas fa-eye"></i> {{ related.view_count }}
+                        </small>
+                        {% if related.summary %}
+                        <p class="text-muted small mt-1 mb-0">{{ related.summary[:80] }}{% if related.summary|length > 80 %}...{% endif %}</p>
+                        {% endif %}
+                    </div>
+                    {% if not loop.last %}<hr class="my-2">{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- 文章目录 -->
+            <div class="card mt-3" id="article-toc" style="display: none;">
+                <div class="card-header">
+                    <h5 class="mb-0">文章目录</h5>
+                </div>
+                <div class="card-body">
+                    <div id="toc-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.article-content {
+    line-height: 1.8;
+    font-size: 16px;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content h5,
+.article-content h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.article-content p {
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+
+.article-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin: 1rem 0;
+}
+
+.article-content blockquote {
+    border-left: 4px solid #007bff;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.article-content code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+.article-content pre {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.article-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.article-content table th,
+.article-content table td {
+    border: 1px solid #dee2e6;
+    padding: 0.5rem;
+    text-align: left;
+}
+
+.article-content table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+#toc-content a {
+    display: block;
+    padding: 0.25rem 0;
+    color: #6c757d;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    padding-left: 0.5rem;
+}
+
+#toc-content a:hover {
+    color: #007bff;
+    border-left-color: #007bff;
+}
+
+#toc-content a.active {
+    color: #007bff;
+    border-left-color: #007bff;
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.attachment-item {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background-color: #f8f9fa;
+}
+
+.attachment-item:hover {
+    background-color: #e9ecef;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // 加载附件列表
+    loadAttachments();
+    
+    // 生成文章目录
+    generateTOC();
+    
+    // 平滑滚动到锚点
+    $('a[href^="#"]').on('click', function(e) {
+        e.preventDefault();
+        var target = $(this.getAttribute('href'));
+        if (target.length) {
+            $('html, body').animate({
+                scrollTop: target.offset().top - 100
+            }, 500);
+        }
+    });
+    
+    // 滚动时更新目录激活状态
+    $(window).on('scroll', function() {
+        updateTOCActive();
+    });
+});
+
+// 加载附件列表
+function loadAttachments() {
+    $.ajax({
+        url: '/api/attachments',
+        method: 'GET',
+        data: {
+            related_type: 'article',
+            related_id: {{ article.id }}
+        },
+        success: function(response) {
+            if (response.success && response.data.length > 0) {
+                var html = '<h5 class="mb-3">附件下载</h5>';
+                response.data.forEach(function(attachment) {
+                    var icon = getFileIcon(attachment.file_type);
+                    var size = formatFileSize(attachment.file_size);
+                    html += '<div class="attachment-item">' +
+                           '<div class="d-flex align-items-center">' +
+                           '<i class="' + icon + ' fa-2x text-muted mr-3"></i>' +
+                           '<div class="flex-fill">' +
+                           '<h6 class="mb-1">' + attachment.original_filename + '</h6>' +
+                           '<small class="text-muted">' + size + '</small>' +
+                           '</div>' +
+                           '<div>' +
+                           '<a href="/attachments/download/' + attachment.id + '" class="btn btn-sm btn-outline-primary">' +
+                           '<i class="fas fa-download"></i> 下载' +
+                           '</a>' +
+                           '</div>' +
+                           '</div>' +
+                           '</div>';
+                });
+                $('#attachment-list').html(html);
+            }
+        }
+    });
+}
+
+// 生成文章目录
+function generateTOC() {
+    var headings = $('.article-content').find('h1, h2, h3, h4, h5, h6');
+    if (headings.length > 0) {
+        var toc = '';
+        headings.each(function(index) {
+            var $this = $(this);
+            var id = 'heading-' + index;
+            $this.attr('id', id);
+            
+            var level = parseInt(this.tagName.charAt(1));
+            var indent = (level - 1) * 1;
+            
+            toc += '<a href="#' + id + '" style="margin-left: ' + indent + 'rem;">' + $this.text() + '</a>';
+        });
+        
+        $('#toc-content').html(toc);
+        $('#article-toc').show();
+    }
+}
+
+// 更新目录激活状态
+function updateTOCActive() {
+    var scrollTop = $(window).scrollTop();
+    var headings = $('.article-content').find('h1, h2, h3, h4, h5, h6');
+    
+    var current = null;
+    headings.each(function() {
+        var $this = $(this);
+        if ($this.offset().top - 150 <= scrollTop) {
+            current = $this.attr('id');
+        }
+    });
+    
+    $('#toc-content a').removeClass('active');
+    if (current) {
+        $('#toc-content a[href="#' + current + '"]').addClass('active');
+    }
+}
+
+// 获取文件图标
+function getFileIcon(fileType) {
+    if (fileType.includes('image')) {
+        return 'fas fa-image';
+    } else if (fileType.includes('pdf')) {
+        return 'fas fa-file-pdf';
+    } else if (fileType.includes('word') || fileType.includes('document')) {
+        return 'fas fa-file-word';
+    } else {
+        return 'fas fa-file';
+    }
+}
+
+// 格式化文件大小
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    var k = 1024;
+    var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+</script>
+{% endblock %}

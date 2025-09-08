@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}分类管理{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>分类管理</h2>
+        {% if current_user.has_permission_name('article_manage') %}
+        <button class="btn btn-primary" data-toggle="modal" data-target="#categoryModal">
+            <i class="fas fa-plus"></i> 新建分类
+        </button>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            {% if categories %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>分类名称</th>
+                            <th>描述</th>
+                            <th>排序</th>
+                            <th>文章数量</th>
+                            <th>状态</th>
+                            <th>创建时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryTableBody">
+                        {% for category in categories %}
+                        <tr data-id="{{ category.id }}">
+                            <td>
+                                <strong>{{ category.name }}</strong>
+                            </td>
+                            <td>
+                                <span class="text-muted">{{ category.description or '无描述' }}</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-secondary">{{ category.sort_order }}</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-info">{{ category.article_count or 0 }}</span>
+                            </td>
+                            <td>
+                                {% if category.is_active %}
+                                <span class="badge badge-success">启用</span>
+                                {% else %}
+                                <span class="badge badge-secondary">禁用</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ category.created_at.strftime('%Y-%m-%d %H:%M') if category.created_at }}
+                                </small>
+                            </td>
+                            <td>
+                                {% if current_user.has_permission_name('article_manage') %}
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-outline-primary" 
+                                            onclick="editCategory({{ category.id }}, '{{ category.name }}', '{{ category.description or '' }}', {{ category.sort_order }}, {{ category.is_active|lower }})" 
+                                            title="编辑">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    
+                                    {% if category.is_active %}
+                                    <button class="btn btn-outline-warning" 
+                                            onclick="toggleCategoryStatus({{ category.id }}, false)" 
+                                            title="禁用">
+                                        <i class="fas fa-pause"></i>
+                                    </button>
+                                    {% else %}
+                                    <button class="btn btn-outline-success" 
+                                            onclick="toggleCategoryStatus({{ category.id }}, true)" 
+                                            title="启用">
+                                        <i class="fas fa-play"></i>
+                                    </button>
+                                    {% endif %}
+                                    
+                                    {% if not category.article_count or category.article_count == 0 %}
+                                    <button class="btn btn-outline-danger" 
+                                            onclick="deleteCategory({{ category.id }}, '{{ category.name }}')" 
+                                            title="删除">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">暂无分类</h5>
+                <p class="text-muted">创建第一个文章分类来开始组织您的内容</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- 分类编辑模态框 -->
+<div class="modal fade" id="categoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryModalTitle">新建分类</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form id="categoryForm">
+                <div class="modal-body">
+                    <input type="hidden" id="categoryId" name="id">
+                    
+                    <div class="form-group">
+                        <label for="categoryName" class="required">分类名称</label>
+                        <input type="text" class="form-control" id="categoryName" name="name" 
+                               required maxlength="50" placeholder="请输入分类名称">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="categoryDescription">分类描述</label>
+                        <textarea class="form-control" id="categoryDescription" name="description" 
+                                  rows="3" maxlength="200" placeholder="请输入分类描述（可选）"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="categorySortOrder">排序</label>
+                        <input type="number" class="form-control" id="categorySortOrder" name="sort_order" 
+                               value="0" min="0" max="999">
+                        <small class="form-text text-muted">数字越小排序越靠前</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="categoryIsActive" 
+                                   name="is_active" value="1" checked>
+                            <label class="custom-control-label" for="categoryIsActive">启用分类</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.required::after {
+    content: ' *';
+    color: red;
+}
+
+.table tbody tr {
+    cursor: default;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var isEditing = false;
+
+$(document).ready(function() {
+    // 重置模态框
+    $('#categoryModal').on('hidden.bs.modal', function() {
+        resetForm();
+    });
+    
+    // 表单提交
+    $('#categoryForm').on('submit', function(e) {
+        e.preventDefault();
+        saveCategory();
+    });
+});
+
+// 重置表单
+function resetForm() {
+    isEditing = false;
+    $('#categoryModalTitle').text('新建分类');
+    $('#categoryForm')[0].reset();
+    $('#categoryId').val('');
+    $('#categoryIsActive').prop('checked', true);
+    $('#categorySortOrder').val('0');
+}
+
+// 编辑分类
+function editCategory(id, name, description, sortOrder, isActive) {
+    isEditing = true;
+    $('#categoryModalTitle').text('编辑分类');
+    $('#categoryId').val(id);
+    $('#categoryName').val(name);
+    $('#categoryDescription').val(description);
+    $('#categorySortOrder').val(sortOrder);
+    $('#categoryIsActive').prop('checked', isActive);
+    $('#categoryModal').modal('show');
+}
+
+// 保存分类
+function saveCategory() {
+    var formData = {
+        name: $('#categoryName').val().trim(),
+        description: $('#categoryDescription').val().trim(),
+        sort_order: parseInt($('#categorySortOrder').val()) || 0,
+        is_active: $('#categoryIsActive').is(':checked')
+    };
+    
+    if (!formData.name) {
+        showAlert('warning', '请输入分类名称');
+        return;
+    }
+    
+    var url, method;
+    if (isEditing) {
+        var categoryId = $('#categoryId').val();
+        url = '/articles/admin/categories/' + categoryId + '/update';
+        method = 'POST';
+        formData.id = categoryId;
+    } else {
+        url = '/articles/admin/categories/create';
+        method = 'POST';
+    }
+    
+    $.ajax({
+        url: url,
+        method: method,
+        data: formData,
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', response.message);
+                $('#categoryModal').modal('hide');
+                location.reload();
+            } else {
+                showAlert('danger', response.message);
+            }
+        },
+        error: function() {
+            showAlert('danger', '操作失败，请重试');
+        }
+    });
+}
+
+// 切换分类状态
+function toggleCategoryStatus(categoryId, isActive) {
+    var action = isActive ? '启用' : '禁用';
+    if (confirm('确定要' + action + '这个分类吗？')) {
+        $.ajax({
+            url: '/articles/admin/categories/' + categoryId + '/update',
+            method: 'POST',
+            data: {
+                id: categoryId,
+                is_active: isActive
+            },
+            success: function(response) {
+                if (response.success) {
+                    showAlert('success', response.message);
+                    location.reload();
+                } else {
+                    showAlert('danger', response.message);
+                }
+            },
+            error: function() {
+                showAlert('danger', '操作失败，请重试');
+            }
+        });
+    }
+}
+
+// 删除分类
+function deleteCategory(categoryId, categoryName) {
+    if (confirm('确定要删除分类 "' + categoryName + '" 吗？此操作不可恢复！')) {
+        $.ajax({
+            url: '/articles/admin/categories/' + categoryId + '/delete',
+            method: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    showAlert('success', response.message);
+                    location.reload();
+                } else {
+                    showAlert('danger', response.message);
+                }
+            },
+            error: function() {
+                showAlert('danger', '删除失败，请重试');
+            }
+        });
+    }
+}
+
+// 显示提示信息
+function showAlert(type, message) {
+    var alertHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+                   message +
+                   '<button type="button" class="close" data-dismiss="alert">' +
+                   '<span>&times;</span>' +
+                   '</button>' +
+                   '</div>';
+    
+    $('.container-fluid').prepend(alertHtml);
+    
+    // 3秒后自动关闭
+    setTimeout(function() {
+        $('.alert').alert('close');
+    }, 3000);
+}
+</script>
+{% endblock %}

@@ -9,7 +9,7 @@ class Role(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     
     # 关联用户
-    users = db.relationship('User', secondary='user_roles', backref=db.backref('roles', lazy='dynamic'))
+    users = db.relationship('User', secondary='user_roles', backref='roles')
     
     def __repr__(self):
         return f'<Role {self.name}>'

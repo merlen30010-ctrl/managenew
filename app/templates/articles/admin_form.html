@@ -1,0 +1,507 @@
+{% extends "base.html" %}
+
+{% block title %}{% if article %}编辑文章{% else %}新建文章{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{% if article %}编辑文章{% else %}新建文章{% endif %}</h2>
+        <a href="{{ url_for('article.admin_list') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> 返回列表
+        </a>
+    </div>
+    
+    <form id="articleForm" method="POST" enctype="multipart/form-data">
+        <div class="row">
+            <!-- 主要内容区 -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- 标题 -->
+                        <div class="form-group">
+                            <label for="title" class="required">文章标题</label>
+                            <input type="text" class="form-control" id="title" name="title" 
+                                   value="{{ article.title if article else '' }}" required maxlength="200">
+                        </div>
+                        
+                        <!-- 摘要 -->
+                        <div class="form-group">
+                            <label for="summary">文章摘要</label>
+                            <textarea class="form-control" id="summary" name="summary" rows="3" 
+                                      maxlength="500" placeholder="简要描述文章内容（可选）">{{ article.summary if article else '' }}</textarea>
+                            <small class="form-text text-muted">摘要将显示在文章列表中，建议控制在100字以内</small>
+                        </div>
+                        
+                        <!-- 内容编辑器 -->
+                        <div class="form-group">
+                            <label for="content" class="required">文章内容</label>
+                            <div class="mb-2">
+                                <div class="btn-toolbar" role="toolbar">
+                                    <div class="btn-group btn-group-sm me-2" role="group">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="insertText('**', '**')" title="粗体">
+                                            <i class="fas fa-bold"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="insertText('*', '*')" title="斜体">
+                                            <i class="fas fa-italic"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="insertText('~~', '~~')" title="删除线">
+                                            <i class="fas fa-strikethrough"></i>
+                                        </button>
+                                    </div>
+                                    <div class="btn-group btn-group-sm me-2" role="group">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="insertText('# ', '')" title="标题1">
+                                            H1
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="insertText('## ', '')" title="标题2">
+                                            H2
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="insertText('### ', '')" title="标题3">
+                                            H3
+                                        </button>
+                                    </div>
+                                    <div class="btn-group btn-group-sm me-2" role="group">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="insertText('- ', '')" title="无序列表">
+                                            <i class="fas fa-list-ul"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="insertText('1. ', '')" title="有序列表">
+                                            <i class="fas fa-list-ol"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="insertText('> ', '')" title="引用">
+                                            <i class="fas fa-quote-right"></i>
+                                        </button>
+                                    </div>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="insertText('[链接文字](', ')')" title="链接">
+                                            <i class="fas fa-link"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="insertText('```\n', '\n```')" title="代码块">
+                                            <i class="fas fa-code"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <textarea id="content" name="content" class="form-control" rows="20" placeholder="请输入文章内容，支持Markdown格式...">{{ article.content if article else '' }}</textarea>
+                            <small class="form-text text-muted">支持Markdown格式，使用上方工具栏快速插入格式</small>
+                        </div>
+                        
+                        <!-- 附件上传 -->
+                        <div class="form-group">
+                            <label>文章附件</label>
+                            <div class="card border-light">
+                                <div class="card-body">
+                                    <div class="upload-area" id="uploadArea">
+                                        <div class="text-center py-4">
+                                            <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                                            <p class="text-muted mb-2">拖拽文件到此处或点击上传</p>
+                                            <input type="file" id="fileInput" multiple style="display: none;">
+                                            <button type="button" class="btn btn-outline-primary" onclick="$('#fileInput').click()">
+                                                选择文件
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="attachmentList" class="mt-3">
+                                        <!-- 现有附件将在这里显示 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 侧边栏 -->
+            <div class="col-md-4">
+                <!-- 发布设置 -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">发布设置</h6>
+                    </div>
+                    <div class="card-body">
+                        <!-- 状态 -->
+                        <div class="form-group">
+                            <label for="status">状态</label>
+                            <select class="form-control" id="status" name="status">
+                                <option value="draft" {% if not article or article.status == 'draft' %}selected{% endif %}>草稿</option>
+                                {% if current_user.has_permission_name('article_publish') %}
+                                <option value="published" {% if article and article.status == 'published' %}selected{% endif %}>已发布</option>
+                                {% endif %}
+                                {% if current_user.has_permission_name('article_manage') %}
+                                <option value="archived" {% if article and article.status == 'archived' %}selected{% endif %}>已归档</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        
+                        <!-- 分类 -->
+                        <div class="form-group">
+                            <label for="category_id">文章分类</label>
+                            <select class="form-control" id="category_id" name="category_id">
+                                <option value="">请选择分类</option>
+                                {% for category in categories %}
+                                <option value="{{ category.id }}" 
+                                        {% if article and article.category_id == category.id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- 置顶 -->
+                        {% if current_user.has_permission_name('article_manage') %}
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="is_featured" 
+                                       name="is_featured" value="1" 
+                                       {% if article and article.is_featured %}checked{% endif %}>
+                                <label class="custom-control-label" for="is_featured">置顶文章</label>
+                            </div>
+                            <small class="form-text text-muted">置顶文章将优先显示在文章列表顶部</small>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- 发布时间 -->
+                        {% if article and article.published_at %}
+                        <div class="form-group">
+                            <label>发布时间</label>
+                            <p class="form-control-plaintext small">
+                                {{ article.published_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-block" name="action" value="save">
+                                <i class="fas fa-save"></i> 保存文章
+                            </button>
+                            
+                            {% if not article or article.status == 'draft' %}
+                            {% if current_user.has_permission_name('article_publish') %}
+                            <button type="submit" class="btn btn-success btn-block" name="action" value="publish">
+                                <i class="fas fa-paper-plane"></i> 保存并发布
+                            </button>
+                            {% endif %}
+                            {% endif %}
+                            
+                            <button type="button" class="btn btn-outline-secondary btn-block" onclick="previewArticle()">
+                                <i class="fas fa-eye"></i> 预览
+                            </button>
+                        </div>
+                        
+                        {% if article %}
+                        <hr>
+                        <div class="text-muted small">
+                            <p class="mb-1">创建时间：{{ article.created_at.strftime('%Y-%m-%d %H:%M') if article.created_at }}</p>
+                            {% if article.updated_at %}
+                            <p class="mb-1">更新时间：{{ article.updated_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            {% endif %}
+                            <p class="mb-0">浏览次数：{{ article.view_count }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 预览模态框 -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">文章预览</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.btn-toolbar .btn-group {
+    margin-right: 0.5rem;
+}
+
+
+.required::after {
+    content: ' *';
+    color: red;
+}
+
+.upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.upload-area:hover {
+    border-color: #007bff;
+}
+
+.upload-area.dragover {
+    border-color: #007bff;
+    background-color: #f8f9fa;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    margin-bottom: 0.5rem;
+}
+
+.attachment-item .file-info {
+    flex: 1;
+    margin-left: 0.5rem;
+}
+
+.attachment-item .file-name {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.attachment-item .file-size {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+#content {
+    font-family: 'Courier New', monospace;
+    line-height: 1.5;
+}
+
+.btn-toolbar {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    margin-bottom: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var existingAttachments = [];
+
+$(document).ready(function() {
+    // 初始化文件上传
+    initFileUpload();
+    
+    // 加载现有附件
+    {% if article %}
+    loadExistingAttachments({{ article.id }});
+    {% endif %}
+});
+
+// 插入文本到textarea
+function insertText(before, after) {
+    var textarea = document.getElementById('content');
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var selectedText = textarea.value.substring(start, end);
+    var replacement = before + selectedText + after;
+    
+    textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+    
+    // 设置光标位置
+    var newCursorPos = start + before.length + selectedText.length + after.length;
+    textarea.setSelectionRange(newCursorPos, newCursorPos);
+    textarea.focus();
+}
+
+// 初始化文件上传
+function initFileUpload() {
+    var uploadArea = $('#uploadArea');
+    var fileInput = $('#fileInput');
+    
+    // 拖拽上传
+    uploadArea.on('dragover', function(e) {
+        e.preventDefault();
+        $(this).addClass('dragover');
+    });
+    
+    uploadArea.on('dragleave', function(e) {
+        e.preventDefault();
+        $(this).removeClass('dragover');
+    });
+    
+    uploadArea.on('drop', function(e) {
+        e.preventDefault();
+        $(this).removeClass('dragover');
+        var files = e.originalEvent.dataTransfer.files;
+        handleFiles(files);
+    });
+    
+    // 文件选择
+    fileInput.on('change', function() {
+        handleFiles(this.files);
+    });
+}
+
+// 处理文件上传
+function handleFiles(files) {
+    for (var i = 0; i < files.length; i++) {
+        uploadFile(files[i]);
+    }
+}
+
+// 上传单个文件
+function uploadFile(file) {
+    var formData = new FormData();
+    formData.append('file', file);
+    formData.append('module', 'article');
+    
+    // 创建进度显示
+    var progressId = 'progress_' + Date.now();
+    var progressHtml = '<div id="' + progressId + '" class="attachment-item">' +
+                      '<i class="fas fa-file text-muted"></i>' +
+                      '<div class="file-info">' +
+                      '<div class="file-name">' + file.name + '</div>' +
+                      '<div class="progress">' +
+                      '<div class="progress-bar" style="width: 0%"></div>' +
+                      '</div>' +
+                      '</div>' +
+                      '</div>';
+    
+    $('#attachmentList').append(progressHtml);
+    
+    $.ajax({
+        url: '/api/attachments/upload',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        xhr: function() {
+            var xhr = new window.XMLHttpRequest();
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    var percentComplete = (e.loaded / e.total) * 100;
+                    $('#' + progressId + ' .progress-bar').css('width', percentComplete + '%');
+                }
+            });
+            return xhr;
+        },
+        success: function(response) {
+            if (response.success) {
+                $('#' + progressId).remove();
+                addAttachmentToList(response.data);
+            } else {
+                $('#' + progressId).remove();
+                showAlert('danger', '文件上传失败：' + response.message);
+            }
+        },
+        error: function() {
+            $('#' + progressId).remove();
+            showAlert('danger', '文件上传失败，请重试');
+        }
+    });
+}
+
+// 添加附件到列表
+function addAttachmentToList(attachment) {
+    var attachmentHtml = '<div class="attachment-item" data-id="' + attachment.id + '">' +
+                        '<i class="fas fa-file text-muted"></i>' +
+                        '<div class="file-info">' +
+                        '<div class="file-name">' + attachment.original_name + '</div>' +
+                        '<div class="file-size">' + formatFileSize(attachment.file_size) + '</div>' +
+                        '</div>' +
+                        '<button type="button" class="btn btn-sm btn-outline-danger" onclick="removeAttachment(' + attachment.id + ')">' +
+                        '<i class="fas fa-times"></i>' +
+                        '</button>' +
+                        '<input type="hidden" name="attachment_ids[]" value="' + attachment.id + '">' +
+                        '</div>';
+    
+    $('#attachmentList').append(attachmentHtml);
+}
+
+// 加载现有附件
+function loadExistingAttachments(articleId) {
+    $.get('/api/attachments/list', { module: 'article', module_id: articleId }, function(response) {
+        if (response.success && response.data.length > 0) {
+            response.data.forEach(function(attachment) {
+                addAttachmentToList(attachment);
+            });
+        }
+    });
+}
+
+// 移除附件
+function removeAttachment(attachmentId) {
+    if (confirm('确定要移除这个附件吗？')) {
+        $('[data-id="' + attachmentId + '"]').remove();
+    }
+}
+
+// 格式化文件大小
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    var k = 1024;
+    var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// 预览文章
+function previewArticle() {
+    var title = $('#title').val();
+    var content = $('#content').val();
+    
+    if (!title.trim()) {
+        showAlert('warning', '请先输入文章标题');
+        return;
+    }
+    
+    // 简单的Markdown预览处理
+    var htmlContent = content
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/~~(.*?)~~/g, '<del>$1</del>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^- (.*$)/gim, '<li>$1</li>')
+        .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
+        .replace(/\[([^\]]+)\]\(([^\)]+)\)/g, '<a href="$2">$1</a>')
+        .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+        .replace(/\n/g, '<br>');
+    
+    var previewHtml = '<h1>' + title + '</h1>' +
+                     '<hr>' +
+                     '<div>' + htmlContent + '</div>';
+    
+    $('#previewContent').html(previewHtml);
+    var previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+    previewModal.show();
+}
+
+// 显示提示信息
+function showAlert(type, message) {
+    var alertHtml = '<div class="alert alert-' + type + ' alert-dismissible fade show" role="alert">' +
+                   message +
+                   '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                   '</div>';
+    
+    $('.container-fluid').prepend(alertHtml);
+    
+    // 3秒后自动关闭
+    setTimeout(function() {
+        var alertElement = document.querySelector('.alert');
+        if (alertElement) {
+            var alert = new bootstrap.Alert(alertElement);
+            alert.close();
+        }
+    }, 3000);
+}
+</script>
+{% endblock %}
