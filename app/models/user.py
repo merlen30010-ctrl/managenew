@@ -36,15 +36,6 @@ class User(UserMixin, db.Model):
         """检查用户是否具有特定角色"""
         return role_name in [role.name for role in self.roles]
     
-    def has_permission_name(self, permission_name):
-        """根据权限名称检查用户是否具有特定权限"""
-        from app.models.permission import Permission
-        permission = Permission.query.filter_by(name=permission_name).first()
-        if permission:
-            return self.has_permission(permission)
-        return False
-    
-
     
     def get_all_permissions(self):
         """获取用户的所有权限"""

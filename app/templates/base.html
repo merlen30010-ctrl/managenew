@@ -24,22 +24,22 @@
                     </li>
                     {% if current_user.is_authenticated %}
                     <!-- 系统管理功能菜单 -->
-                    {% if current_user.has_permission_name('user_read') or current_user.has_permission_name('role_read') or current_user.has_permission_name('permission_read') or current_user.has_permission_name('notification_manage') %}
+                    {% if current_user.has_permission('user_read') or current_user.has_permission('role_read') or current_user.has_permission('permission_read') or current_user.has_permission('notification_manage') %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             系统管理
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="adminDropdown">
-                            {% if current_user.has_permission_name('user_read') %}
+                            {% if current_user.has_permission('user_read') %}
                             <li><a class="dropdown-item" href="{{ url_for('main.users') }}">用户管理</a></li>
                             {% endif %}
-                            {% if current_user.has_permission_name('role_read') %}
+                            {% if current_user.has_permission('role_read') %}
                             <li><a class="dropdown-item" href="{{ url_for('main.roles') }}">角色管理</a></li>
                             {% endif %}
-                            {% if current_user.has_permission_name('permission_read') %}
+                            {% if current_user.has_permission('permission_read') %}
                             <li><a class="dropdown-item" href="{{ url_for('permission.list_permissions') }}">权限管理</a></li>
                             {% endif %}
-                            {% if current_user.has_permission_name('notification_manage') %}
+                            {% if current_user.has_permission('notification_manage') %}
                             <li><a class="dropdown-item" href="{{ url_for('notification.admin_list_notifications') }}">通知管理</a></li>
                             {% endif %}
                             {% if current_user.is_superuser %}
@@ -84,11 +84,11 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="articleDropdown">
                             <li><a class="dropdown-item" href="{{ url_for('article.user_list') }}">文章列表</a></li>
-                            {% if current_user.has_permission_name('article_manage') or current_user.has_permission_name('article_create') %}
+                            {% if current_user.has_permission('article_manage') or current_user.has_permission('article_create') %}
                             <li><a class="dropdown-item" href="{{ url_for('article.admin_list') }}">文章管理</a></li>
                             <li><a class="dropdown-item" href="{{ url_for('article.admin_create') }}">创建文章</a></li>
                             {% endif %}
-                            {% if current_user.has_permission_name('article_category_read') or current_user.has_permission_name('article_category_create') %}
+                            {% if current_user.has_permission('article_category_read') or current_user.has_permission('article_category_create') %}
                             <li><a class="dropdown-item" href="{{ url_for('article.admin_category_list') }}">分类管理</a></li>
                             {% endif %}
                         </ul>

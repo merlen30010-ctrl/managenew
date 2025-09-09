@@ -14,7 +14,7 @@ def get_material_transactions():
     """获取物料进出厂记录列表"""
     # 根据用户权限获取数据
     from flask_login import current_user
-    if current_user.has_permission_name('material_transaction_read_all'):
+    if current_user.has_permission('material_transaction_read_all'):
         # 管理员可以看到所有数据
         transactions = MaterialTransaction.query.all()
     else:
@@ -54,7 +54,7 @@ def get_material_transaction(transaction_id):
     transaction = MaterialTransaction.query.get_or_404(transaction_id)
     
     # 检查权限
-    if not current_user.has_permission_name('material_transaction_read_all'):
+    if not current_user.has_permission('material_transaction_read_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if transaction.factory_id not in factory_ids:
@@ -94,7 +94,7 @@ def create_material_transaction():
         return jsonify({'error': '日期、客户、物料名称和分厂是必填字段'}), 400
     
     # 检查权限
-    if not current_user.has_permission_name('material_transaction_update_all'):
+    if not current_user.has_permission('material_transaction_update_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if int(data['factory_id']) not in factory_ids:
@@ -164,7 +164,7 @@ def update_material_transaction(transaction_id):
         return jsonify({'error': '没有提供更新数据'}), 400
     
     # 检查权限
-    if not current_user.has_permission_name('material_transaction_update_all'):
+    if not current_user.has_permission('material_transaction_update_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if transaction.factory_id not in factory_ids:
@@ -185,7 +185,7 @@ def update_material_transaction(transaction_id):
     
     if 'factory_id' in data:
         # 检查权限
-        if not current_user.has_permission_name('material_transaction_create_all'):
+        if not current_user.has_permission('material_transaction_create_all'):
             user_departments = current_user.managed_departments
             factory_ids = [dept.id for dept in user_departments if dept.level == 1]
             if int(data['factory_id']) not in factory_ids:
@@ -261,7 +261,7 @@ def delete_material_transaction(transaction_id):
     transaction = MaterialTransaction.query.get_or_404(transaction_id)
     
     # 检查权限
-    if not current_user.has_permission_name('material_transaction_update_all'):
+    if not current_user.has_permission('material_transaction_update_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if transaction.factory_id not in factory_ids:
@@ -281,7 +281,7 @@ def update_material_transaction_status(transaction_id):
     data = request.get_json()
     
     # 检查权限
-    if not current_user.has_permission_name('material_transaction_delete_all'):
+    if not current_user.has_permission('material_transaction_delete_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if transaction.factory_id not in factory_ids:
@@ -341,7 +341,7 @@ def assign_material_transaction_operators(transaction_id):
     data = request.get_json()
     
     # 检查权限
-    if not current_user.has_permission_name('material_transaction_delete_all'):
+    if not current_user.has_permission('material_transaction_delete_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if transaction.factory_id not in factory_ids:

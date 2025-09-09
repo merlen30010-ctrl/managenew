@@ -131,7 +131,7 @@ def get_articles():
         query = Article.query
         
         # 根据权限过滤
-        if not current_user.has_permission_name('article_manage'):
+        if not current_user.has_permission('article_manage'):
             # 普通用户只能看到已发布的文章
             query = query.filter_by(status='published')
         else:
@@ -184,7 +184,7 @@ def get_article(article_id):
         article = Article.query.get_or_404(article_id)
         
         # 权限检查
-        if article.status != 'published' and not current_user.has_permission_name('article_manage'):
+        if article.status != 'published' and not current_user.has_permission('article_manage'):
             return jsonify({'success': False, 'message': '无权访问此文章'}), 403
         
         # 增加浏览次数（仅对已发布文章）
@@ -246,7 +246,7 @@ def update_article(article_id):
         data = request.get_json()
         
         # 权限检查：只有作者或管理员可以编辑
-        if article.author_id != current_user.id and not current_user.has_permission_name('article_manage'):
+        if article.author_id != current_user.id and not current_user.has_permission('article_manage'):
             return jsonify({'success': False, 'message': '无权编辑此文章'}), 403
         
         # 验证必填字段

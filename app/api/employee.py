@@ -97,7 +97,7 @@ def get_employee(employee_id):
             }), 404
         
         # 检查权限：管理员或本人（如果员工有关联用户）
-        if not current_user.has_permission_name('employee_read_all') and employee.user_id and current_user.id != employee.user_id:
+        if not current_user.has_permission('employee_read_all') and employee.user_id and current_user.id != employee.user_id:
             return jsonify({
                 'success': False,
                 'message': '权限不足'
@@ -197,7 +197,7 @@ def update_employee(employee_id):
             }), 404
         
         # 检查权限：管理员或本人（如果员工有关联用户）
-        if not current_user.has_permission_name('employee_update_all') and employee.user_id and current_user.id != employee.user_id:
+        if not current_user.has_permission('employee_update_all') and employee.user_id and current_user.id != employee.user_id:
             return jsonify({
                 'success': False,
                 'message': '权限不足'
@@ -217,7 +217,7 @@ def update_employee(employee_id):
             employee.employee_id = data['employee_id']
         
         # 只有管理员可以修改的字段
-        if current_user.has_permission_name('employee_update_all'):
+        if current_user.has_permission('employee_update_all'):
             if 'department_id' in data:
                 employee.department_id = data['department_id']
             if 'job_title' in data:
@@ -317,7 +317,7 @@ def upload_avatar(employee_id):
             }), 404
         
         # 检查权限：管理员或本人（如果员工有关联用户）
-        if not current_user.has_permission_name('employee_avatar_upload_all') and employee.user_id and current_user.id != employee.user_id:
+        if not current_user.has_permission('employee_avatar_upload_all') and employee.user_id and current_user.id != employee.user_id:
             return jsonify({
                 'success': False,
                 'message': '权限不足'

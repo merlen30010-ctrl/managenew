@@ -98,7 +98,7 @@ def create_transaction():
             return redirect(url_for('material_transaction.create_transaction'))
         
         # 检查权限
-        if not current_user.has_permission_name('material_transaction_create_all'):
+        if not current_user.has_permission('material_transaction_create_all'):
             user_departments = current_user.managed_departments
             factory_ids = [dept.id for dept in user_departments if dept.level == 1]
             if int(factory_id) not in factory_ids:
@@ -158,7 +158,7 @@ def edit_transaction(transaction_id):
     transaction = MaterialTransaction.query.get_or_404(transaction_id)
     
     # 检查权限
-    if not current_user.has_permission_name('material_transaction_update_all'):
+    if not current_user.has_permission('material_transaction_update_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if transaction.factory_id not in factory_ids:
@@ -190,7 +190,7 @@ def edit_transaction(transaction_id):
             return redirect(url_for('material_transaction.edit_transaction', transaction_id=transaction_id))
         
         # 检查权限
-        if not current_user.has_permission_name('material_transaction_update_all'):
+        if not current_user.has_permission('material_transaction_update_all'):
             user_departments = current_user.managed_departments
             factory_ids = [dept.id for dept in user_departments if dept.level == 1]
             if int(factory_id) not in factory_ids:
@@ -247,7 +247,7 @@ def delete_transaction(transaction_id):
     transaction = MaterialTransaction.query.get_or_404(transaction_id)
     
     # 检查权限
-    if not current_user.has_permission_name('material_transaction_delete_all'):
+    if not current_user.has_permission('material_transaction_delete_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if transaction.factory_id not in factory_ids:

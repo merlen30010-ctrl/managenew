@@ -21,7 +21,7 @@
         </div>
     </div>
     
-    {% if current_user.has_permission_name('user_read') %}
+    {% if current_user.has_permission('user_read') %}
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
@@ -33,7 +33,7 @@
     </div>
     {% endif %}
     
-    {% if current_user.has_permission_name('material_read') %}
+    {% if current_user.has_permission('material_read') %}
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
@@ -47,7 +47,7 @@
 </div>
 
 <div class="row mt-4">
-    {% if current_user.has_permission_name('contract_read') %}
+    {% if current_user.has_permission('contract_read') %}
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
@@ -59,7 +59,7 @@
     </div>
     {% endif %}
     
-    {% if current_user.has_permission_name('material_transaction_read') %}
+    {% if current_user.has_permission('material_transaction_read') %}
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
@@ -71,7 +71,7 @@
     </div>
     {% endif %}
     
-    {% if current_user.has_permission_name('production_record_read') %}
+    {% if current_user.has_permission('production_record_read') %}
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
@@ -85,7 +85,7 @@
 </div>
 
 <div class="row mt-4">
-    {% if current_user.has_permission_name('assay_data_read') %}
+    {% if current_user.has_permission('assay_data_read') %}
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">
@@ -97,7 +97,7 @@
     </div>
     {% endif %}
     
-    {% if current_user.has_permission_name('metal_price_read') %}
+    {% if current_user.has_permission('metal_price_read') %}
     <div class="col-md-4">
         <div class="card">
             <div class="card-body">

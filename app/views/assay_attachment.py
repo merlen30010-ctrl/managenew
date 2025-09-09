@@ -132,7 +132,7 @@ def preview_assay_attachment(attachment_id):
             return jsonify({'error': '关联的化验数据不存在'}), 404
             
         # 检查用户权限
-        if not current_user.has_permission_name('assay_data_delete_all'):
+        if not current_user.has_permission('assay_data_delete_all'):
             user_departments = current_user.managed_departments
             factory_ids = [dept.id for dept in user_departments if dept.level == 1]
             if assay_data.factory_id not in factory_ids:
@@ -255,7 +255,7 @@ def list_assay_attachments(assay_data_id):
         assay_data = AssayData.query.get_or_404(assay_data_id)
         
         # 检查用户权限
-        if not current_user.has_permission_name('assay_data_update_all'):
+        if not current_user.has_permission('assay_data_update_all'):
             user_departments = current_user.managed_departments
             factory_ids = [dept.id for dept in user_departments if dept.level == 1]
             if assay_data.factory_id not in factory_ids:

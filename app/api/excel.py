@@ -191,7 +191,7 @@ def export_excel_data(module_name):
             query = MaterialTransaction.query
             
             # 根据用户权限筛选数据
-            if not current_user.has_permission_name('assay_data_create_all'):
+            if not current_user.has_permission('assay_data_create_all'):
                 user_departments = current_user.managed_departments
                 factory_ids = [dept.id for dept in user_departments if dept.level == 1]
                 query = query.filter(MaterialTransaction.factory_id.in_(factory_ids))

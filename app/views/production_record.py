@@ -41,7 +41,7 @@ def list_records():
     query = pagination_service.build_filter_query(query, ProductionRecord, filters)
     
     # 根据用户权限筛选数据
-    if not current_user.has_permission_name('production_record_read_all'):
+    if not current_user.has_permission('production_record_read_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         query = query.filter(ProductionRecord.factory_id.in_(factory_ids))
@@ -91,7 +91,7 @@ def create_record():
             return redirect(url_for('production_record.create_record'))
         
         # 检查权限
-        if not current_user.has_permission_name('production_record_create_all'):
+        if not current_user.has_permission('production_record_create_all'):
             user_departments = current_user.managed_departments
             factory_ids = [dept.id for dept in user_departments if dept.level == 1]
             if int(factory_id) not in factory_ids:
@@ -151,7 +151,7 @@ def edit_record(record_id):
     record = ProductionRecord.query.get_or_404(record_id)
     
     # 检查权限
-    if not current_user.has_permission_name('production_record_update_all'):
+    if not current_user.has_permission('production_record_update_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if record.factory_id not in factory_ids:
@@ -178,7 +178,7 @@ def edit_record(record_id):
             return redirect(url_for('production_record.edit_record', record_id=record_id))
         
         # 检查权限
-        if not current_user.has_permission_name('production_record_update_all'):
+        if not current_user.has_permission('production_record_update_all'):
             user_departments = current_user.managed_departments
             factory_ids = [dept.id for dept in user_departments if dept.level == 1]
             if int(factory_id) not in factory_ids:
@@ -228,7 +228,7 @@ def delete_record(record_id):
     record = ProductionRecord.query.get_or_404(record_id)
     
     # 检查权限
-    if not current_user.has_permission_name('production_record_delete_all'):
+    if not current_user.has_permission('production_record_delete_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if record.factory_id not in factory_ids:

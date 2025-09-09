@@ -13,8 +13,7 @@ def permission_required(permission_name):
                 return redirect(url_for('auth.login'))
             
             # 检查用户是否具有指定权限
-            permission = Permission.query.filter_by(name=permission_name).first()
-            if not permission or not current_user.has_permission(permission):
+            if not current_user.has_permission(permission_name):
                 flash('您没有权限访问此页面')
                 return redirect(url_for('main.index'))
                 
@@ -31,7 +30,7 @@ def admin_required(f):
             return redirect(url_for('auth.login'))
         
         # 检查用户是否有管理员权限
-        if not current_user.has_permission_name('user_read'):
+        if not current_user.has_permission('user_read'):
             flash('您没有权限访问此页面')
             return redirect(url_for('main.index'))
             

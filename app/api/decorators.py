@@ -96,8 +96,7 @@ def permission_required(permission_name):
                 }), 401
             
             # 检查用户是否具有指定权限
-            permission = Permission.query.filter_by(name=permission_name).first()
-            if not permission or not user.has_permission(permission):
+            if not user.has_permission(permission_name):
                 return jsonify({
                     'success': False,
                     'message': f'缺少权限: {permission_name}',

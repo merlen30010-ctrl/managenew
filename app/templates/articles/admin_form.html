@@ -122,10 +122,10 @@
                             <label for="status">状态</label>
                             <select class="form-control" id="status" name="status">
                                 <option value="draft" {% if not article or article.status == 'draft' %}selected{% endif %}>草稿</option>
-                                {% if current_user.has_permission_name('article_publish') %}
+                                {% if current_user.has_permission('article_publish') %}
                                 <option value="published" {% if article and article.status == 'published' %}selected{% endif %}>已发布</option>
                                 {% endif %}
-                                {% if current_user.has_permission_name('article_manage') %}
+                                {% if current_user.has_permission('article_manage') %}
                                 <option value="archived" {% if article and article.status == 'archived' %}selected{% endif %}>已归档</option>
                                 {% endif %}
                             </select>
@@ -146,7 +146,7 @@
                         </div>
                         
                         <!-- 置顶 -->
-                        {% if current_user.has_permission_name('article_manage') %}
+                        {% if current_user.has_permission('article_manage') %}
                         <div class="form-group">
                             <div class="custom-control custom-checkbox">
                                 <input type="checkbox" class="custom-control-input" id="is_featured" 
@@ -179,7 +179,7 @@
                             </button>
                             
                             {% if not article or article.status == 'draft' %}
-                            {% if current_user.has_permission_name('article_publish') %}
+                            {% if current_user.has_permission('article_publish') %}
                             <button type="submit" class="btn btn-success btn-block" name="action" value="publish">
                                 <i class="fas fa-paper-plane"></i> 保存并发布
                             </button>
