@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 def get_assay_data_list():
     """获取化验数据列表"""
     # 根据用户权限获取数据
-    if current_user.has_role('管理员'):
+    if current_user.has_permission_name('assay_data_read_all'):
         # 管理员可以看到所有数据
         assay_data_list = AssayData.query.all()
     else:
@@ -60,7 +60,7 @@ def get_assay_data(data_id):
     assay_data = AssayData.query.get_or_404(data_id)
     
     # 检查权限
-    if not current_user.has_role('管理员'):
+    if not current_user.has_permission_name('assay_data_update_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if assay_data.factory_id not in factory_ids:
@@ -99,7 +99,7 @@ def create_assay_data():
         return jsonify({'error': '样品名称和分厂是必填字段'}), 400
     
     # 检查权限
-    if not current_user.has_role('管理员'):
+    if not current_user.has_permission_name('assay_data_read_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if int(data['factory_id']) not in factory_ids:
@@ -164,7 +164,7 @@ def update_assay_data(data_id):
         return jsonify({'error': '没有提供更新数据'}), 400
     
     # 检查权限
-    if not current_user.has_role('管理员'):
+    if not current_user.has_permission_name('assay_data_delete_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if assay_data.factory_id not in factory_ids:
@@ -176,7 +176,7 @@ def update_assay_data(data_id):
     
     if 'factory_id' in data:
         # 检查权限
-        if not current_user.has_role('管理员'):
+        if not current_user.has_permission_name('assay_data_create_all'):
             user_departments = current_user.managed_departments
             factory_ids = [dept.id for dept in user_departments if dept.level == 1]
             if int(data['factory_id']) not in factory_ids:
@@ -243,7 +243,7 @@ def delete_assay_data(data_id):
     assay_data = AssayData.query.get_or_404(data_id)
     
     # 检查权限
-    if not current_user.has_role('管理员'):
+    if not current_user.has_permission_name('assay_data_delete_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if assay_data.factory_id not in factory_ids:
@@ -596,7 +596,7 @@ def preview_assay_attachment(attachment_id):
             return jsonify({'error': '关联的化验数据不存在'}), 404
             
         # 检查用户权限
-        if not current_user.has_role('管理员'):
+        if not current_user.has_permission_name('assay_data_read_all'):
             user_departments = current_user.managed_departments
             factory_ids = [dept.id for dept in user_departments if dept.level == 1]
             if assay_data.factory_id not in factory_ids:
@@ -668,7 +668,7 @@ def delete_assay_attachment(attachment_id):
             return jsonify({'error': '关联的化验数据不存在'}), 404
             
         # 检查用户权限
-        if not current_user.has_role('管理员'):
+        if not current_user.has_permission_name('assay_data_update_all'):
             user_departments = current_user.managed_departments
             factory_ids = [dept.id for dept in user_departments if dept.level == 1]
             if assay_data.factory_id not in factory_ids:
@@ -723,7 +723,7 @@ def list_assay_attachments(assay_data_id):
         assay_data = AssayData.query.get_or_404(assay_data_id)
         
         # 检查用户权限
-        if not current_user.has_role('管理员'):
+        if not current_user.has_permission_name('assay_data_update_all'):
             user_departments = current_user.managed_departments
             factory_ids = [dept.id for dept in user_departments if dept.level == 1]
             if assay_data.factory_id not in factory_ids:

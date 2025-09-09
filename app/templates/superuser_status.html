@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}超级管理员状态{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">我的权限状态</h3>
+                </div>
+                <div class="card-body">
+                    <!-- 用户基本信息 -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-primary"><i class="fas fa-user"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">用户名</span>
+                                    <span class="info-box-number">{{ user_info.username }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-{{ 'success' if user_info.is_active else 'danger' }}"><i class="fas fa-circle"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">账户状态</span>
+                                    <span class="info-box-number">{{ '活跃' if user_info.is_active else '禁用' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 权限状态 -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-{{ 'warning' if user_info.is_superuser else 'info' }}"><i class="fas fa-{{ 'user-shield' if user_info.is_superuser else 'user' }}"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">权限级别</span>
+                                    <span class="info-box-number">
+                                        {% if user_info.is_superuser %}
+                                            超级管理员
+                                        {% else %}
+                                            普通用户
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-success"><i class="fas fa-key"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">可用权限数</span>
+                                    <span class="info-box-number">{{ user_info.permission_count }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 权限模式说明 -->
+                    <div class="alert alert-{{ 'warning' if user_info.is_superuser else 'info' }}">
+                        <h5><i class="fas fa-info-circle"></i> 权限模式说明</h5>
+                        {% if user_info.is_superuser %}
+                            <p><strong>混合模式 - 超级管理员：</strong></p>
+                            <ul>
+                                <li>您拥有系统的所有权限，无需通过角色分配</li>
+                                <li>权限检查时优先验证超级管理员身份</li>
+                                <li>可以管理其他用户的超级管理员权限</li>
+                                <li>拥有系统最高级别的访问权限</li>
+                            </ul>
+                        {% else %}
+                            <p><strong>混合模式 - 普通用户：</strong></p>
+                            <ul>
+                                <li>您的权限通过分配的角色获得</li>
+                                <li>当前分配的角色：
+                                    {% if user_info.roles %}
+                                        {% for role in user_info.roles %}
+                                            <span class="badge badge-primary">{{ role }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        <span class="text-muted">无角色分配</span>
+                                    {% endif %}
+                                </li>
+                                <li>权限范围受角色限制</li>
+                                <li>如需更高权限，请联系超级管理员</li>
+                            </ul>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- 角色信息 -->
+                    {% if user_info.roles %}
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">分配的角色</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for role in user_info.roles %}
+                                <div class="col-md-4 mb-2">
+                                    <span class="badge badge-primary badge-lg">
+                                        <i class="fas fa-user-tag"></i> {{ role }}
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- 操作按钮 -->
+                    <div class="mt-4">
+                        {% if user_info.is_superuser %}
+                            <a href="{{ url_for('superuser_view.management') }}" class="btn btn-warning">
+                                <i class="fas fa-users-cog"></i> 管理超级管理员
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('permission.list_permissions') }}" class="btn btn-info">
+                            <i class="fas fa-list"></i> 查看系统权限
+                        </a>
+                        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+                            <i class="fas fa-home"></i> 返回首页
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // 页面加载完成后的初始化操作
+    console.log('超级管理员状态页面已加载');
+});
+</script>
+{% endblock %}

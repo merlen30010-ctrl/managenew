@@ -42,8 +42,7 @@ class JWTTestCase(unittest.TestCase):
         # 创建测试用户
         self.test_user = User(
             username='testuser',
-    
-            name='Test User'
+            email='test@example.com'
         )
         self.test_user.set_password('testpassword')
         db.session.add(self.test_user)

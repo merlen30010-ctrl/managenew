@@ -17,5 +17,6 @@ from app.api import material_transaction
 from app.api import employee_document
 from app.api import employee_reward_punishment
 from app.api import notification
+from app.api import superuser
 from app.api import article
 from app.api import article_attachment

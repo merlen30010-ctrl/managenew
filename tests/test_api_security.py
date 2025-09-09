@@ -33,7 +33,7 @@ class TestAPISecurity(unittest.TestCase):
             db.create_all()
             
             # 创建测试用户
-            self.test_user = User(username='testuser', name='测试用户')
+            self.test_user = User(username='testuser', email='testuser@example.com')
             self.test_user.set_password('test123')
             db.session.add(self.test_user)
             
@@ -63,8 +63,9 @@ class TestAPISecurity(unittest.TestCase):
         response = self.client.get('/api/users')
         self.assertEqual(response.status_code, 401)
         data = json.loads(response.data)
-        self.assertIn('error', data)
-        self.assertEqual(data['error'], '需要登录才能访问此资源')
+        self.assertIn('error_code', data)
+        self.assertEqual(data['error_code'], 'UNAUTHORIZED')
+        self.assertEqual(data['message'], '需要登录才能访问此资源')
     
     def test_api_with_login_but_no_permission(self):
         """测试登录但无权限访问API"""
@@ -79,8 +80,9 @@ class TestAPISecurity(unittest.TestCase):
         response = self.client.get('/api/users')
         self.assertEqual(response.status_code, 403)
         data = json.loads(response.data)
-        self.assertIn('error', data)
-        self.assertIn('缺少权限', data['error'])
+        self.assertIn('error_code', data)
+        self.assertEqual(data['error_code'], 'INSUFFICIENT_PERMISSIONS')
+        self.assertIn('缺少权限', data['message'])
     
     def test_api_with_login_and_permission(self):
         """测试登录且有权限访问API"""

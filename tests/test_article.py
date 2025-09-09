@@ -55,7 +55,7 @@ class ArticleTestCase(unittest.TestCase):
         # 创建测试用户
         self.test_user = User(
             username='testuser',
-
+            email='testuser@example.com'
         )
         self.test_user.set_password('test123')
         db.session.add(self.test_user)
@@ -70,6 +70,7 @@ class ArticleTestCase(unittest.TestCase):
             ('article_create', '创建文章', 'article', 'create'),
             ('article_update', '更新文章', 'article', 'update'),
             ('article_delete', '删除文章', 'article', 'delete'),
+            ('article_category_read', '查看分类', 'article_category', 'read'),
             ('article_category_create', '创建分类', 'article_category', 'create'),
         ]
         
@@ -88,9 +89,7 @@ class ArticleTestCase(unittest.TestCase):
             self.test_role.add_permission(perm)
         
         # 为用户分配角色
-        from app.models.role import UserRole
-        user_role = UserRole(user_id=self.test_user.id, role_id=self.test_role.id)
-        db.session.add(user_role)
+        self.test_user.roles.append(self.test_role)
         
         # 创建测试分类
         self.test_category = ArticleCategory(

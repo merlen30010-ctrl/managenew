@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}超级管理员管理{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">超级管理员管理</h3>
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSuperuserModal">
+                            <i class="fas fa-plus"></i> 添加超级管理员
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>混合模式说明：</strong>超级管理员拥有所有权限，无需角色分配。普通用户通过角色获得权限。
+                    </div>
+                    
+                    <!-- 当前超级管理员状态 -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-success"><i class="fas fa-user-shield"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">当前状态</span>
+                                    <span class="info-box-number" id="currentStatus">
+                                        {% if current_user.is_superuser %}
+                                            超级管理员
+                                        {% else %}
+                                            普通用户
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-info"><i class="fas fa-users"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">超级管理员总数</span>
+                                    <span class="info-box-number" id="superuserCount">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 超级管理员列表 -->
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" id="superuserTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>用户名</th>
+                                    <th>邮箱</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 数据将通过AJAX加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 添加超级管理员模态框 -->
+<div class="modal fade" id="addSuperuserModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加超级管理员</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addSuperuserForm">
+                    <div class="form-group">
+                        <label for="userSelect">选择用户</label>
+                        <select class="form-control" id="userSelect" name="user_id" required>
+                            <option value="">请选择用户</option>
+                        </select>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>注意：</strong>设置为超级管理员后，该用户将拥有系统所有权限。
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="addSuperuser()">确认添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 确认取消模态框 -->
+<div class="modal fade" id="confirmModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">确认操作</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage"></p>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>警告：</strong>此操作不可撤销，请谨慎操作。
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-danger" id="confirmButton">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    loadSuperusers();
+    loadUsers();
+});
+
+// 加载超级管理员列表
+function loadSuperusers() {
+    $.ajax({
+        url: '/api/superuser/list',
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                updateSuperuserTable(response.data);
+                $('#superuserCount').text(response.total);
+            } else {
+                showAlert('error', '加载超级管理员列表失败：' + response.error);
+            }
+        },
+        error: function(xhr) {
+            if (xhr.status === 403) {
+                showAlert('error', '权限不足，无法访问超级管理员管理功能');
+            } else {
+                showAlert('error', '网络错误，请稍后重试');
+            }
+        }
+    });
+}
+
+// 更新超级管理员表格
+function updateSuperuserTable(data) {
+    const tbody = $('#superuserTable tbody');
+    tbody.empty();
+    
+    data.forEach(function(user) {
+        const row = `
+            <tr>
+                <td>${user.id}</td>
+                <td>${user.username}</td>
+                <td>${user.email || '-'}</td>
+                <td>
+                    <span class="badge ${user.is_active ? 'badge-success' : 'badge-danger'}">
+                        ${user.is_active ? '活跃' : '禁用'}
+                    </span>
+                </td>
+                <td>${user.created_at ? new Date(user.created_at).toLocaleString() : '-'}</td>
+                <td>
+                    ${user.id !== {{ current_user.id }} ? 
+                        `<button class="btn btn-sm btn-danger" onclick="removeSuperuser(${user.id}, '${user.username}')">
+                            <i class="fas fa-user-minus"></i> 取消权限
+                        </button>` : 
+                        '<span class="text-muted">当前用户</span>'
+                    }
+                </td>
+            </tr>
+        `;
+        tbody.append(row);
+    });
+}
+
+// 加载用户列表（用于添加超级管理员）
+function loadUsers() {
+    $.ajax({
+        url: '/api/users',
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                const select = $('#userSelect');
+                select.empty().append('<option value="">请选择用户</option>');
+                
+                response.data.forEach(function(user) {
+                    if (!user.is_superuser) {
+                        select.append(`<option value="${user.id}">${user.username} (${user.email || '无邮箱'})</option>`);
+                    }
+                });
+            }
+        },
+        error: function() {
+            showAlert('error', '加载用户列表失败');
+        }
+    });
+}
+
+// 添加超级管理员
+function addSuperuser() {
+    const userId = $('#userSelect').val();
+    if (!userId) {
+        showAlert('warning', '请选择要设置为超级管理员的用户');
+        return;
+    }
+    
+    $.ajax({
+        url: `/api/superuser/set/${userId}`,
+        method: 'POST',
+        success: function(response) {
+            if (response.success) {
+                showAlert('success', response.message);
+                bootstrap.Modal.getInstance(document.getElementById('addSuperuserModal')).hide();
+                loadSuperusers();
+                loadUsers(); // 重新加载用户列表
+            } else {
+                showAlert('error', response.error);
+            }
+        },
+        error: function() {
+            showAlert('error', '设置超级管理员失败');
+        }
+    });
+}
+
+// 取消超级管理员权限
+function removeSuperuser(userId, username) {
+    $('#confirmMessage').text(`确定要取消用户 "${username}" 的超级管理员权限吗？`);
+    $('#confirmButton').off('click').on('click', function() {
+        $.ajax({
+            url: `/api/superuser/unset/${userId}`,
+            method: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    showAlert('success', response.message);
+                    bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+                    loadSuperusers();
+                    loadUsers(); // 重新加载用户列表
+                } else {
+                    showAlert('error', response.error);
+                }
+            },
+            error: function() {
+                showAlert('error', '取消超级管理员权限失败');
+            }
+        });
+    });
+    new bootstrap.Modal(document.getElementById('confirmModal')).show();
+}
+
+// 显示提示信息
+function showAlert(type, message) {
+    const alertClass = {
+        'success': 'alert-success',
+        'error': 'alert-danger',
+        'warning': 'alert-warning',
+        'info': 'alert-info'
+    }[type] || 'alert-info';
+    
+    const alert = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    
+    $('.container-fluid').prepend(alert);
+    
+    // 3秒后自动消失
+    setTimeout(function() {
+        $('.alert').fadeOut();
+    }, 3000);
+}
+</script>
+{% endblock %}

@@ -1,7 +1,7 @@
 from flask import request, jsonify, current_app
 from app import db
 from app.models import EmployeeDocument, DocumentType, Employee
-from app.api.decorators import api_login_required, admin_required, permission_required
+from app.api.decorators import api_login_required, permission_required
 from app.utils.validators import validate_required_fields
 from app.api import api_bp
 from datetime import datetime
@@ -72,7 +72,7 @@ def get_employee_document(document_id):
         return jsonify({'code': 500, 'message': '服务器内部错误'}), 500
 
 @api_bp.route('/employee-documents', methods=['POST'])
-@admin_required
+@permission_required('employee_document_create')
 def create_employee_document():
     """创建员工证件"""
     try:
@@ -121,7 +121,7 @@ def create_employee_document():
         return jsonify({'code': 500, 'message': '服务器内部错误'}), 500
 
 @api_bp.route('/employee-documents/<int:document_id>', methods=['PUT'])
-@admin_required
+@permission_required('employee_document_update')
 def update_employee_document(document_id):
     """更新员工证件"""
     try:
@@ -162,7 +162,7 @@ def update_employee_document(document_id):
         return jsonify({'code': 500, 'message': '服务器内部错误'}), 500
 
 @api_bp.route('/employee-documents/<int:document_id>', methods=['DELETE'])
-@admin_required
+@permission_required('employee_document_delete')
 def delete_employee_document(document_id):
     """删除员工证件"""
     try:

@@ -1,7 +1,7 @@
 from flask import request, jsonify, current_app
 from app import db
 from app.models import EmployeeRewardPunishment, RewardPunishmentType, Employee
-from app.api.decorators import api_login_required, admin_required, permission_required
+from app.api.decorators import api_login_required, permission_required
 from app.utils.validators import validate_required_fields
 from app.api import api_bp
 from datetime import datetime
@@ -87,7 +87,7 @@ def get_employee_reward_punishment(record_id):
         return jsonify({'code': 500, 'message': '服务器内部错误'}), 500
 
 @api_bp.route('/employee-reward-punishments', methods=['POST'])
-@admin_required
+@permission_required('employee_reward_punishment_create')
 def create_employee_reward_punishment():
     """创建员工奖惩记录"""
     try:
@@ -145,7 +145,7 @@ def create_employee_reward_punishment():
         return jsonify({'code': 500, 'message': '服务器内部错误'}), 500
 
 @api_bp.route('/employee-reward-punishments/<int:record_id>', methods=['PUT'])
-@admin_required
+@permission_required('employee_reward_punishment_update')
 def update_employee_reward_punishment(record_id):
     """更新员工奖惩记录"""
     try:
@@ -198,7 +198,7 @@ def update_employee_reward_punishment(record_id):
         return jsonify({'code': 500, 'message': '服务器内部错误'}), 500
 
 @api_bp.route('/employee-reward-punishments/<int:record_id>', methods=['DELETE'])
-@admin_required
+@permission_required('employee_reward_punishment_delete')
 def delete_employee_reward_punishment(record_id):
     """删除员工奖惩记录"""
     try:

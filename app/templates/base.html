@@ -23,17 +23,29 @@
                         <a class="nav-link" href="{{ url_for('main.index') }}">首页</a>
                     </li>
                     {% if current_user.is_authenticated %}
-                    <!-- 管理员功能菜单 -->
-                    {% if current_user.has_role('管理员') %}
+                    <!-- 系统管理功能菜单 -->
+                    {% if current_user.has_permission_name('user_read') or current_user.has_permission_name('role_read') or current_user.has_permission_name('permission_read') or current_user.has_permission_name('notification_manage') %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             系统管理
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                            {% if current_user.has_permission_name('user_read') %}
                             <li><a class="dropdown-item" href="{{ url_for('main.users') }}">用户管理</a></li>
+                            {% endif %}
+                            {% if current_user.has_permission_name('role_read') %}
                             <li><a class="dropdown-item" href="{{ url_for('main.roles') }}">角色管理</a></li>
+                            {% endif %}
+                            {% if current_user.has_permission_name('permission_read') %}
                             <li><a class="dropdown-item" href="{{ url_for('permission.list_permissions') }}">权限管理</a></li>
+                            {% endif %}
+                            {% if current_user.has_permission_name('notification_manage') %}
                             <li><a class="dropdown-item" href="{{ url_for('notification.admin_list_notifications') }}">通知管理</a></li>
+                            {% endif %}
+                            {% if current_user.is_superuser %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('superuser_view.management') }}"><i class="fas fa-crown text-warning"></i> 超级管理员</a></li>
+                            {% endif %}
                         </ul>
                     </li>
                     {% endif %}

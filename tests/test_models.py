@@ -32,17 +32,17 @@ class ModelTestCase(unittest.TestCase):
         self.assertFalse(user.check_password('wrongpassword'))
         
     def test_role_model(self):
-        role = Role(name='admin', description='Administrator')
+        role = Role(name='测试管理员', description='测试用系统管理员')
         db.session.add(role)
         db.session.commit()
         
         self.assertEqual(Role.query.count(), 1)
-        self.assertEqual(role.name, 'admin')
+        self.assertEqual(role.name, '测试管理员')
         
     def test_user_role_relationship(self):
         user = User(username='testuser')
         user.set_password('password')
-        role = Role(name='admin', description='Administrator')
+        role = Role(name='测试用户角色', description='测试用用户角色')
         db.session.add(user)
         db.session.add(role)
         db.session.commit()
@@ -53,7 +53,7 @@ class ModelTestCase(unittest.TestCase):
         db.session.commit()
         
         self.assertEqual(UserRole.query.count(), 1)
-        self.assertEqual(user.roles[0].name, 'admin')
+        self.assertEqual(user.roles[0].name, '测试用户角色')
         
     def test_material_model(self):
         material = Material(name='测试物料', code='MAT001', full_name='测试物料全称', purpose='原料')

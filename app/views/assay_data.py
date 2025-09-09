@@ -19,7 +19,7 @@ assay_data_bp = Blueprint('assay_data', __name__, url_prefix='/assay-data')
 def list_assay_data():
     """化验数据列表"""
     # 根据用户权限获取数据
-    if current_user.has_role('管理员'):
+    if current_user.has_permission_name('assay_data_read_all'):
         # 管理员可以看到所有数据
         assay_data_list = AssayData.query.all()
     else:
@@ -39,7 +39,7 @@ def create_assay_data():
         factory_id = request.form.get('factory_id')
         
         # 检查权限
-        if not current_user.has_role('管理员'):
+        if not current_user.has_permission_name('assay_data_create_all'):
             user_factories = [dept.id for dept in current_user.managed_departments if dept.level == 1]
             if factory_id and int(factory_id) not in user_factories:
                 flash('您没有权限在此分厂创建化验数据')
@@ -135,7 +135,7 @@ def create_assay_data():
         return redirect(url_for('assay_data.list_assay_data'))
     
     # 获取用户有权限的分厂
-    if current_user.has_role('管理员'):
+    if current_user.has_permission_name('assay_data_read_all'):
         factories = Department.query.filter_by(level=1).all()
     else:
         factories = current_user.managed_departments
@@ -149,7 +149,7 @@ def edit_assay_data(id):
     assay_data = AssayData.query.get_or_404(id)
     
     # 检查权限
-    if not current_user.has_role('管理员'):
+    if not current_user.has_permission_name('assay_data_update_all'):
         user_factories = [dept.id for dept in current_user.managed_departments if dept.level == 1]
         if assay_data.factory_id not in user_factories:
             flash('您没有权限编辑此化验数据')
@@ -178,7 +178,7 @@ def edit_assay_data(id):
         return redirect(url_for('assay_data.list_assay_data'))
     
     # 获取用户有权限的分厂
-    if current_user.has_role('管理员'):
+    if current_user.has_permission_name('assay_data_read_all'):
         factories = Department.query.filter_by(level=1).all()
     else:
         factories = current_user.managed_departments
@@ -192,7 +192,7 @@ def delete_assay_data(id):
     assay_data = AssayData.query.get_or_404(id)
     
     # 检查权限
-    if not current_user.has_role('管理员'):
+    if not current_user.has_permission_name('assay_data_delete_all'):
         user_factories = [dept.id for dept in current_user.managed_departments if dept.level == 1]
         if assay_data.factory_id not in user_factories:
             flash('您没有权限删除此化验数据')

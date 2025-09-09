@@ -22,6 +22,7 @@ from app.api import material_transaction
 from app.api import employee_document
 from app.api import employee_reward_punishment
 from app.api import notification
+from app.api import superuser
 
 # 导入已存在的模块
 from app.api import excel
@@ -55,7 +56,7 @@ def delete_production_record(record_id):
     record = ProductionRecord.query.get_or_404(record_id)
     
     # 检查权限
-    if not current_user.has_role('管理员'):
+    if not current_user.has_permission_name('assay_data_read_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if record.factory_id not in factory_ids:
@@ -75,7 +76,7 @@ def update_production_record_status(record_id):
     data = request.get_json()
     
     # 检查权限
-    if not current_user.has_role('管理员'):
+    if not current_user.has_permission_name('assay_data_read_all'):
         user_departments = current_user.managed_departments
         factory_ids = [dept.id for dept in user_departments if dept.level == 1]
         if record.factory_id not in factory_ids:

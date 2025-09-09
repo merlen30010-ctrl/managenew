@@ -103,11 +103,16 @@ def create_test_data():
     print("创建测试数据...")
     
     app = create_app()
+    app.config['TESTING'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    
     with app.app_context():
+        # 创建所有数据库表
+        db.create_all()
         # 创建测试用户
         user = User.query.filter_by(username='testuser').first()
         if not user:
-            user = User(username='testuser', name='测试用户')
+            user = User(username='testuser', email='testuser@example.com')
             user.set_password('test123')
             db.session.add(user)
             db.session.commit()
@@ -169,7 +174,7 @@ def test_create_user():
         print(f"   创建用户请求失败: {e}")
         return None
 
-def test_get_user(user_id):
+def api_test_get_user(user_id):
     """测试获取用户接口"""
     if not user_id:
         return
@@ -189,7 +194,7 @@ def test_get_user(user_id):
     except Exception as e:
         print(f"   获取用户请求失败: {e}")
 
-def test_update_user(user_id):
+def api_test_update_user(user_id):
     """测试更新用户接口"""
     if not user_id:
         return
@@ -215,7 +220,7 @@ def test_update_user(user_id):
     except Exception as e:
         print(f"   更新用户请求失败: {e}")
 
-def test_delete_user(user_id):
+def api_test_delete_user(user_id):
     """测试删除用户接口"""
     if not user_id:
         return
@@ -244,8 +249,8 @@ if __name__ == '__main__':
     
     # 测试用户CRUD操作
     user_id = test_create_user()
-    test_get_user(user_id)
-    test_update_user(user_id)
-    test_delete_user(user_id)
+    api_test_get_user(user_id)
+    api_test_update_user(user_id)
+    api_test_delete_user(user_id)
     
     print("\n所有测试完成!")

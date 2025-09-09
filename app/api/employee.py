@@ -4,7 +4,8 @@ from app import db
 from app.models.employee import Employee
 from app.models.user import User
 from app.models.department import Department
-from app.api.decorators import admin_required, api_login_required, permission_required
+from app.models.role import Role
+from app.api.decorators import api_login_required, permission_required
 from app.utils.pagination_service import PaginationService
 from datetime import datetime
 import os
@@ -23,7 +24,7 @@ def allowed_file(filename):
 
 @employee_bp.route('/employees', methods=['GET'])
 @login_required
-@admin_required
+@permission_required('employee_read')
 def get_employees():
     """获取员工列表"""
     try:
@@ -96,7 +97,7 @@ def get_employee(employee_id):
             }), 404
         
         # 检查权限：管理员或本人（如果员工有关联用户）
-        if not current_user.has_role('管理员') and employee.user_id and current_user.id != employee.user_id:
+        if not current_user.has_permission_name('employee_read_all') and employee.user_id and current_user.id != employee.user_id:
             return jsonify({
                 'success': False,
                 'message': '权限不足'
@@ -119,7 +120,7 @@ def get_employee(employee_id):
 
 @employee_bp.route('/employees', methods=['POST'])
 @login_required
-@admin_required
+@permission_required('employee_create')
 def create_employee():
     """创建员工信息"""
     try:
@@ -196,7 +197,7 @@ def update_employee(employee_id):
             }), 404
         
         # 检查权限：管理员或本人（如果员工有关联用户）
-        if not current_user.has_role('管理员') and employee.user_id and current_user.id != employee.user_id:
+        if not current_user.has_permission_name('employee_update_all') and employee.user_id and current_user.id != employee.user_id:
             return jsonify({
                 'success': False,
                 'message': '权限不足'
@@ -216,7 +217,7 @@ def update_employee(employee_id):
             employee.employee_id = data['employee_id']
         
         # 只有管理员可以修改的字段
-        if current_user.has_role('管理员'):
+        if current_user.has_permission_name('employee_update_all'):
             if 'department_id' in data:
                 employee.department_id = data['department_id']
             if 'job_title' in data:
@@ -272,7 +273,7 @@ def update_employee(employee_id):
 
 @employee_bp.route('/employees/<int:employee_id>', methods=['DELETE'])
 @login_required
-@admin_required
+@permission_required('employee_delete')
 def delete_employee(employee_id):
     """删除员工信息"""
     try:
@@ -316,7 +317,7 @@ def upload_avatar(employee_id):
             }), 404
         
         # 检查权限：管理员或本人（如果员工有关联用户）
-        if not current_user.has_role('管理员') and employee.user_id and current_user.id != employee.user_id:
+        if not current_user.has_permission_name('employee_avatar_upload_all') and employee.user_id and current_user.id != employee.user_id:
             return jsonify({
                 'success': False,
                 'message': '权限不足'
@@ -378,7 +379,7 @@ def upload_avatar(employee_id):
 
 @employee_bp.route('/employees/statistics', methods=['GET'])
 @login_required
-@admin_required
+@permission_required('employee_read')
 def get_employee_statistics():
     """获取员工统计信息"""
     try:
@@ -426,7 +427,7 @@ def get_employee_statistics():
 
 @employee_bp.route('/employee/generate-id', methods=['GET'])
 @login_required
-@admin_required
+@permission_required('employee_create')
 def generate_employee_id():
     """生成员工工号"""
     try:
@@ -471,7 +472,7 @@ def generate_employee_id():
 
 @employee_bp.route('/employee/<int:employee_id>/promote', methods=['POST'])
 @login_required
-@admin_required
+@permission_required('employee_update')
 def promote_employee_api(employee_id):
     """员工转正API"""
     try:
@@ -530,12 +531,19 @@ def promote_employee_api(employee_id):
         from werkzeug.security import generate_password_hash
         new_user = User(
             username=data['username'],
-            password_hash=generate_password_hash(data['password']),
-            role='employee',
             is_active=True
         )
+        new_user.set_password(data['password'])
         db.session.add(new_user)
         db.session.flush()  # 获取用户ID
+        
+        # 分配员工角色
+        employee_role = Role.query.filter_by(name='员工').first()
+        if employee_role:
+            new_user.roles.append(employee_role)
+        else:
+            # 如果员工角色不存在，记录警告但继续创建用户
+            print('警告：员工角色不存在，用户创建成功但未分配角色')
         
         # 更新员工信息
         employee.user_id = new_user.id

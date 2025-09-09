@@ -20,8 +20,12 @@ def test_assay_api():
     from app.models.permission import Permission
     
     app = create_app()
+    app.config['TESTING'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     
     with app.app_context():
+        # 创建所有数据库表
+        db.create_all()
         # 创建测试分厂
         factory = Department.query.filter_by(name='API测试分厂').first()
         if not factory:
@@ -56,7 +60,7 @@ def test_assay_api():
         # 创建测试用户并分配角色
         test_user = User.query.filter_by(username='apitestuser').first()
         if not test_user:
-            test_user = User(username='apitestuser', name='API测试用户')
+            test_user = User(username='apitestuser', email='apitest@example.com')
             test_user.set_password('test123')
             db.session.add(test_user)
             db.session.commit()

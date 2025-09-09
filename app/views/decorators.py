@@ -30,9 +30,9 @@ def admin_required(f):
             flash('请先登录')
             return redirect(url_for('auth.login'))
         
-        # 检查用户是否为管理员
-        if not current_user.is_admin:
-            flash('您没有管理员权限访问此页面')
+        # 检查用户是否有管理员权限
+        if not current_user.has_permission_name('user_read'):
+            flash('您没有权限访问此页面')
             return redirect(url_for('main.index'))
             
         return f(*args, **kwargs)

@@ -4,13 +4,13 @@ from app import db
 from app.models.employee import Employee
 from app.models.user import User
 from app.models.department import Department
-from app.api.decorators import admin_required
+from app.views.decorators import permission_required
 
 employee_view_bp = Blueprint('employee', __name__)
 
 @employee_view_bp.route('/')
 @login_required
-@admin_required
+@permission_required('employee_read')
 def list_employees():
     """员工列表页面"""
     try:
@@ -42,7 +42,7 @@ def my_profile():
 
 @employee_view_bp.route('/statistics')
 @login_required
-@admin_required
+@permission_required('employee_read')
 def statistics():
     """员工统计页面"""
     try:
@@ -53,7 +53,7 @@ def statistics():
 
 @employee_view_bp.route('/documents')
 @login_required
-@admin_required
+@permission_required('employee_document_read')
 def documents():
     """员工证件管理页面"""
     try:
@@ -64,7 +64,7 @@ def documents():
 
 @employee_view_bp.route('/rewards-punishments')
 @login_required
-@admin_required
+@permission_required('employee_reward_punishment_read')
 def rewards_punishments():
     """员工奖惩管理页面"""
     try:
@@ -75,7 +75,7 @@ def rewards_punishments():
 
 @employee_view_bp.route('/promote/<int:employee_id>')
 @login_required
-@admin_required
+@permission_required('employee_update')
 def promote_employee(employee_id):
     """员工转正页面"""
     try:
