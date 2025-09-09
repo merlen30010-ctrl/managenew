@@ -34,7 +34,7 @@ class JWTTestCase(unittest.TestCase):
         db.create_all()
         
         # 删除已存在的测试用户
-        existing_user = User.query.filter_by(email='test@example.com').first()
+        existing_user = User.query.filter_by(username='testuser').first()
         if existing_user:
             db.session.delete(existing_user)
             db.session.commit()
@@ -42,7 +42,7 @@ class JWTTestCase(unittest.TestCase):
         # 创建测试用户
         self.test_user = User(
             username='testuser',
-            email='test@example.com',
+    
             name='Test User'
         )
         self.test_user.set_password('testpassword')
@@ -368,7 +368,7 @@ class BlacklistManagerTestCase(unittest.TestCase):
         db.create_all()
         
         # 删除已存在的测试用户
-        existing_user = User.query.filter_by(email='blacklist@example.com').first()
+        existing_user = User.query.filter_by(username='blacklistuser').first()
         if existing_user:
             db.session.delete(existing_user)
             db.session.commit()

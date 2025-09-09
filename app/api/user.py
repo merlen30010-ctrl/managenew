@@ -82,10 +82,10 @@ def create_user():
         data = request.get_json()
         
         # 检查必填字段
-        if not data or not data.get('username') or not data.get('email'):
+        if not data or not data.get('username'):
             return jsonify({
                 'success': False,
-                'message': '用户名和邮箱是必填字段'
+                'message': '用户名是必填字段'
             }), 400
         
         # 检查用户是否已存在
@@ -94,17 +94,10 @@ def create_user():
                 'success': False,
                 'message': '用户名已存在'
             }), 400
-            
-        if User.query.filter_by(email=data['email']).first():
-            return jsonify({
-                'success': False,
-                'message': '邮箱已存在'
-            }), 400
         
         # 创建新用户
         user = User()
         user.username = data['username']
-        user.email = data['email']
         # name和phone字段已移至Employee表，此处不再处理
         
         if data.get('password'):
@@ -157,15 +150,7 @@ def update_user(user_id):
                 }), 400
             user.username = data['username']
         
-        if 'email' in data:
-            # 检查邮箱是否已存在
-            existing_user = User.query.filter_by(email=data['email']).first()
-            if existing_user and existing_user.id != user_id:
-                return jsonify({
-                    'success': False,
-                    'message': '邮箱已存在'
-                }), 400
-            user.email = data['email']
+
         
         # name和phone字段已移至Employee表，此处不再处理
         

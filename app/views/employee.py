@@ -17,15 +17,8 @@ def list_employees():
         # 获取所有部门用于筛选
         departments = Department.query.filter_by(is_active=True).order_by(Department.name).all()
         
-        # 获取没有员工信息的用户（用于新增员工时选择）
-        users_without_employee = db.session.query(User).outerjoin(Employee).filter(
-            Employee.user_id.is_(None),
-            User.is_active == True
-        ).order_by(User.username).all()  # 改为按用户名排序
-        
         return render_template('employee/list.html', 
-                             departments=departments,
-                             users_without_employee=users_without_employee)
+                             departments=departments)
     except Exception as e:
         flash(f'加载页面失败: {str(e)}', 'error')
         return redirect(url_for('main.index'))
@@ -79,3 +72,27 @@ def rewards_punishments():
     except Exception as e:
         flash(f'加载奖惩管理页面失败: {str(e)}', 'error')
         return redirect(url_for('main.index'))
+
+@employee_view_bp.route('/promote/<int:employee_id>')
+@login_required
+@admin_required
+def promote_employee(employee_id):
+    """员工转正页面"""
+    try:
+        # 获取员工信息
+        employee = Employee.query.get_or_404(employee_id)
+        
+        # 检查员工状态
+        if employee.employment_status != '储备':
+            flash('只有储备状态的员工才能转正', 'warning')
+            return redirect(url_for('employee.list_employees'))
+        
+        # 获取所有部门
+        departments = Department.query.filter_by(is_active=True).order_by(Department.name).all()
+        
+        return render_template('employee/promote.html', 
+                             employee=employee, 
+                             departments=departments)
+    except Exception as e:
+        flash(f'加载转正页面失败: {str(e)}', 'error')
+        return redirect(url_for('employee.list_employees'))

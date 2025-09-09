@@ -42,7 +42,6 @@ def api_login():
                 'user': {
                     'id': user.id,
                     'username': user.username,
-                    'email': user.email,
                     # name字段已移至Employee表
                 }
             }
@@ -58,10 +57,10 @@ def api_register():
     """API注册接口"""
     data = request.get_json()
     
-    if not data or not data.get('username') or not data.get('email') or not data.get('password'):
+    if not data or not data.get('username') or not data.get('password'):
         return jsonify({
             'success': False,
-            'message': '用户名、邮箱和密码不能为空'
+            'message': '用户名和密码不能为空'
         }), 400
     
     # 检查用户是否已存在
@@ -70,17 +69,11 @@ def api_register():
             'success': False,
             'message': '用户名已存在'
         }), 400
-        
-    if User.query.filter_by(email=data['email']).first():
-        return jsonify({
-            'success': False,
-            'message': '邮箱已存在'
-        }), 400
+     
     
     # 创建新用户
     user = User(
         username=data['username'],
-        email=data['email'],
         name=data.get('name', data['username'])
     )
     user.set_password(data['password'])
@@ -95,7 +88,6 @@ def api_register():
             'user': {
                 'id': user.id,
                 'username': user.username,
-                'email': user.email,
                 # name字段已移至Employee表
             }
         }

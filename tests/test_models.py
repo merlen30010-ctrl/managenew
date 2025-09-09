@@ -22,7 +22,7 @@ class ModelTestCase(unittest.TestCase):
         self.app_context.pop()
         
     def test_user_model(self):
-        user = User(username='testuser', email='test@example.com')
+        user = User(username='testuser')
         user.set_password('password')
         db.session.add(user)
         db.session.commit()
@@ -40,7 +40,7 @@ class ModelTestCase(unittest.TestCase):
         self.assertEqual(role.name, 'admin')
         
     def test_user_role_relationship(self):
-        user = User(username='testuser', email='test@example.com')
+        user = User(username='testuser')
         user.set_password('password')
         role = Role(name='admin', description='Administrator')
         db.session.add(user)
@@ -105,7 +105,7 @@ class ModelTestCase(unittest.TestCase):
         db.session.commit()
         
         # 创建用户
-        user = User(username='testuser', email='test@example.com')
+        user = User(username='testuser')
         user.set_password('password')
         db.session.add(user)
         db.session.commit()

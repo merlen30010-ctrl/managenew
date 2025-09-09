@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}员工转正{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">员工转正</h3>
+                    <div class="card-tools">
+                        <a href="{{ url_for('employee.list_employees') }}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> 返回员工列表
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="promoteForm">
+                        <input type="hidden" id="employeeId" value="{{ employee.id }}">
+                        
+                        <!-- 基本信息 -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="mb-3">基本信息</h5>
+                                <div class="form-group">
+                                    <label for="name">姓名 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name" value="{{ employee.name }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="gender">性别 <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="gender" name="gender" required>
+                                        <option value="">请选择</option>
+                                        <option value="男" {{ 'selected' if employee.gender == '男' else '' }}>男</option>
+                                        <option value="女" {{ 'selected' if employee.gender == '女' else '' }}>女</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="birth_date">出生日期 <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="birth_date" name="birth_date" value="{{ employee.birth_date }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="id_card">身份证号 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="id_card" name="id_card" value="{{ employee.id_card }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="phone">联系电话 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="phone" name="phone" value="{{ employee.phone }}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5 class="mb-3">详细信息</h5>
+                                <div class="form-group">
+                                    <label for="native_place">籍贯</label>
+                                    <input type="text" class="form-control" id="native_place" name="native_place" value="{{ employee.native_place }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="nationality">民族</label>
+                                    <input type="text" class="form-control" id="nationality" name="nationality" value="{{ employee.nationality }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="education">学历</label>
+                                    <select class="form-control" id="education" name="education">
+                                        <option value="">请选择</option>
+                                        <option value="小学" {{ 'selected' if employee.education == '小学' else '' }}>小学</option>
+                                        <option value="初中" {{ 'selected' if employee.education == '初中' else '' }}>初中</option>
+                                        <option value="高中" {{ 'selected' if employee.education == '高中' else '' }}>高中</option>
+                                        <option value="中专" {{ 'selected' if employee.education == '中专' else '' }}>中专</option>
+                                        <option value="大专" {{ 'selected' if employee.education == '大专' else '' }}>大专</option>
+                                        <option value="本科" {{ 'selected' if employee.education == '本科' else '' }}>本科</option>
+                                        <option value="硕士" {{ 'selected' if employee.education == '硕士' else '' }}>硕士</option>
+                                        <option value="博士" {{ 'selected' if employee.education == '博士' else '' }}>博士</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="marital_status">婚姻状况</label>
+                                    <select class="form-control" id="marital_status" name="marital_status">
+                                        <option value="">请选择</option>
+                                        <option value="未婚" {{ 'selected' if employee.marital_status == '未婚' else '' }}>未婚</option>
+                                        <option value="已婚" {{ 'selected' if employee.marital_status == '已婚' else '' }}>已婚</option>
+                                        <option value="离异" {{ 'selected' if employee.marital_status == '离异' else '' }}>离异</option>
+                                        <option value="丧偶" {{ 'selected' if employee.marital_status == '丧偶' else '' }}>丧偶</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="address">居住地址</label>
+                                    <textarea class="form-control" id="address" name="address" rows="3">{{ employee.address }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- 工作信息 -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="mb-3">工作信息</h5>
+                                <div class="form-group">
+                                    <label for="employee_id">工号 <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="employee_id" name="employee_id" value="{{ employee.employee_id or '' }}" required>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary" id="generateEmployeeId">
+                                                <i class="fas fa-sync"></i> 自动生成
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="department_id">部门 <span class="text-danger">*</span></label>
+                                    <select class="form-control" id="department_id" name="department_id" required>
+                                        <option value="">请选择部门</option>
+                                        {% for dept in departments %}
+                                        <option value="{{ dept.id }}" {{ 'selected' if employee.department_id == dept.id else '' }}>{{ dept.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="job_title">职位 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="job_title" name="job_title" value="{{ employee.job_title }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="hire_date">入职日期 <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="hire_date" name="hire_date" value="{{ employee.hire_date }}" required>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <h5 class="mb-3">紧急联系人</h5>
+                                <div class="form-group">
+                                    <label for="emergency_contact">紧急联系人</label>
+                                    <input type="text" class="form-control" id="emergency_contact" name="emergency_contact" value="{{ employee.emergency_contact }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="emergency_phone">紧急联系电话</label>
+                                    <input type="text" class="form-control" id="emergency_phone" name="emergency_phone" value="{{ employee.emergency_phone }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- 账号信息 -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="mb-3">账号信息</h5>
+                                <div class="form-group">
+                                    <label for="username">用户名 <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="username" name="username" required>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary" id="generateUsername">
+                                                <i class="fas fa-sync"></i> 自动生成
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <small class="form-text text-muted">建议使用工号作为用户名</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">初始密码 <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="password" name="password" required>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary" id="generatePassword">
+                                                <i class="fas fa-sync"></i> 生成密码
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <small class="form-text text-muted">建议使用身份证后6位作为初始密码</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-check"></i> 确认转正
+                                </button>
+                                <a href="{{ url_for('employee.list_employees') }}" class="btn btn-secondary ml-2">
+                                    <i class="fas fa-times"></i> 取消
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // 自动生成工号
+    $('#generateEmployeeId').click(function() {
+        $.get('/api/employee/generate-id', function(data) {
+            if (data.success) {
+                $('#employee_id').val(data.employee_id);
+                // 同时更新用户名
+                $('#username').val(data.employee_id);
+            } else {
+                showAlert('error', data.message || '生成工号失败');
+            }
+        }).fail(function() {
+            showAlert('error', '生成工号失败，请稍后重试');
+        });
+    });
+    
+    // 自动生成用户名
+    $('#generateUsername').click(function() {
+        const employeeId = $('#employee_id').val();
+        if (employeeId) {
+            $('#username').val(employeeId);
+        } else {
+            showAlert('warning', '请先填写或生成工号');
+        }
+    });
+    
+    // 生成密码
+    $('#generatePassword').click(function() {
+        const idCard = $('#id_card').val();
+        if (idCard && idCard.length >= 6) {
+            const password = idCard.slice(-6);
+            $('#password').val(password);
+        } else {
+            // 生成随机6位密码
+            const password = Math.random().toString(36).slice(-6);
+            $('#password').val(password);
+        }
+    });
+    
+    // 切换密码显示
+    $('#togglePassword').click(function() {
+        const passwordField = $('#password');
+        const icon = $(this).find('i');
+        
+        if (passwordField.attr('type') === 'password') {
+            passwordField.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            passwordField.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+    
+    // 表单提交
+    $('#promoteForm').submit(function(e) {
+        e.preventDefault();
+        
+        const formData = {
+            employee_id: $('#employee_id').val(),
+            name: $('#name').val(),
+            gender: $('#gender').val(),
+            birth_date: $('#birth_date').val(),
+            id_card: $('#id_card').val(),
+            phone: $('#phone').val(),
+            native_place: $('#native_place').val(),
+            nationality: $('#nationality').val(),
+            education: $('#education').val(),
+            marital_status: $('#marital_status').val(),
+            address: $('#address').val(),
+            department_id: $('#department_id').val(),
+            job_title: $('#job_title').val(),
+            hire_date: $('#hire_date').val(),
+            emergency_contact: $('#emergency_contact').val(),
+            emergency_phone: $('#emergency_phone').val(),
+            username: $('#username').val(),
+            password: $('#password').val(),
+            employment_status: '在职'
+        };
+        
+        const employeeId = $('#employeeId').val();
+        
+        $.ajax({
+            url: `/api/employee/${employeeId}/promote`,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                if (response.success) {
+                    showAlert('success', '员工转正成功！');
+                    setTimeout(function() {
+                        window.location.href = '/employees';
+                    }, 2000);
+                } else {
+                    showAlert('error', response.message || '转正失败');
+                }
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                showAlert('error', response?.message || '转正失败，请稍后重试');
+            }
+        });
+    });
+    
+    // 显示提示信息
+    function showAlert(type, message) {
+        const alertClass = type === 'success' ? 'alert-success' : 
+                          type === 'warning' ? 'alert-warning' : 'alert-danger';
+        const alertHtml = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
+            </div>
+        `;
+        
+        $('.card-body').first().find('.alert:not(.flash-message)').remove();
+        $('.card-body').first().prepend(alertHtml);
+        
+        setTimeout(function() {
+            $('.alert:not(.flash-message)').fadeOut(function() {
+                $(this).remove();
+            });
+        }, 3000);
+    }
+});
+</script>
+{% endblock %}

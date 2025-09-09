@@ -18,6 +18,7 @@ from app.models.contract import Contract, ContractFile
 from app.models.attachment import Attachment
 from app.models.article import Article
 from app.models.article_category import ArticleCategory
+from app.models.employee import Employee
 
 def init_db():
     """初始化数据库"""
@@ -46,6 +47,12 @@ def init_db():
             {'name': 'customer_create', 'description': '创建客户', 'module': 'customer', 'action': 'create'},
             {'name': 'customer_update', 'description': '更新客户', 'module': 'customer', 'action': 'update'},
             {'name': 'customer_delete', 'description': '删除客户', 'module': 'customer', 'action': 'delete'},
+            
+            # 员工管理权限
+            {'name': 'employee_read', 'description': '查看员工', 'module': 'employee', 'action': 'read'},
+            {'name': 'employee_create', 'description': '创建员工', 'module': 'employee', 'action': 'create'},
+            {'name': 'employee_update', 'description': '更新员工', 'module': 'employee', 'action': 'update'},
+            {'name': 'employee_delete', 'description': '删除员工', 'module': 'employee', 'action': 'delete'},
             
             # 部门管理权限
             {'name': 'department_read', 'description': '查看部门', 'module': 'department', 'action': 'read'},
@@ -146,6 +153,18 @@ def init_db():
             {'name': 'article_category_create', 'description': '创建文章分类', 'module': 'article_category', 'action': 'create'},
             {'name': 'article_category_update', 'description': '更新文章分类', 'module': 'article_category', 'action': 'update'},
             {'name': 'article_category_delete', 'description': '删除文章分类', 'module': 'article_category', 'action': 'delete'},
+            
+            # 权限管理权限
+            {'name': 'permission_read', 'description': '查看权限', 'module': 'permission', 'action': 'read'},
+            {'name': 'permission_create', 'description': '创建权限', 'module': 'permission', 'action': 'create'},
+            {'name': 'permission_update', 'description': '更新权限', 'module': 'permission', 'action': 'update'},
+            {'name': 'permission_delete', 'description': '删除权限', 'module': 'permission', 'action': 'delete'},
+            
+            # 角色管理权限
+            {'name': 'role_read', 'description': '查看角色', 'module': 'role', 'action': 'read'},
+            {'name': 'role_create', 'description': '创建角色', 'module': 'role', 'action': 'create'},
+            {'name': 'role_update', 'description': '更新角色', 'module': 'role', 'action': 'update'},
+            {'name': 'role_delete', 'description': '删除角色', 'module': 'role', 'action': 'delete'}
         ]
         
         # 创建权限

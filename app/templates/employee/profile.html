@@ -86,8 +86,7 @@
                                         {% if employee.employment_status %}
                                             {% if employee.employment_status == '在职' %}
                                                 <span class="badge badge-success">{{ employee.employment_status }}</span>
-                                            {% elif employee.employment_status == '试用期' %}
-                                                <span class="badge badge-warning">{{ employee.employment_status }}</span>
+
                                             {% elif employee.employment_status == '离职' %}
                                                 <span class="badge badge-secondary">{{ employee.employment_status }}</span>
                                             {% else %}
@@ -290,7 +289,7 @@ $('#editProfileForm').on('submit', function(e) {
     const data = Object.fromEntries(formData.entries());
     
     $.ajax({
-        url: '/api/employees/{{ employee.user_id }}',
+        url: '/api/employees/{{ employee.id }}',
         method: 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(data),
@@ -338,7 +337,7 @@ function uploadAvatar() {
     formData.append('file', file);
     
     $.ajax({
-        url: '/api/employees/{{ employee.user_id }}/avatar',
+        url: '/api/employees/{{ employee.id }}/avatar',
         method: 'POST',
         data: formData,
         processData: false,

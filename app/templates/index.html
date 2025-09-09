@@ -14,6 +14,11 @@
                 <p>请登录或注册以开始使用系统。</p>
                 <a class="btn btn-primary btn-lg" href="{{ url_for('auth.login') }}" role="button">登录</a>
                 <a class="btn btn-secondary btn-lg" href="{{ url_for('auth.register') }}" role="button">注册</a>
+                <hr class="my-4">
+                <p>正在寻找工作机会？</p>
+                <a class="btn btn-success btn-lg" href="{{ url_for('main.application') }}" role="button">
+                    <i class="fas fa-user-plus"></i> 在线应聘
+                </a>
             {% endif %}
         </div>
     </div>

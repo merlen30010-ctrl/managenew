@@ -135,8 +135,8 @@ def create_usage_record():
     data = request.get_json()
     
     # 检查必填字段
-    if not data or not data.get('vehicle_id') or not data.get('usage_type'):
-        return jsonify({'error': '车辆ID和使用类型是必填字段'}), 400
+    if not data or not data.get('vehicle_id'):
+        return jsonify({'error': '车辆ID是必填字段'}), 400
     
     # 检查车辆是否存在
     vehicle = Vehicle.query.get(data['vehicle_id'])
@@ -144,51 +144,25 @@ def create_usage_record():
         return jsonify({'error': '车辆不存在'}), 404
     
     # 检查借车时车辆状态
-    if data['usage_type'] == '借车' and vehicle.status != '可用':
+    if vehicle.status != '可用':
         return jsonify({'error': '车辆当前不可用'}), 400
     
-    # 检查还车时是否有对应的借车记录
-    if data['usage_type'] == '还车':
-        # 查找最近的未完成借车记录
-        last_borrow_record = VehicleUsageRecord.query.filter_by(
-            vehicle_id=data['vehicle_id'],
-            usage_type='借车',
-            return_record_id=None
-        ).order_by(VehicleUsageRecord.created_at.desc()).first()
-        
-        if not last_borrow_record:
-            return jsonify({'error': '没有找到对应的借车记录'}), 400
-    
-    # 创建记录
+    # 创建借车记录
     record = VehicleUsageRecord(
         vehicle_id=data['vehicle_id'],
-        usage_type=data['usage_type'],
-        borrower=data.get('borrower', ''),
-        user_id=getattr(current_user, 'id', None),
+        borrower_id=getattr(current_user, 'id', None),
         borrow_time=datetime.strptime(data['borrow_time'], '%Y-%m-%d %H:%M:%S') if data.get('borrow_time') else datetime.now(),
-        return_time=datetime.strptime(data['return_time'], '%Y-%m-%d %H:%M:%S') if data.get('return_time') else None,
         borrow_mileage=data.get('borrow_mileage'),
-        return_mileage=data.get('return_mileage'),
+        borrow_photo_id=data.get('borrow_photo_id'),
         purpose=data.get('purpose', ''),
         remarks=data.get('remarks', '')
     )
     
-    # 处理照片附件
-    if data.get('photo_attachment_id'):
-        record.photo_attachment_id = data['photo_attachment_id']
-    
     db.session.add(record)
     db.session.flush()  # 获取记录ID
     
-    # 如果是还车记录，关联借车记录
-    if data['usage_type'] == '还车' and last_borrow_record:
-        last_borrow_record.return_record_id = record.id
-    
-    # 更新车辆状态
-    if data['usage_type'] == '借车':
-        vehicle.status = '使用中'
-    elif data['usage_type'] == '还车':
-        vehicle.status = '可用'
+    # 更新车辆状态为使用中
+    vehicle.status = '使用中'
     
     db.session.commit()
     
@@ -206,8 +180,8 @@ def update_usage_record(record_id):
         return jsonify({'error': '没有提供更新数据'}), 400
     
     # 更新记录信息
-    if 'borrower' in data:
-        record.borrower = data['borrower']
+    if 'borrower_id' in data:
+        record.borrower_id = data['borrower_id']
     
     if 'borrow_time' in data:
         record.borrow_time = datetime.strptime(data['borrow_time'], '%Y-%m-%d %H:%M:%S') if data['borrow_time'] else None
@@ -227,8 +201,11 @@ def update_usage_record(record_id):
     if 'remarks' in data:
         record.remarks = data['remarks']
     
-    if 'photo_attachment_id' in data:
-        record.photo_attachment_id = data['photo_attachment_id']
+    if 'borrow_photo_id' in data:
+        record.borrow_photo_id = data['borrow_photo_id']
+    
+    if 'return_photo_id' in data:
+        record.return_photo_id = data['return_photo_id']
     
     db.session.commit()
     

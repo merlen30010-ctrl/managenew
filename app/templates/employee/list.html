@@ -32,9 +32,9 @@
                         <div class="col-md-2">
                             <select class="form-control" id="statusFilter">
                                 <option value="">所有状态</option>
+                                <option value="储备">储备</option>
                                 <option value="在职">在职</option>
                                 <option value="离职">离职</option>
-                                <option value="试用期">试用期</option>
                             </select>
                         </div>
                         <div class="col-md-2">
@@ -91,48 +91,10 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label for="addUserId">关联用户 <span class="text-danger">*</span></label>
-                                <select class="form-control" id="addUserId" name="user_id" required>
-                                    <option value="">请选择用户</option>
-                                    {% for user in users_without_employee %}
-                                    <option value="{{ user.id }}">{{ user.username }} ({{ user.email }})</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="addEmployeeId">工号 <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="addEmployeeId" name="employee_id" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
                                 <label for="addName">姓名 <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="addName" name="name" required>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="addDepartmentId">部门</label>
-                                <select class="form-control" id="addDepartmentId" name="department_id">
-                                    <option value="">请选择部门</option>
-                                    {% for dept in departments %}
-                                    <option value="{{ dept.id }}">{{ dept.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="addJobTitle">职位</label>
-                                <input type="text" class="form-control" id="addJobTitle" name="job_title">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="addGender">性别</label>
@@ -143,42 +105,42 @@
                                 </select>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="addBirthDate">出生日期</label>
                                 <input type="date" class="form-control" id="addBirthDate" name="birth_date">
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="addIdCard">身份证号</label>
                                 <input type="text" class="form-control" id="addIdCard" name="id_card">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="addPhone">电话</label>
                                 <input type="text" class="form-control" id="addPhone" name="phone">
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="addNativePlace">籍贯</label>
                                 <input type="text" class="form-control" id="addNativePlace" name="native_place">
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="addNationality">民族</label>
                                 <input type="text" class="form-control" id="addNationality" name="nationality">
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="addEducation">学历</label>
@@ -195,6 +157,8 @@
                                 </select>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="addMaritalStatus">婚姻状况</label>
@@ -207,22 +171,15 @@
                                 </select>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="addHireDate">入职时间</label>
-                                <input type="date" class="form-control" id="addHireDate" name="hire_date">
-                            </div>
-                        </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="addEmploymentStatus">在职状态</label>
                                 <select class="form-control" id="addEmploymentStatus" name="employment_status">
-                                    <option value="在职">在职</option>
-                                    <option value="试用期">试用期</option>
-                                    <option value="离职">离职</option>
+                                    <option value="储备" selected>储备</option>
+                                <option value="在职">在职</option>
+                                <option value="离职">离职</option>
                                 </select>
+                                <small class="form-text text-muted">新增员工默认为储备状态，转正后可修改为在职</small>
                             </div>
                         </div>
                     </div>
@@ -263,7 +220,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form id="editEmployeeForm">
-                <input type="hidden" id="editUserId" name="user_id">
+                <input type="hidden" id="editEmployeeId" name="id">
                 <div class="modal-body">
                     <!-- 编辑表单内容与新增类似，但不包含用户选择 -->
                     <div class="row">
@@ -395,9 +352,9 @@
                             <div class="form-group">
                                 <label for="editEmploymentStatus">在职状态</label>
                                 <select class="form-control" id="editEmploymentStatus" name="employment_status">
-                                    <option value="在职">在职</option>
-                                    <option value="试用期">试用期</option>
-                                    <option value="离职">离职</option>
+                                    <option value="储备">储备</option>
+                                <option value="在职">在职</option>
+                                <option value="离职">离职</option>
                                 </select>
                             </div>
                         </div>
@@ -526,9 +483,13 @@ function renderEmployeeTable(employees) {
     }
     
     employees.forEach(function(employee) {
+        const rowClass = employee.employment_status === '储备' ? 'table-info' : '';
         const row = `
-            <tr>
-                <td>${employee.employee_id || '-'}</td>
+            <tr class="${rowClass}">
+                <td>
+                    ${employee.employment_status === '储备' ? '<i class="fas fa-user-clock text-info mr-1" title="储备员工"></i>' : ''}
+                    ${employee.employee_id || '-'}
+                </td>
                 <td>${employee.name || '-'}</td>
                 <td>${employee.gender || '-'}</td>
                 <td>${employee.department_name || '-'}</td>
@@ -541,13 +502,17 @@ function renderEmployeeTable(employees) {
                 </td>
                 <td>${employee.hire_date || '-'}</td>
                 <td>
-                    <button class="btn btn-sm btn-info" onclick="viewEmployee(${employee.user_id})">
+                    <button class="btn btn-sm btn-info" onclick="viewEmployee(${employee.id})">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-sm btn-warning" onclick="editEmployee(${employee.user_id})">
+                    <button class="btn btn-sm btn-warning" onclick="editEmployee(${employee.id})">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteEmployee(${employee.user_id}, '${employee.name}')">
+                    ${employee.employment_status === '储备' ? 
+                        `<a href="/employees/promote/${employee.id}" class="btn btn-sm btn-success" title="转正">
+                             <i class="fas fa-user-check"></i>
+                         </a>` : ''}
+                    <button class="btn btn-sm btn-danger" onclick="deleteEmployee(${employee.id}, '${employee.name}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -560,8 +525,8 @@ function renderEmployeeTable(employees) {
 // 获取状态徽章样式
 function getStatusBadgeClass(status) {
     switch(status) {
+        case '储备': return 'info';
         case '在职': return 'success';
-        case '试用期': return 'warning';
         case '离职': return 'secondary';
         default: return 'secondary';
     }
@@ -699,9 +664,9 @@ function renderEmployeeDetails(employee) {
 }
 
 // 编辑员工
-function editEmployee(userId) {
+function editEmployee(employeeId) {
     $.ajax({
-        url: `/api/employees/${userId}`,
+        url: `/api/employees/${employeeId}`,
         method: 'GET',
         success: function(response) {
             if (response.success) {
@@ -719,7 +684,7 @@ function editEmployee(userId) {
 
 // 填充编辑表单
 function fillEditForm(employee) {
-    $('#editUserId').val(employee.user_id);
+    $('#editEmployeeId').val(employee.id);
     $('#editEmployeeId').val(employee.employee_id);
     $('#editName').val(employee.name);
     $('#editDepartmentId').val(employee.department_id);
@@ -741,13 +706,13 @@ function fillEditForm(employee) {
 
 // 更新员工信息
 function updateEmployee() {
-    const userId = $('#editUserId').val();
+    const employeeId = $('#editEmployeeId').val();
     const formData = new FormData($('#editEmployeeForm')[0]);
     const data = Object.fromEntries(formData.entries());
-    delete data.user_id; // 移除user_id，不允许修改
+    delete data.id; // 移除id，不允许修改
     
     $.ajax({
-        url: `/api/employees/${userId}`,
+        url: `/api/employees/${employeeId}`,
         method: 'PUT',
         contentType: 'application/json',
         data: JSON.stringify(data),
@@ -767,13 +732,23 @@ function updateEmployee() {
     });
 }
 
+
+
 // 删除员工
-function deleteEmployee(userId, userName) {
+function deleteEmployee(employeeId, userName) {
+    // 防止重复点击
+    if (window.deletingEmployee) {
+        return;
+    }
+    
     if (confirm(`确定要删除员工 "${userName}" 的信息吗？此操作不可恢复。`)) {
+        window.deletingEmployee = true;
+        
         $.ajax({
-            url: `/api/employees/${userId}`,
+            url: `/api/employees/${employeeId}`,
             method: 'DELETE',
             success: function(response) {
+                window.deletingEmployee = false;
                 if (response.success) {
                     showAlert('success', '员工信息删除成功');
                     loadEmployees(currentPage);
@@ -782,6 +757,7 @@ function deleteEmployee(userId, userName) {
                 }
             },
             error: function(xhr) {
+                window.deletingEmployee = false;
                 const response = xhr.responseJSON;
                 showAlert('error', response?.message || '删除员工信息失败');
             }
@@ -795,21 +771,21 @@ function showAlert(type, message) {
     const alertHtml = `
         <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
             ${message}
-            <button type="button" class="close" data-dismiss="alert">
-                <span>&times;</span>
-            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     `;
     
-    // 移除现有的提示
-    $('.alert').remove();
+    // 移除现有的提示（只在当前页面的card-body中）
+    $('.card-body .alert:not(.flash-message)').remove();
     
-    // 添加新提示到页面顶部
-    $('.container-fluid').prepend(alertHtml);
+    // 添加新提示到当前页面的card-body顶部
+    $('.card-body').first().prepend(alertHtml);
     
     // 3秒后自动隐藏
     setTimeout(function() {
-        $('.alert').fadeOut();
+        $('.card-body .alert:not(.flash-message)').fadeOut(function() {
+            $(this).remove();
+        });
     }, 3000);
 }
 </script>

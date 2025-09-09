@@ -68,7 +68,7 @@
     "user": {
       "id": 1,
       "username": "admin",
-      "email": "admin@example.com",
+      
       "name": "管理员"
     }
   }
@@ -83,7 +83,7 @@
 ```json
 {
   "username": "用户名",
-  "email": "邮箱地址",
+  
   "password": "密码",
   "name": "真实姓名（可选）"
 }
@@ -98,7 +98,7 @@
     "user": {
       "id": 2,
       "username": "newuser",
-      "email": "newuser@example.com",
+      
       "name": "新用户"
     }
   }
@@ -162,7 +162,7 @@
   {
     "id": 2,
     "username": "user1",
-    "email": "user1@example.com",
+    
     "name": "用户1"
   }
 ]
@@ -214,7 +214,7 @@
 ```json
 {
   "username": "新用户名（可选）",
-  "email": "新邮箱（可选）",
+  
   "name": "新姓名（可选）",
   "phone": "新电话（可选）",
   "password": "新密码（可选）"
@@ -1608,7 +1608,7 @@
 |--------|------|------|------|
 | id | Integer | 用户ID | 主键，自增 |
 | username | String(64) | 用户名 | 唯一，索引 |
-| email | String(120) | 邮箱 | 唯一，索引 |
+
 | password_hash | String(128) | 密码哈希 | 不可为空 |
 | name | String(64) | 真实姓名 | 可为空 |
 | phone | String(20) | 电话号码 | 可为空 |

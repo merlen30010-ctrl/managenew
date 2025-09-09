@@ -107,7 +107,7 @@ def create_test_data():
         # 创建测试用户
         user = User.query.filter_by(username='testuser').first()
         if not user:
-            user = User(username='testuser', email='test@example.com', name='测试用户')
+            user = User(username='testuser', name='测试用户')
             user.set_password('test123')
             db.session.add(user)
             db.session.commit()
@@ -147,7 +147,7 @@ def test_create_user():
     # 准备测试数据
     user_data = {
         "username": "api_test_user",
-        "email": "api_test@example.com",
+
         "name": "API测试用户",
         "phone": "13800138000",
         "password": "test123"

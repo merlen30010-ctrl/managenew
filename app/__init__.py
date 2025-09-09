@@ -17,6 +17,7 @@ migrate = Migrate()
 # 导入缓存服务和查询监控
 from app.utils.cache_service import cache_service
 from app.utils.query_monitor import query_monitor
+from app.utils.anti_spam import anti_spam
 
 def create_app():
     app = Flask(__name__)
@@ -29,6 +30,7 @@ def create_app():
     jwt.init_app(app)
     cache_service.init_app(app)
     query_monitor.init_app(app)
+    anti_spam.init_app(app)
     CORS(app)
     
     login_manager.login_view = 'auth.login'
@@ -75,6 +77,7 @@ def create_app():
     from app.api.employee import employee_bp
     from app.api.notification import notification_bp as api_notification_bp
     from app.api.article_attachment import article_attachment_bp
+    from app.api.application import application_bp
     
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -108,6 +111,7 @@ def create_app():
     app.register_blueprint(employee_bp, url_prefix='/api')
     app.register_blueprint(api_notification_bp, url_prefix='/api')
     app.register_blueprint(article_attachment_bp)
+    app.register_blueprint(application_bp, url_prefix='/api')
     app.register_blueprint(api_bp, url_prefix='/api')
     
     # 设置缓存失效钩子

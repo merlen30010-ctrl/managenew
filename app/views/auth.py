@@ -31,20 +31,19 @@ def logout():
 def register():
     if request.method == 'POST':
         username = request.form.get('username')
-        email = request.form.get('email')
         password = request.form.get('password')
+        
+        if not username or not password:
+            flash('用户名和密码都是必填的')
+            return redirect(url_for('auth.register'))
         
         # 检查用户是否已存在
         if User.query.filter_by(username=username).first():
             flash('用户名已存在')
             return redirect(url_for('auth.register'))
-            
-        if User.query.filter_by(email=email).first():
-            flash('邮箱已存在')
-            return redirect(url_for('auth.register'))
         
         # 创建新用户
-        user = User(username=username, email=email)
+        user = User(username=username)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()

@@ -7,7 +7,7 @@ from app.views.decorators import permission_required
 
 permission_bp = Blueprint('permission', __name__)
 
-@permission_bp.route('/permissions')
+@permission_bp.route('/')
 @login_required
 @permission_required('permission_read')
 def list_permissions():
@@ -15,7 +15,7 @@ def list_permissions():
     permissions = Permission.query.all()
     return render_template('permissions/list.html', permissions=permissions)
 
-@permission_bp.route('/permissions/create', methods=['GET', 'POST'])
+@permission_bp.route('/create', methods=['GET', 'POST'])
 @login_required
 @permission_required('permission_create')
 def create_permission():
@@ -46,7 +46,7 @@ def create_permission():
         
     return render_template('permissions/create.html')
 
-@permission_bp.route('/permissions/<int:permission_id>/edit', methods=['GET', 'POST'])
+@permission_bp.route('/<int:permission_id>/edit', methods=['GET', 'POST'])
 @login_required
 @permission_required('permission_update')
 def edit_permission(permission_id):
@@ -65,7 +65,7 @@ def edit_permission(permission_id):
         
     return render_template('permissions/edit.html', permission=permission)
 
-@permission_bp.route('/permissions/<int:permission_id>/delete', methods=['POST'])
+@permission_bp.route('/<int:permission_id>/delete', methods=['POST'])
 @login_required
 @permission_required('permission_delete')
 def delete_permission(permission_id):

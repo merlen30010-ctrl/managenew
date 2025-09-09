@@ -181,7 +181,7 @@ def borrow_vehicle(vehicle_id):
             borrow_time = datetime.now()
             if borrow_time_str:
                 try:
-                    borrow_time = datetime.strptime(borrow_time_str, '%Y-%m-%d %H:%M:%S')
+                    borrow_time = datetime.strptime(borrow_time_str, '%Y-%m-%dT%H:%M')
                 except ValueError:
                     flash('借车时间格式不正确', 'error')
                     return render_template('vehicle/borrow.html', vehicle=vehicle)
@@ -195,14 +195,27 @@ def borrow_vehicle(vehicle_id):
                     flash('里程数格式不正确', 'error')
                     return render_template('vehicle/borrow.html', vehicle=vehicle)
             
+            # 处理照片上传
+            borrow_photo_id = None
+            if 'borrow_photo' in request.files:
+                photo_file = request.files['borrow_photo']
+                if photo_file and photo_file.filename:
+                    from app.utils.file_handler import save_uploaded_file
+                    try:
+                        attachment = save_uploaded_file(photo_file, 'vehicle_photos')
+                        if attachment:
+                            borrow_photo_id = attachment.id
+                    except Exception as e:
+                        logger.error(f"照片上传失败: {str(e)}")
+                        flash('照片上传失败，但借车记录已创建', 'warning')
+            
             # 创建借车记录
             record = VehicleUsageRecord(
                 vehicle_id=vehicle.id,
-                usage_type='借车',
-                borrower=borrower,
-                user_id=current_user.id,
+                borrower_id=current_user.id,
                 borrow_time=borrow_time,
                 borrow_mileage=borrow_mileage_val,
+                borrow_photo_id=borrow_photo_id,
                 purpose=purpose,
                 remarks=remarks
             )
@@ -244,7 +257,7 @@ def return_vehicle(record_id):
             return_time = datetime.now()
             if return_time_str:
                 try:
-                    return_time = datetime.strptime(return_time_str, '%Y-%m-%d %H:%M:%S')
+                    return_time = datetime.strptime(return_time_str, '%Y-%m-%dT%H:%M')
                 except ValueError:
                     flash('还车时间格式不正确', 'error')
                     return render_template('vehicle/return.html', borrow_record=borrow_record, vehicle=vehicle)
@@ -258,23 +271,26 @@ def return_vehicle(record_id):
                     flash('里程数格式不正确', 'error')
                     return render_template('vehicle/return.html', borrow_record=borrow_record, vehicle=vehicle)
             
-            # 创建还车记录
-            record = VehicleUsageRecord(
-                vehicle_id=vehicle.id,
-                usage_type='还车',
-                borrower=borrow_record.borrower,
-                user_id=current_user.id,
-                return_time=return_time,
-                return_mileage=return_mileage_val,
-                remarks=remarks,
-                return_record_id=borrow_record.id  # 关联借车记录
-            )
+            # 处理照片上传
+            return_photo_id = None
+            if 'return_photo' in request.files:
+                photo_file = request.files['return_photo']
+                if photo_file and photo_file.filename:
+                    from app.utils.file_handler import save_uploaded_file
+                    try:
+                        attachment = save_uploaded_file(photo_file, 'vehicle_photos')
+                        if attachment:
+                            return_photo_id = attachment.id
+                    except Exception as e:
+                        logger.error(f"照片上传失败: {str(e)}")
+                        flash('照片上传失败，但还车记录已更新', 'warning')
             
-            db.session.add(record)
-            db.session.flush()  # 获取记录ID
-            
-            # 关联借车记录
-            borrow_record.return_record_id = record.id
+            # 更新借车记录为还车状态
+            borrow_record.return_time = return_time
+            borrow_record.return_mileage = return_mileage_val
+            borrow_record.return_photo_id = return_photo_id
+            if remarks:
+                borrow_record.remarks = (borrow_record.remarks or '') + '\n还车备注: ' + remarks
             
             # 更新车辆状态
             vehicle.status = '可用'

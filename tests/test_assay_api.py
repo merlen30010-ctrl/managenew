@@ -56,7 +56,7 @@ def test_assay_api():
         # 创建测试用户并分配角色
         test_user = User.query.filter_by(username='apitestuser').first()
         if not test_user:
-            test_user = User(username='apitestuser', email='api@test.com', name='API测试用户')
+            test_user = User(username='apitestuser', name='API测试用户')
             test_user.set_password('test123')
             db.session.add(test_user)
             db.session.commit()

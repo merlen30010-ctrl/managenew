@@ -55,7 +55,7 @@ class ArticleTestCase(unittest.TestCase):
         # 创建测试用户
         self.test_user = User(
             username='testuser',
-            email='test@example.com'
+
         )
         self.test_user.set_password('test123')
         db.session.add(self.test_user)

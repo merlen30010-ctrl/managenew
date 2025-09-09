@@ -53,8 +53,8 @@ class VehicleUsageRecord(db.Model):
     vehicle_id = db.Column(db.Integer, db.ForeignKey('vehicles.id'), nullable=False)  # 车辆ID
     borrower_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # 借车人ID
     borrow_time = db.Column(db.DateTime, nullable=False)  # 借车时间
-    borrow_mileage = db.Column(db.Float, nullable=False)  # 借车时里程数
-    borrow_photo_id = db.Column(db.Integer, db.ForeignKey('attachments.id'), nullable=False)  # 借车照片ID
+    borrow_mileage = db.Column(db.Float, nullable=True)  # 借车时里程数
+    borrow_photo_id = db.Column(db.Integer, db.ForeignKey('attachments.id'), nullable=True)  # 借车照片ID
     return_time = db.Column(db.DateTime)  # 还车时间
     return_mileage = db.Column(db.Float)  # 还车时里程数
     return_photo_id = db.Column(db.Integer, db.ForeignKey('attachments.id'))  # 还车照片ID

@@ -8,7 +8,7 @@ class User(UserMixin, db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, index=True)
-    email = db.Column(db.String(120), unique=True, index=True)
+    email = db.Column(db.String(120), nullable=True, index=True)
     password_hash = db.Column(db.String(128))
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
@@ -37,6 +37,24 @@ class User(UserMixin, db.Model):
         if permission:
             return self.has_permission(permission)
         return False
+    
+    @property
+    def is_admin(self):
+        """检查用户是否为管理员"""
+        return self.has_role('管理员')
+    
+    def get_all_permissions(self):
+        """获取用户的所有权限"""
+        from app.models.permission import Permission, RolePermission
+        permissions = set()
+        for role in self.roles:
+            # 通过RolePermission中间表获取权限
+            role_perms = RolePermission.query.filter_by(role_id=role.id).all()
+            for rp in role_perms:
+                permission = Permission.query.get(rp.permission_id)
+                if permission:
+                    permissions.add(permission)
+        return list(permissions)
     
     def __repr__(self):
         return f'<User {self.username}>'

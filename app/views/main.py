@@ -3,10 +3,13 @@ from flask_login import login_required, current_user
 from app import db
 from app.models.user import User
 from app.models.role import Role
+from app.models.employee import Employee
 from app.models.notification import Notification, ExamResult
 from app.utils.validators import validate_password
 from app.views.decorators import permission_required
+from app.utils.anti_spam import anti_spam_required, record_submission_attempt, anti_spam
 import os
+from datetime import datetime
 
 main_bp = Blueprint('main', __name__)
 
@@ -85,7 +88,6 @@ def users():
 def create_user():
     if request.method == 'POST':
         username = request.form.get('username')
-        email = request.form.get('email')
         password = request.form.get('password')
         name = request.form.get('name')
         phone = request.form.get('phone')
@@ -94,13 +96,9 @@ def create_user():
         if User.query.filter_by(username=username).first():
             flash('用户名已存在')
             return redirect(url_for('main.create_user'))
-            
-        if User.query.filter_by(email=email).first():
-            flash('邮箱已存在')
-            return redirect(url_for('main.create_user'))
         
         # 创建新用户
-        user = User(username=username, email=email, name=name, phone=phone)
+        user = User(username=username, name=name, phone=phone)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
@@ -118,7 +116,6 @@ def edit_user(user_id):
     
     if request.method == 'POST':
         user.username = request.form.get('username')
-        user.email = request.form.get('email')
         # name和phone字段已移至Employee表，此处不再处理
         
         # 如果提供了新密码，则更新密码
@@ -145,12 +142,14 @@ def delete_user(user_id):
 # 角色管理功能
 @main_bp.route('/roles')
 @login_required
+@permission_required('role_read')
 def roles():
     roles = Role.query.all()
     return render_template('roles/list.html', roles=roles)
 
 @main_bp.route('/roles/create', methods=['GET', 'POST'])
 @login_required
+@permission_required('role_create')
 def create_role():
     if request.method == 'POST':
         name = request.form.get('name')
@@ -168,11 +167,105 @@ def create_role():
         
         flash('角色创建成功')
         return redirect(url_for('main.roles'))
+
+# 应聘相关路由（公开访问）
+@main_bp.route('/application')
+def application():
+    """应聘信息填写页面（公开访问）"""
+    return render_template('application.html')
+
+@main_bp.route('/application/submit', methods=['POST'])
+@anti_spam_required
+def submit_application():
+    """处理应聘信息提交"""
+    ip = anti_spam.get_client_ip()
+    
+    try:
+        # 获取表单数据
+        name = request.form.get('name', '').strip()
+        gender = request.form.get('gender', '').strip()
+        birth_date_str = request.form.get('birth_date', '').strip()
+        id_card = request.form.get('id_card', '').strip()
+        phone = request.form.get('phone', '').strip()
+        education = request.form.get('education', '').strip()
+        native_place = request.form.get('native_place', '').strip()
+        nationality = request.form.get('nationality', '').strip()
+        marital_status = request.form.get('marital_status', '').strip()
+        job_title = request.form.get('job_title', '').strip()
+        address = request.form.get('address', '').strip()
+        emergency_contact = request.form.get('emergency_contact', '').strip()
+        emergency_phone = request.form.get('emergency_phone', '').strip()
+        
+        # 验证必填字段
+        if not all([name, gender, birth_date_str, id_card, phone, education]):
+            flash('请填写所有必填项目', 'error')
+            return redirect(url_for('main.application'))
+        
+        # 检查身份证号是否已存在
+        existing_employee = Employee.query.filter_by(id_card=id_card).first()
+        if existing_employee:
+            flash('该身份证号已存在，请检查后重新填写', 'error')
+            return redirect(url_for('main.application'))
+        
+        # 转换日期格式
+        try:
+            birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            flash('出生日期格式不正确', 'error')
+            return redirect(url_for('main.application'))
+        
+        # 创建员工记录
+        try:
+            employee = Employee(
+                user_id=None,  # 应聘阶段不关联用户
+                employee_id=None,  # 应聘阶段不分配工号
+                department_id=None,  # 应聘阶段不分配部门
+                job_title=job_title if job_title else None,
+                hire_date=None,  # 应聘阶段不设置入职日期
+                work_years=None,
+                name=name,
+                gender=gender,
+                birth_date=birth_date,
+                id_card=id_card,
+                native_place=native_place if native_place else None,
+                nationality=nationality if nationality else None,
+                education=education,
+                marital_status=marital_status if marital_status else None,
+                phone=phone,
+                address=address if address else None,
+                avatar_path=None,
+                employment_status='储备',  # 默认为储备状态
+                emergency_contact=emergency_contact if emergency_contact else None,
+                emergency_phone=emergency_phone if emergency_phone else None
+            )
+            
+            db.session.add(employee)
+            db.session.commit()
+            current_app.logger.info(f'员工记录创建成功: {name}, ID: {employee.id}')
+        except Exception as create_error:
+            db.session.rollback()
+            current_app.logger.error(f'创建员工记录失败: {str(create_error)}')
+            raise create_error
+        
+        # 记录成功提交
+        record_submission_attempt(ip, request.form.to_dict())
+        
+        flash('应聘信息提交成功！我们会尽快与您联系。', 'success')
+        return redirect(url_for('main.application'))
+        
+    except Exception as e:
+        db.session.rollback()
+        # 即使失败也记录提交尝试（防止恶意重试）
+        record_submission_attempt(ip, request.form.to_dict())
+        current_app.logger.error(f'应聘信息提交失败: {str(e)}')
+        flash('提交失败，请稍后重试', 'error')
+        return redirect(url_for('main.application'))
         
     return render_template('roles/create.html')
 
 @main_bp.route('/roles/<int:role_id>/edit', methods=['GET', 'POST'])
 @login_required
+@permission_required('role_update')
 def edit_role(role_id):
     role = Role.query.get_or_404(role_id)
     
@@ -188,9 +281,15 @@ def edit_role(role_id):
 
 @main_bp.route('/roles/<int:role_id>/delete', methods=['POST'])
 @login_required
+@permission_required('role_delete')
 def delete_role(role_id):
     role = Role.query.get_or_404(role_id)
     db.session.delete(role)
     db.session.commit()
     flash('角色删除成功')
     return redirect(url_for('main.roles'))
+
+@main_bp.route('/robots.txt')
+def robots_txt():
+    """提供robots.txt文件，禁止搜索引擎抓取"""
+    return send_from_directory(current_app.root_path + '/../', 'robots.txt', mimetype='text/plain')

@@ -27,7 +27,7 @@
                         </div>
                     </div>
                     
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -38,14 +38,21 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="return_mileage" class="form-label">还车里程(公里)</label>
-                                    <input type="number" class="form-control" id="return_mileage" name="return_mileage" step="0.1">
+                                    <label for="return_mileage" class="form-label">还车里程(公里) *</label>
+                                    <input type="number" class="form-control" id="return_mileage" name="return_mileage" step="0.1" min="0" required>
                                 </div>
                             </div>
                         </div>
                         
                         <div class="row">
-                            <div class="col-12">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="return_photo" class="form-label">还车照片</label>
+                                    <input type="file" class="form-control" id="return_photo" name="return_photo" accept="image/*">
+                                    <div class="form-text">请上传车辆归还时的照片（可选）</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="remarks" class="form-label">备注</label>
                                     <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>

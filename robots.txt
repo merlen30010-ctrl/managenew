@@ -1,0 +1,37 @@
+# Robots.txt - 禁止所有搜索引擎蜘蛛抓取
+# 此文件用于指示搜索引擎爬虫不要抓取本网站的任何内容
+
+# 禁止所有用户代理（搜索引擎蜘蛛）
+User-agent: *
+Disallow: /
+
+# 明确禁止常见的搜索引擎蜘蛛
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: Slurp
+Disallow: /
+
+User-agent: DuckDuckBot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+User-agent: facebookexternalhit
+Disallow: /
+
+User-agent: Twitterbot
+Disallow: /
+
+# 爬取延迟设置（秒）
+Crawl-delay: 86400
+
+# 不提供站点地图
+# Sitemap:

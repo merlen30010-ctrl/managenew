@@ -4,8 +4,11 @@ from datetime import datetime
 class Employee(db.Model):
     __tablename__ = 'employees'
     
-    # 使用user_id作为主键，建立一对一关系
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True, comment='用户ID')
+    # 主键
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='员工记录ID')
+    
+    # 用户关联（可为空，应聘阶段不关联用户）
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True, comment='用户ID')
     
     # 员工基本信息
     employee_id = db.Column(db.String(20), unique=True, index=True, comment='员工工号')
@@ -26,7 +29,7 @@ class Employee(db.Model):
     phone = db.Column(db.String(20), comment='联系电话')
     address = db.Column(db.String(200), comment='居住地址')
     avatar_path = db.Column(db.String(200), comment='照片路径')
-    employment_status = db.Column(db.String(20), default='在职', comment='在职状态')
+    employment_status = db.Column(db.String(20), default='储备', comment='在职状态')
     
     # 联系信息
     emergency_contact = db.Column(db.String(50), comment='紧急联系人')
@@ -46,6 +49,7 @@ class Employee(db.Model):
     def to_dict(self):
         """转换为字典格式"""
         return {
+            'id': self.id,
             'user_id': self.user_id,
             'employee_id': self.employee_id,
             'department_id': self.department_id,
