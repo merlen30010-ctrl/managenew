@@ -33,9 +33,13 @@
                             <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                             <td>
                                 <a href="{{ url_for('main.edit_user', user_id=user.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                                {% if user.username != 'admin' and (not user.is_superuser or (user.is_superuser and superuser_count > 1)) and user.id != current_user.id %}
                                 <form action="{{ url_for('main.delete_user', user_id=user.id) }}" method="POST" style="display: inline;">
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这个用户吗？')">删除</button>
                                 </form>
+                                {% else %}
+                                <span class="text-muted small">不可删除</span>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endfor %}

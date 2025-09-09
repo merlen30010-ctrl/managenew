@@ -80,7 +80,8 @@ def change_password():
 @permission_required('user_read')
 def users():
     users = User.query.all()
-    return render_template('users/list.html', users=users)
+    superuser_count = User.query.filter_by(is_superuser=True).count()
+    return render_template('users/list.html', users=users, superuser_count=superuser_count)
 
 @main_bp.route('/users/create', methods=['GET', 'POST'])
 @login_required
@@ -133,10 +134,34 @@ def edit_user(user_id):
 @login_required
 @permission_required('user_delete')
 def delete_user(user_id):
-    user = User.query.get_or_404(user_id)
-    db.session.delete(user)
-    db.session.commit()
-    flash('用户删除成功')
+    """删除用户"""
+    try:
+        user = User.query.get_or_404(user_id)
+        
+        # 防止删除当前登录用户
+        if user.id == current_user.id:
+            flash('不能删除当前登录用户', 'error')
+            return redirect(url_for('main.users'))
+        
+        # 防止删除admin用户
+        if user.username == 'admin':
+            flash('不能删除系统管理员admin用户', 'error')
+            return redirect(url_for('main.users'))
+        
+        # 防止删除最后一个超级管理员
+        if user.is_superuser:
+            superuser_count = User.query.filter_by(is_superuser=True).count()
+            if superuser_count <= 1:
+                flash('不能删除最后一个超级管理员', 'error')
+                return redirect(url_for('main.users'))
+        
+        db.session.delete(user)
+        db.session.commit()
+        flash('用户删除成功', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'删除用户失败: {str(e)}', 'error')
+    
     return redirect(url_for('main.users'))
 
 # 角色管理功能

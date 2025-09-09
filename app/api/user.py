@@ -192,6 +192,22 @@ def delete_user(user_id):
                 'message': '不能删除当前登录用户'
             }), 400
         
+        # 防止删除admin用户
+        if user.username == 'admin':
+            return jsonify({
+                'success': False,
+                'message': '不能删除系统管理员admin用户'
+            }), 400
+        
+        # 防止删除最后一个超级管理员
+        if user.is_superuser:
+            superuser_count = User.query.filter_by(is_superuser=True).count()
+            if superuser_count <= 1:
+                return jsonify({
+                    'success': False,
+                    'message': '不能删除最后一个超级管理员'
+                }), 400
+        
         db.session.delete(user)
         db.session.commit()
         
