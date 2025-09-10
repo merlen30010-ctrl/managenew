@@ -1,0 +1,34 @@
+{
+  "name": "managepro",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/merlen30010-ctrl/managenew.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/merlen30010-ctrl/managenew/issues"
+  },
+  "homepage": "https://github.com/merlen30010-ctrl/managenew#readme",
+  "dependencies": {
+    "@dcloudio/uni-app": "^2.0.2-4070620250821001",
+    "@dcloudio/uni-cli-shared": "^2.0.2-4070620250821001",
+    "@dcloudio/uni-h5": "^2.0.2-4070620250821001",
+    "@dcloudio/uni-i18n": "^2.0.2-4070620250821001",
+    "@dcloudio/uni-mp-weixin": "^2.0.2-4070620250821001",
+    "@dcloudio/uni-ui": "^1.5.11",
+    "vue": "^3.5.21"
+  }
+}

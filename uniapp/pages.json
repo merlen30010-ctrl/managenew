@@ -1,0 +1,66 @@
+{
+	"pages": [
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "首页"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/dashboard/dashboard",
+			"style": {
+				"navigationBarTitleText": "仪表盘"
+			}
+		},
+		{
+			"path": "pages/profile/profile",
+			"style": {
+				"navigationBarTitleText": "个人中心"
+			}
+		},
+		{
+			"path": "pages/vehicle/vehicle",
+			"style": {
+				"navigationBarTitleText": "办公用车"
+			}
+		},
+		{
+			"path": "pages/test/test",
+			"style": {
+				"navigationBarTitleText": "测试页面"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "管理系统",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#6366f1",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [
+			{
+				"pagePath": "pages/dashboard/dashboard",
+				"text": "主页"
+			},
+			{
+				"pagePath": "pages/vehicle/vehicle",
+				"text": "用车"
+			},
+			{
+				"pagePath": "pages/profile/profile",
+				"text": "我的"
+			}
+		]
+	}
+}

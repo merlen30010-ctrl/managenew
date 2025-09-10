@@ -1,0 +1,44 @@
+/* uni.scss */
+@import '@dcloudio/uni-ui/lib/uni-scss/index.scss';
+
+/* 全局样式变量 */
+$uni-primary: #6366f1;
+$uni-success: #10b981;
+$uni-warning: #f59e0b;
+$uni-error: #ef4444;
+$uni-info: #6b7280;
+
+/* 文字颜色 */
+$uni-text-color: #1f2937;
+$uni-text-color-inverse: #ffffff;
+$uni-text-color-grey: #6b7280;
+$uni-text-color-placeholder: #9ca3af;
+
+/* 背景颜色 */
+$uni-bg-color: #f5f7fa;
+$uni-bg-color-grey: #f9fafb;
+$uni-bg-color-hover: #f3f4f6;
+
+/* 边框颜色 */
+$uni-border-color: #e5e7eb;
+
+/* 字体尺寸 */
+$uni-font-size-sm: 24rpx;
+$uni-font-size-base: 28rpx;
+$uni-font-size-lg: 32rpx;
+
+/* 图标尺寸 */
+$uni-img-size-sm: 40rpx;
+$uni-img-size-base: 52rpx;
+$uni-img-size-lg: 80rpx;
+
+/* 边距 */
+$uni-spacing-sm: 16rpx;
+$uni-spacing-base: 24rpx;
+$uni-spacing-lg: 40rpx;
+
+/* 圆角 */
+$uni-border-radius-sm: 8rpx;
+$uni-border-radius-base: 16rpx;
+$uni-border-radius-lg: 24rpx;
+$uni-border-radius-circle: 50%;

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>办公用车</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+        }
+        .vehicle-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .status-available {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .status-in-use {
+            background-color: #ffedd5;
+            color: #9a3412;
+        }
+        .status-maintenance {
+            background-color: #e0f2fe;
+            color: #0c4a6e;
+        }
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+        .apply-btn:active {
+            transform: translateY(0);
+        }
+        /* 底部导航栏样式 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 2px solid #e5e7eb;
+            padding: 5px 0 5px 0; /* 增加顶部和底部padding */
+            z-index: 100;
+            height: 120px; /* 增加导航栏高度 */
+        }
+        .nav-item.active {
+            color: #6366f1;
+        }
+        .nav-item.active .nav-icon {
+            background: #eef2ff;
+        }
+        /* 调整底部按钮位置 */
+        .fixed-bottom-btn {
+            position: fixed;
+            bottom: 80px; /* 高于底部导航栏 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 2rem);
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+    <!-- 顶部导航 -->
+    <div class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="flex items-center justify-between p-4">
+            <div class="flex items-center">
+                <button class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                    <i class="fas fa-arrow-left text-gray-600"></i>
+                </button>
+                <h1 class="ml-3 text-xl font-semibold text-gray-800">办公用车</h1>
+            </div>
+            <div class="relative">
+                <button class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                    <i class="fas fa-bell text-gray-600"></i>
+                </button>
+                <span class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-xs text-white">2</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主要内容 -->
+    <div class="px-4 pt-4">
+        <!-- 统计信息 -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-3 text-white shadow-lg">
+                <p class="text-sm opacity-80">总车辆</p>
+                <p class="text-xl font-bold mt-1">12</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-green-500 to-teal-600 rounded-xl p-3 text-white shadow-lg">
+                <p class="text-sm opacity-80">可用车辆</p>
+                <p class="text-xl font-bold mt-1">8</p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl p-3 text-white shadow-lg">
+                <p class="text-sm opacity-80">使用中</p>
+                <p class="text-xl font-bold mt-1">4</p>
+            </div>
+        </div>
+        
+        <!-- 车辆列表 -->
+        <div class="mb-6">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-lg font-semibold text-gray-800">车辆列表</h2>
+                <a href="#" class="text-sm text-indigo-600">查看全部</a>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- 车辆1 -->
+                <div class="vehicle-card bg-white rounded-2xl p-4 shadow-sm transition-all duration-300">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center">
+                            <div class="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center">
+                                <i class="fas fa-car text-2xl text-gray-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="font-semibold text-gray-800">京A12345</h3>
+                                <p class="text-sm text-gray-600">大众帕萨特</p>
+                                <div class="flex items-center mt-1">
+                                    <span class="status-available text-xs px-2 py-1 rounded-full">可用</span>
+                                    <span class="ml-2 text-xs text-gray-500">油量 75%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="apply-btn bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-2 px-4 rounded-lg font-medium shadow-md transition-all duration-300">
+                            申请用车
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 车辆2 -->
+                <div class="vehicle-card bg-white rounded-2xl p-4 shadow-sm transition-all duration-300">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center">
+                            <div class="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center">
+                                <i class="fas fa-car text-2xl text-gray-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="font-semibold text-gray-800">京B67890</h3>
+                                <p class="text-sm text-gray-600">丰田凯美瑞</p>
+                                <div class="flex items-center mt-1">
+                                    <span class="status-in-use text-xs px-2 py-1 rounded-full">使用中</span>
+                                    <span class="ml-2 text-xs text-gray-500">预计15:30归还</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="bg-gray-200 text-gray-500 py-2 px-4 rounded-lg font-medium" disabled>
+                            申请用车
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 车辆3 -->
+                <div class="vehicle-card bg-white rounded-2xl p-4 shadow-sm transition-all duration-300">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center">
+                            <div class="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center">
+                                <i class="fas fa-car text-2xl text-gray-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="font-semibold text-gray-800">京C11111</h3>
+                                <p class="text-sm text-gray-600">本田雅阁</p>
+                                <div class="flex items-center mt-1">
+                                    <span class="status-available text-xs px-2 py-1 rounded-full">可用</span>
+                                    <span class="ml-2 text-xs text-gray-500">油量 90%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="apply-btn bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-2 px-4 rounded-lg font-medium shadow-md transition-all duration-300">
+                            申请用车
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 我的申请 -->
+        <div class="mb-24">
+            <h2 class="text-lg font-semibold text-gray-800 mb-3">我的申请</h2>
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <!-- 申请记录1 -->
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-medium text-gray-800">京A12345 大众帕萨特</h3>
+                            <p class="text-sm text-gray-600 mt-1">2025-09-10 09:00 - 17:00</p>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">已批准</span>
+                    </div>
+                </div>
+                
+                <!-- 申请记录2 -->
+                <div class="p-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-medium text-gray-800">京C11111 本田雅阁</h3>
+                            <p class="text-sm text-gray-600 mt-1">2025-09-12 14:00 - 18:00</p>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">待审批</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+   
+    
+    <!-- 底部导航栏 -->
+    <div class="bottom-nav">
+        <div class="flex justify-around">
+            <a href="dashboard.html" class="nav-item flex flex-col items-center text-xs py-1 px-2 text-gray-500">
+                <div class="nav-icon w-8 h-8 rounded-full flex items-center justify-center mb-1">
+                    <i class="fas fa-home text-lg"></i>
+                </div>
+                <span>主页</span>
+            </a>
+            <a href="#" class="nav-item flex flex-col items-center text-xs py-1 px-2 text-gray-500">
+                <div class="nav-icon w-8 h-8 rounded-full flex items-center justify-center mb-1">
+                    <i class="fas fa-newspaper text-lg"></i>
+                </div>
+                <span>资讯</span>
+            </a>
+            <a href="#" class="nav-item flex flex-col items-center text-xs py-1 px-2 text-gray-500">
+                <div class="nav-icon w-8 h-8 rounded-full flex items-center justify-center mb-1">
+                    <i class="fas fa-bell text-lg"></i>
+                </div>
+                <span>通知</span>
+            </a>
+            <a href="profile.html" class="nav-item flex flex-col items-center text-xs py-1 px-2 text-gray-500">
+                <div class="nav-icon w-8 h-8 rounded-full flex items-center justify-center mb-1">
+                    <i class="fas fa-user text-lg"></i>
+                </div>
+                <span>我的</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

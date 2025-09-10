@@ -20,3 +20,4 @@ from app.api import notification
 from app.api import superuser
 from app.api import article
 from app.api import article_attachment
+from app.api import stats

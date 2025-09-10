@@ -1,0 +1,88 @@
+@font-face {
+  font-family: "iconfont";
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 32rpx;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-user:before {
+  content: "\f007";
+}
+
+.icon-lock:before {
+  content: "\f023";
+}
+
+.icon-building:before {
+  content: "\f1ad";
+}
+
+.icon-bell:before {
+  content: "\f0f3";
+}
+
+.icon-car:before {
+  content: "\f1b9";
+}
+
+.icon-users:before {
+  content: "\f0c0";
+}
+
+.icon-file-invoice:before {
+  content: "\f570";
+}
+
+.icon-box:before {
+  content: "\f466";
+}
+
+.icon-exclamation-circle:before {
+  content: "\f06a";
+}
+
+.icon-calendar-check:before {
+  content: "\f274";
+}
+
+.icon-user-plus:before {
+  content: "\f234";
+}
+
+.icon-chevron-right:before {
+  content: "\f054";
+}
+
+.icon-cog:before {
+  content: "\f013";
+}
+
+.icon-users-cog:before {
+  content: "\f509";
+}
+
+.icon-chart-bar:before {
+  content: "\f080";
+}
+
+.icon-sign-out-alt:before {
+  content: "\f2f5";
+}
+
+.icon-arrow-left:before {
+  content: "\f060";
+}
+
+.icon-plus:before {
+  content: "\f067";
+}
+
+.icon-file-alt:before {
+  content: "\f15c";
+}
