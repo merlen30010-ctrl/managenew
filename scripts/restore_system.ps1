@@ -35,7 +35,8 @@ try {
     $codeBackupPath = Join-Path $BackupPath "code"
     if (Test-Path $codeBackupPath) {
         Write-Host "Restoring code files..." -ForegroundColor Cyan
-        & robocopy $codeBackupPath $RestorePath /E /R:3 /W:1 /MT:8 /NFL /NDL /NP
+        $targetPath = if ($RestorePath -eq ".") { ".." } else { $RestorePath }
+        & robocopy $codeBackupPath $targetPath /E /R:3 /W:1 /MT:8 /NFL /NDL /NP
         if ($LASTEXITCODE -le 7) {
             Write-Host "Code files restored successfully" -ForegroundColor Green
         } else {
@@ -47,7 +48,8 @@ try {
     $dbBackupPath = Join-Path $BackupPath "database\management.db"
     if (Test-Path $dbBackupPath) {
         Write-Host "Restoring database..." -ForegroundColor Cyan
-        Copy-Item $dbBackupPath (Join-Path $RestorePath "management.db") -Force
+        $dbTargetPath = if ($RestorePath -eq ".") { "..\management.db" } else { Join-Path $RestorePath "management.db" }
+        Copy-Item $dbBackupPath $dbTargetPath -Force
         Write-Host "Database restored successfully" -ForegroundColor Green
     } else {
         Write-Host "Warning: Database backup not found" -ForegroundColor Yellow
@@ -59,7 +61,13 @@ try {
         Write-Host "Restoring configuration files..." -ForegroundColor Cyan
         $configFiles = Get-ChildItem $configBackupPath
         foreach ($file in $configFiles) {
-            Copy-Item $file.FullName (Join-Path $RestorePath $file.Name) -Force
+            $targetPath = switch ($file.Name) {
+                "config.py" { if ($RestorePath -eq ".") { "..\backend\config.py" } else { Join-Path $RestorePath "backend\config.py" } }
+                "requirements.txt" { if ($RestorePath -eq ".") { "..\backend\requirements.txt" } else { Join-Path $RestorePath "backend\requirements.txt" } }
+                ".env" { if ($RestorePath -eq ".") { "..\$($file.Name)" } else { Join-Path $RestorePath $file.Name } }
+                default { if ($RestorePath -eq ".") { "..\$($file.Name)" } else { Join-Path $RestorePath $file.Name } }
+            }
+            Copy-Item $file.FullName $targetPath -Force
         }
         Write-Host "Configuration files restored successfully" -ForegroundColor Green
     }
@@ -68,9 +76,9 @@ try {
     Write-Host "Next steps:" -ForegroundColor Yellow
     Write-Host "1. Create virtual environment: python -m venv venv_new" -ForegroundColor White
     Write-Host "2. Activate virtual environment: venv_new\Scripts\activate" -ForegroundColor White
-    Write-Host "3. Install dependencies: pip install -r requirements.txt" -ForegroundColor White
-    Write-Host "4. Initialize database: python init_db.py" -ForegroundColor White
-    Write-Host "5. Start application: python run.py" -ForegroundColor White
+    Write-Host "3. Install dependencies: pip install -r backend/requirements.txt" -ForegroundColor White
+    Write-Host "4. Initialize database: python backend/init_db.py" -ForegroundColor White
+    Write-Host "5. Start application: python backend/run.py" -ForegroundColor White
     
 } catch {
     Write-Host "Error during restore: $($_.Exception.Message)" -ForegroundColor Red

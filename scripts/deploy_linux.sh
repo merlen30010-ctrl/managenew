@@ -85,7 +85,7 @@ setup_python_venv() {
     pip install --upgrade pip
     
     log_info "安装Python依赖"
-    pip install -r requirements.txt
+    pip install -r ../backend/requirements.txt
     
     deactivate
     log_info "Python虚拟环境设置完成"
@@ -95,7 +95,7 @@ setup_python_venv() {
 init_database() {
     log_info "初始化数据库"
     source venv/bin/activate
-    python init_db.py
+    python ../backend/init_db.py
     deactivate
     log_info "数据库初始化完成"
 }
@@ -133,7 +133,7 @@ Type=simple
 User=www-data
 WorkingDirectory=$(pwd)
 Environment=PATH=$(pwd)/venv/bin
-ExecStart=$(pwd)/venv/bin/python run.py
+ExecStart=$(pwd)/venv/bin/python backend/run.py
 Restart=always
 
 [Install]
@@ -157,7 +157,7 @@ EOF
         log_info "手动运行应用："
         echo "  cd $(pwd)"
         echo "  source venv/bin/activate"
-        echo "  python run.py"
+        echo "  python backend/run.py"
     fi
 }
 
@@ -170,7 +170,7 @@ show_completion_info() {
     echo ""
     echo "管理命令："
     echo "  激活虚拟环境: source venv/bin/activate"
-    echo "  运行应用: python run.py"
+    echo "  运行应用: python backend/run.py"
     echo "  停止应用: 按Ctrl+C"
     echo ""
     log_info "请确保防火墙允许5000端口的访问"

@@ -26,7 +26,7 @@ try {
     New-Item -ItemType Directory -Path $codeBackupDir -Force | Out-Null
     
     # Use robocopy for efficient copying
-    & robocopy . $codeBackupDir /E /R:3 /W:1 /MT:8 /XD venv_new __pycache__ .git node_modules temp tmp /XF *.pyc *.pyo *.log /NFL /NDL /NP
+    & robocopy .. $codeBackupDir /E /R:3 /W:1 /MT:8 /XD venv_new __pycache__ .git node_modules temp tmp /XF *.pyc *.pyo *.log /NFL /NDL /NP
     
     if ($LASTEXITCODE -le 7) {
         Write-Host "Code backup completed" -ForegroundColor Green
@@ -39,8 +39,8 @@ try {
     $dbBackupDir = Join-Path $backupDir "database"
     New-Item -ItemType Directory -Path $dbBackupDir -Force | Out-Null
     
-    if (Test-Path "management.db") {
-        Copy-Item "management.db" (Join-Path $dbBackupDir "management.db") -Force
+    if (Test-Path "..\management.db") {
+        Copy-Item "..\management.db" (Join-Path $dbBackupDir "management.db") -Force
         Write-Host "Database backup completed" -ForegroundColor Green
     } else {
         Write-Host "Warning: Database file not found" -ForegroundColor Yellow
@@ -51,11 +51,12 @@ try {
     $configBackupDir = Join-Path $backupDir "config"
     New-Item -ItemType Directory -Path $configBackupDir -Force | Out-Null
     
-    $configFiles = @(".env", "config.py", "requirements.txt", "README.md")
+    $configFiles = @("../.env", "../backend/config.py", "../backend/requirements.txt", "../README.md")
+    $configFileNames = @(".env", "config.py", "requirements.txt", "README.md")
     
-    foreach ($file in $configFiles) {
-        if (Test-Path $file) {
-            Copy-Item $file (Join-Path $configBackupDir $file) -Force
+    for ($i = 0; $i -lt $configFiles.Length; $i++) {
+        if (Test-Path $configFiles[$i]) {
+            Copy-Item $configFiles[$i] (Join-Path $configBackupDir $configFileNames[$i]) -Force
         }
     }
     Write-Host "Configuration files backup completed" -ForegroundColor Green

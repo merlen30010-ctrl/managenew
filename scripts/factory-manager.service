@@ -8,7 +8,7 @@ User=www-data
 Group=www-data
 WorkingDirectory=/path/to/your/factory-manager
 Environment=PATH=/path/to/your/factory-manager/venv/bin
-ExecStart=/path/to/your/factory-manager/venv/bin/python run.py
+ExecStart=/path/to/your/factory-manager/venv/bin/python backend/run.py
 Restart=always
 RestartSec=10
 
