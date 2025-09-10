@@ -42,7 +42,7 @@ def api_login():
                 'user': {
                     'id': user.id,
                     'username': user.username,
-                    # name字段已移至Employee表
+                    'name': user.name,
                 }
             }
         })
@@ -81,6 +81,13 @@ def api_register():
     db.session.add(user)
     db.session.commit()
     
+    # 自动为新用户分配员工角色
+    from app.models.role import Role
+    employee_role = Role.query.filter_by(name='员工').first()
+    if employee_role:
+        user.roles.append(employee_role)
+        db.session.commit()
+    
     return jsonify({
         'success': True,
         'message': '注册成功',
@@ -88,7 +95,7 @@ def api_register():
             'user': {
                 'id': user.id,
                 'username': user.username,
-                # name字段已移至Employee表
+                'name': user.name,
             }
         }
     })
@@ -159,7 +166,7 @@ def get_user_sessions():
 def revoke_all_sessions():
     """撤销所有会话"""
     try:
-        session_manager.revoke_all_user_sessions(current_user.id)
+        session_manager.revoke_user_sessions(current_user.id)
         return jsonify({
             'success': True,
             'message': '所有会话已撤销'

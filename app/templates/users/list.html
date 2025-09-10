@@ -16,9 +16,7 @@
                         <tr>
                             <th>ID</th>
                             <th>用户名</th>
-            
                             <th>姓名</th>
-                            <th>电话</th>
                             <th>创建时间</th>
                             <th>操作</th>
                         </tr>
@@ -28,8 +26,7 @@
                         <tr>
                             <td>{{ user.id }}</td>
                             <td>{{ user.username }}</td>
-            
-                            <!-- 姓名和电话信息已移至员工信息中 -->
+                            <td>{{ user.name or '-' }}</td>
                             <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                             <td>
                                 <a href="{{ url_for('main.edit_user', user_id=user.id) }}" class="btn btn-sm btn-primary">编辑</a>

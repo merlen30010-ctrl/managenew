@@ -3,11 +3,13 @@ from flask_login import login_required
 from app import db
 from app.models.department import Department
 from app.models.user import User
+from app.views.decorators import permission_required
 
 department_bp = Blueprint('department', __name__)
 
 @department_bp.route('/')
 @login_required
+@permission_required('department_read')
 def list_departments():
     # 获取所有顶级部门（分厂）
     factories = Department.query.filter_by(level=1).all()
@@ -15,6 +17,7 @@ def list_departments():
 
 @department_bp.route('/create', methods=['GET', 'POST'])
 @login_required
+@permission_required('department_create')
 def create_department():
     if request.method == 'POST':
         name = request.form.get('name')
@@ -43,6 +46,7 @@ def create_department():
 
 @department_bp.route('/<int:department_id>/edit', methods=['GET', 'POST'])
 @login_required
+@permission_required('department_update')
 def edit_department(department_id):
     department = Department.query.get_or_404(department_id)
     
@@ -69,6 +73,7 @@ def edit_department(department_id):
 
 @department_bp.route('/<int:department_id>/delete', methods=['POST'])
 @login_required
+@permission_required('department_delete')
 def delete_department(department_id):
     department = Department.query.get_or_404(department_id)
     db.session.delete(department)
@@ -78,6 +83,7 @@ def delete_department(department_id):
 
 @department_bp.route('/<int:department_id>/managers', methods=['GET', 'POST'])
 @login_required
+@permission_required('department_update')
 def manage_managers(department_id):
     department = Department.query.get_or_404(department_id)
     

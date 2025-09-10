@@ -7,7 +7,9 @@
     <div class="col-12">
         <h2>部门管理</h2>
         <div class="d-flex justify-content-between mb-3">
+            {% if current_user.has_permission('department_create') %}
             <a href="{{ url_for('department.create_department') }}" class="btn btn-primary">创建部门</a>
+            {% endif %}
         </div>
         <div class="card">
             <div class="card-body">
@@ -17,11 +19,15 @@
                         {{ factory.name }}
                         <small class="text-muted">({{ factory.short_name }})</small>
                         <div class="float-end">
+                            {% if current_user.has_permission('department_update') %}
                             <a href="{{ url_for('department.edit_department', department_id=factory.id) }}" class="btn btn-sm btn-primary">编辑</a>
                             <a href="{{ url_for('department.manage_managers', department_id=factory.id) }}" class="btn btn-sm btn-secondary">设置管理员</a>
+                            {% endif %}
+                            {% if current_user.has_permission('department_delete') %}
                             <form action="{{ url_for('department.delete_department', department_id=factory.id) }}" method="POST" style="display: inline;">
                                 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这个分厂吗？')">删除</button>
                             </form>
+                            {% endif %}
                         </div>
                     </h4>
                     <p>{{ factory.full_name or '未设置全称' }} | 电话: {{ factory.phone or '未设置' }}</p>
@@ -38,11 +44,15 @@
                                     {{ dept.full_name or '未设置全称' }} | 电话: {{ dept.phone or '未设置' }}
                                 </div>
                                 <div>
+                                    {% if current_user.has_permission('department_update') %}
                                     <a href="{{ url_for('department.edit_department', department_id=dept.id) }}" class="btn btn-sm btn-primary">编辑</a>
                                     <a href="{{ url_for('department.manage_managers', department_id=dept.id) }}" class="btn btn-sm btn-secondary">设置管理员</a>
+                                    {% endif %}
+                                    {% if current_user.has_permission('department_delete') %}
                                     <form action="{{ url_for('department.delete_department', department_id=dept.id) }}" method="POST" style="display: inline;">
                                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这个部门吗？')">删除</button>
                                     </form>
+                                    {% endif %}
                                 </div>
                             </div>
                         </li>

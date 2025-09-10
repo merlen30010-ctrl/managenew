@@ -167,7 +167,7 @@ function updateSuperuserTable(data) {
             <tr>
                 <td>${user.id}</td>
                 <td>${user.username}</td>
-                <td>${user.email || '-'}</td>
+                
                 <td>
                     <span class="badge ${user.is_active ? 'badge-success' : 'badge-danger'}">
                         ${user.is_active ? '活跃' : '禁用'}
@@ -200,7 +200,7 @@ function loadUsers() {
                 
                 response.data.forEach(function(user) {
                     if (!user.is_superuser) {
-                        select.append(`<option value="${user.id}">${user.username} (${user.email || '无邮箱'})</option>`);
+                        select.append(`<option value="${user.id}">${user.username}</option>`);
                     }
                 });
             }

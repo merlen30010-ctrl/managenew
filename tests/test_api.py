@@ -112,7 +112,7 @@ def create_test_data():
         # 创建测试用户
         user = User.query.filter_by(username='testuser').first()
         if not user:
-            user = User(username='testuser', email='testuser@example.com')
+            user = User(username='testuser')
             user.set_password('test123')
             db.session.add(user)
             db.session.commit()

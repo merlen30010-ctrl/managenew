@@ -211,14 +211,39 @@ def init_db():
             if not existing_rp:
                 admin_role.add_permission(permission)
         
+        # 创建员工角色
+        employee_role = Role.query.filter_by(name='员工').first()
+        if not employee_role:
+            employee_role = Role(name='员工', description='普通员工')
+            db.session.add(employee_role)
+            db.session.commit()
+            
+            # 为员工角色分配基础权限（只有阅读文章和通知）
+            employee_permissions = [
+                'article_read',
+                'notification_read'
+            ]
+            
+            for perm_name in employee_permissions:
+                permission = Permission.query.filter_by(name=perm_name).first()
+                if permission:
+                    from app.models.permission import RolePermission
+                    existing_rp = RolePermission.query.filter_by(
+                        role_id=employee_role.id,
+                        permission_id=permission.id
+                    ).first()
+                    
+                    if not existing_rp:
+                        employee_role.add_permission(permission)
+        
         # 如果管理员用户不存在，创建它
         if not admin_user:
             # 创建管理员用户
             admin_user = User()
             admin_user.username = 'admin'
-            admin_user.email = 'admin@example.com'
-            # name字段已移至Employee表
+            admin_user.name = 'Administrator'
             admin_user.set_password('admin123')
+            admin_user.is_superuser = True  # 设置为超级管理员
             db.session.add(admin_user)
             db.session.commit()
             
@@ -226,13 +251,14 @@ def init_db():
             admin_user.roles.append(admin_role)
             db.session.commit()
             
-            print("管理员用户创建成功，用户名: admin，密码: admin123")
+            print("超级管理员用户创建成功，用户名: admin，密码: admin123")
         else:
-            # 确保管理员用户具有管理员角色
+            # 确保管理员用户具有管理员角色和超级管理员权限
             if admin_role not in admin_user.roles:
                 admin_user.roles.append(admin_role)
-                db.session.commit()
-            print("管理员用户已存在")
+            admin_user.is_superuser = True
+            db.session.commit()
+            print("管理员用户已存在，已设置为超级管理员")
         
         # 确保提交所有更改
         db.session.commit()

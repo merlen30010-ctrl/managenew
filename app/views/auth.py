@@ -32,6 +32,7 @@ def register():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        name = request.form.get('name')
         
         if not username or not password:
             flash('用户名和密码都是必填的')
@@ -43,10 +44,17 @@ def register():
             return redirect(url_for('auth.register'))
         
         # 创建新用户
-        user = User(username=username)
+        user = User(username=username, name=name)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
+        
+        # 自动为新用户分配员工角色
+        from app.models.role import Role
+        employee_role = Role.query.filter_by(name='员工').first()
+        if employee_role:
+            user.roles.append(employee_role)
+            db.session.commit()
         
         flash('注册成功')
         return redirect(url_for('auth.login'))

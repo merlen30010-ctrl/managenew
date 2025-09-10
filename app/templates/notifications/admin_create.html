@@ -50,9 +50,7 @@
                                     <input class="form-check-input user-checkbox" type="checkbox" id="user_{{ user.id }}" name="user_ids" value="{{ user.id }}">
                                     <label class="form-check-label" for="user_{{ user.id }}">
                                         {{ user.username }}
-                                        {% if user.email %}
-                                        <small class="text-muted">({{ user.email }})</small>
-                                        {% endif %}
+
                                     </label>
                                 </div>
                             </div>

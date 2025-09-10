@@ -55,29 +55,47 @@
                             基础字典
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{{ url_for('material.list_materials') }}">物料管理</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('customer.list_customers') }}">客户管理</a></li>
+                            {% if current_user.has_permission('material_read') %}
+                        <li><a class="dropdown-item" href="{{ url_for('material.list_materials') }}">物料管理</a></li>
+                        {% endif %}
+                        {% if current_user.has_permission('customer_read') %}
+                        <li><a class="dropdown-item" href="{{ url_for('customer.list_customers') }}">客户管理</a></li>
+                        {% endif %}
+                            {% if current_user.has_permission('department_read') %}
                             <li><a class="dropdown-item" href="{{ url_for('department.list_departments') }}">部门管理</a></li>
+                            {% endif %}
                         </ul>
                     </li>
+                    {% if current_user.has_permission('contract_read') %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('contract.list_contracts') }}">合同管理</a>
                     </li>
+                    {% endif %}
+                    {% if current_user.has_permission('assay_data_read') %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('assay_data.list_assay_data') }}">化验数据</a>
                     </li>
+                    {% endif %}
+                    {% if current_user.has_permission('material_transaction_read') %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('material_transaction.list_transactions') }}">物料进出厂</a>
                     </li>
+                    {% endif %}
+                    {% if current_user.has_permission('production_record_read') %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('production_record.list_records') }}">产品产能</a>
                     </li>
+                    {% endif %}
+                    {% if current_user.has_permission('metal_price_read') %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('metal_price.list_prices') }}">金属价格</a>
                     </li>
+                    {% endif %}
+                    {% if current_user.has_permission('vehicle_read') %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('vehicle.list_vehicles') }}">办公用车</a>
                     </li>
+                    {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="articleDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             文章管理
@@ -98,9 +116,15 @@
                             员工管理
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="employeeDropdown">
+                            {% if current_user.has_permission('user_read') %}
                             <li><a class="dropdown-item" href="{{ url_for('employee.list_employees') }}">员工列表</a></li>
+                            {% endif %}
+                            {% if current_user.has_permission('user_read') %}
                             <li><a class="dropdown-item" href="{{ url_for('employee.documents') }}">证件管理</a></li>
+                            {% endif %}
+                            {% if current_user.has_permission('user_read') %}
                             <li><a class="dropdown-item" href="{{ url_for('employee.rewards_punishments') }}">奖惩管理</a></li>
+                            {% endif %}
                         </ul>
                     </li>
                     {% endif %}

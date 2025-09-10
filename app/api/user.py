@@ -21,8 +21,8 @@ def get_current_user():
         'data': {
             'id': current_user.id,
             'username': current_user.username,
-            'email': current_user.email,
-            # name字段已移至Employee表
+    
+            'name': current_user.name,
             'roles': [role.name for role in current_user.roles] if hasattr(current_user, 'roles') else []
         }
     })
@@ -39,8 +39,8 @@ def get_users():
             'data': [{
                 'id': user.id,
                 'username': user.username,
-                'email': user.email,
-                # name字段已移至Employee表
+    
+                'name': user.name
             } for user in users]
         })
     except Exception as e:
@@ -62,8 +62,8 @@ def get_user(user_id):
             'data': {
                 'id': user.id,
                 'username': user.username,
-                'email': user.email,
-                # name字段已移至Employee表
+        
+                'name': user.name
             }
         })
     except Exception as e:
@@ -98,7 +98,8 @@ def create_user():
         # 创建新用户
         user = User()
         user.username = data['username']
-        # name和phone字段已移至Employee表，此处不再处理
+        if data.get('name'):
+            user.name = data['name']
         
         if data.get('password'):
             user.set_password(data['password'])
@@ -106,14 +107,21 @@ def create_user():
         db.session.add(user)
         db.session.commit()
         
+        # 自动为新用户分配员工角色
+        from app.models.role import Role
+        employee_role = Role.query.filter_by(name='员工').first()
+        if employee_role:
+            user.roles.append(employee_role)
+            db.session.commit()
+        
         return jsonify({
             'success': True,
             'message': '用户创建成功',
             'data': {
                 'id': user.id,
                 'username': user.username,
-                'email': user.email,
-                # name字段已移至Employee表
+    
+                'name': user.name
             }
         }), 201
     except Exception as e:
@@ -149,7 +157,8 @@ def update_user(user_id):
         
 
         
-        # name和phone字段已移至Employee表，此处不再处理
+        if 'name' in data:
+            user.name = data['name']
         
         if 'password' in data:
             user.set_password(data['password'])
@@ -162,8 +171,8 @@ def update_user(user_id):
             'data': {
                 'id': user.id,
                 'username': user.username,
-                'email': user.email,
-                # name字段已移至Employee表
+    
+                'name': user.name
             }
         })
     except Exception as e:

@@ -91,7 +91,6 @@ def create_user():
         username = request.form.get('username')
         password = request.form.get('password')
         name = request.form.get('name')
-        phone = request.form.get('phone')
         
         # 检查用户是否已存在
         if User.query.filter_by(username=username).first():
@@ -99,10 +98,17 @@ def create_user():
             return redirect(url_for('main.create_user'))
         
         # 创建新用户
-        user = User(username=username, name=name, phone=phone)
+        user = User(username=username, name=name)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
+        
+        # 自动为新用户分配员工角色
+        from app.models.role import Role
+        employee_role = Role.query.filter_by(name='员工').first()
+        if employee_role:
+            user.roles.append(employee_role)
+            db.session.commit()
         
         flash('用户创建成功')
         return redirect(url_for('main.users'))
@@ -116,9 +122,10 @@ def edit_user(user_id):
     user = User.query.get_or_404(user_id)
     
     if request.method == 'POST':
-        # 禁止修改任何用户的用户名
-        flash('用户名不允许修改')
-        return redirect(url_for('main.edit_user', user_id=user_id))
+        # 更新姓名
+        name = request.form.get('name')
+        if name:
+            user.name = name
         
         # 如果提供了新密码，则更新密码
         password = request.form.get('password')
