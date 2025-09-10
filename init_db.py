@@ -54,6 +54,18 @@ def init_db():
             {'name': 'employee_update', 'description': '更新员工', 'module': 'employee', 'action': 'update'},
             {'name': 'employee_delete', 'description': '删除员工', 'module': 'employee', 'action': 'delete'},
             
+            # 员工证件管理权限
+            {'name': 'employee_document_read', 'description': '查看员工证件', 'module': 'employee_document', 'action': 'read'},
+            {'name': 'employee_document_create', 'description': '创建员工证件', 'module': 'employee_document', 'action': 'create'},
+            {'name': 'employee_document_update', 'description': '更新员工证件', 'module': 'employee_document', 'action': 'update'},
+            {'name': 'employee_document_delete', 'description': '删除员工证件', 'module': 'employee_document', 'action': 'delete'},
+            
+            # 员工奖惩管理权限
+            {'name': 'employee_reward_punishment_read', 'description': '查看员工奖惩记录', 'module': 'employee_reward_punishment', 'action': 'read'},
+            {'name': 'employee_reward_punishment_create', 'description': '创建员工奖惩记录', 'module': 'employee_reward_punishment', 'action': 'create'},
+            {'name': 'employee_reward_punishment_update', 'description': '更新员工奖惩记录', 'module': 'employee_reward_punishment', 'action': 'update'},
+            {'name': 'employee_reward_punishment_delete', 'description': '删除员工奖惩记录', 'module': 'employee_reward_punishment', 'action': 'delete'},
+            
             # 部门管理权限
             {'name': 'department_read', 'description': '查看部门', 'module': 'department', 'action': 'read'},
             {'name': 'department_create', 'description': '创建部门', 'module': 'department', 'action': 'create'},

@@ -116,8 +116,9 @@ def edit_user(user_id):
     user = User.query.get_or_404(user_id)
     
     if request.method == 'POST':
-        user.username = request.form.get('username')
-        # name和phone字段已移至Employee表，此处不再处理
+        # 禁止修改任何用户的用户名
+        flash('用户名不允许修改')
+        return redirect(url_for('main.edit_user', user_id=user_id))
         
         # 如果提供了新密码，则更新密码
         password = request.form.get('password')

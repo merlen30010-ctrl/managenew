@@ -141,14 +141,11 @@ def update_user(user_id):
         
         # 更新用户信息
         if 'username' in data:
-            # 检查用户名是否已存在
-            existing_user = User.query.filter_by(username=data['username']).first()
-            if existing_user and existing_user.id != user_id:
-                return jsonify({
-                    'success': False,
-                    'message': '用户名已存在'
-                }), 400
-            user.username = data['username']
+            # 禁止修改任何用户的用户名
+            return jsonify({
+                'success': False,
+                'message': '用户名不允许修改'
+            }), 400
         
 
         
