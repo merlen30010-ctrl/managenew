@@ -228,7 +228,7 @@ def create_contract():
         tax_rate = request.form.get('tax_rate') or 0
         pricing_method = request.form.get('pricing_method')
         coefficient = request.form.get('coefficient')
-        status = request.form.get('status') or '执行'
+        status = request.form.get('status') or '草稿'
         
         # 检查合同编号是否已存在
         if Contract.query.filter_by(contract_number=contract_number).first():
@@ -355,6 +355,11 @@ def edit_contract(contract_id):
     contract = Contract.query.get_or_404(contract_id)
     
     if request.method == 'POST':
+        # 若合同已归档且非超级管理员，禁止编辑
+        if contract.status == '合同归档' and not current_user.is_superuser:
+            flash('合同已归档，只有超级管理员可以编辑。')
+            return redirect(url_for('contract.list_contracts'))
+        
         contract.contract_type = request.form.get('contract_type')
         contract.contract_number = request.form.get('contract_number')
         contract.customer_id = int(request.form.get('customer_id'))
@@ -395,6 +400,10 @@ def upload_contract_file(contract_id):
     contract = Contract.query.get_or_404(contract_id)
     
     if request.method == 'POST':
+        # 若合同已归档且非超级管理员，禁止上传附件
+        if contract.status == '合同归档' and not current_user.is_superuser:
+            flash('合同已归档，只有超级管理员可以上传或删除附件。')
+            return render_template('contracts/upload.html', contract=contract)
         file = request.files.get('file')
         if file and file.filename:
             try:
@@ -598,6 +607,11 @@ def preview_contract_file(file_id):
 def delete_contract_file(file_id):
     try:
         contract_file = ContractFile.query.get_or_404(file_id)
+        # 取关联合同并检查归档
+        contract = Contract.query.get(contract_file.contract_id)
+        if contract and contract.status == '合同归档' and not current_user.is_superuser:
+            flash('合同已归档，只有超级管理员可以删除附件。')
+            return redirect(url_for('contract.list_contracts'))
         
         # 验证文件记录
         if not contract_file.file_path:
@@ -647,6 +661,10 @@ def delete_contract_file(file_id):
 def delete_contract(contract_id):
     try:
         contract = Contract.query.get_or_404(contract_id)
+        # 若合同已归档且非超级管理员，禁止删除
+        if contract.status == '合同归档' and not current_user.is_superuser:
+            flash('合同已归档，只有超级管理员可以删除合同。')
+            return redirect(url_for('contract.list_contracts'))
         
         # 删除关联的合同文件
         for file in contract.files:

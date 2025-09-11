@@ -102,6 +102,22 @@ def upload_attachment():
         db.session.add(attachment)
         db.session.commit()
         
+        # 若为合同附件，写入合同操作日志
+        try:
+            if related_type == 'contract':
+                from app.models.contract import Contract
+                contract = Contract.query.get(int(related_id))
+                if contract:
+                    contract.append_log('attachment_upload', actor_id=current_user.id, details={
+                        'attachment_id': attachment.id,
+                        'original_name': attachment.original_name,
+                        'stored_name': attachment.stored_name,
+                        'description': attachment.description
+                    })
+                    db.session.commit()
+        except Exception as e:
+            logger.warning(f"附件上传写合同日志失败: {e}")
+        
         return jsonify({
             'id': attachment.id,
             'related_type': attachment.related_type,
@@ -245,9 +261,28 @@ def delete_attachment(attachment_id):
         else:
             logger.warning(f"文件不存在，跳过删除: {file_path}")
         
+        related_type = attachment.related_type
+        related_id = attachment.related_id
+        
         db.session.delete(attachment)
         db.session.commit()
         logger.info("数据库记录删除成功")
+
+        # 若为合同附件，写入合同操作日志
+        try:
+            if related_type == 'contract':
+                from app.models.contract import Contract
+                contract = Contract.query.get(int(related_id))
+                if contract:
+                    contract.append_log('attachment_delete', actor_id=current_user.id, details={
+                        'attachment_id': attachment.id,
+                        'original_name': attachment.original_name,
+                        'stored_name': attachment.stored_name
+                    })
+                    db.session.commit()
+        except Exception as e:
+            logger.warning(f"附件删除写合同日志失败: {e}")
+        
         return jsonify({'message': '附件删除成功'}), 200
         
     except Exception as e:

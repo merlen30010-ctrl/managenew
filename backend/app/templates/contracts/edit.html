@@ -90,8 +90,12 @@
                     <div class="mb-3">
                         <label for="status" class="form-label">状态</label>
                         <select class="form-select" id="status" name="status">
-                            <option value="执行" {% if contract.status == '执行' %}selected{% endif %}>执行</option>
-                            <option value="归档" {% if contract.status == '归档' %}selected{% endif %}>归档</option>
+                            <option value="草稿" {% if contract.status == '草稿' %}selected{% endif %}>草稿</option>
+                            <option value="签订合同" {% if contract.status == '签订合同' %}selected{% endif %}>签订合同</option>
+                            <option value="执行合同" {% if contract.status == '执行合同' %}selected{% endif %}>执行合同</option>
+                            <option value="财务结算" {% if contract.status == '财务结算' %}selected{% endif %}>财务结算</option>
+                            <option value="票据尾款" {% if contract.status == '票据尾款' %}selected{% endif %}>票据尾款</option>
+                            <option value="合同归档" {% if contract.status == '合同归档' %}selected{% endif %}>合同归档</option>
                         </select>
                     </div>
                     <div class="d-grid">
@@ -104,5 +108,25 @@
             </div>
         </div>
     </div>
+</div>
+{% if not current_user.is_superuser and contract.status == '合同归档' %}
+<div class="alert alert-warning mt-3">合同已归档，只有超级管理员可以编辑。</div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    if (form) {
+      Array.from(form.elements).forEach(function(el){
+        if (el && el.tagName !== 'A' && el.type !== 'hidden' && el.type !== 'button' && el.type !== 'submit') {
+          el.setAttribute('disabled', 'disabled');
+        }
+      });
+      // 也禁用提交按钮
+      const submit = form.querySelector('button[type="submit"]');
+      if (submit) submit.setAttribute('disabled', 'disabled');
+    }
+  });
+</script>
+{% endif %}
+</div>
 </div>
 {% endblock %}

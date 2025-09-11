@@ -1,4 +1,6 @@
 from app import db
+import json
+from datetime import datetime
 
 class Contract(db.Model):
     __tablename__ = 'contracts'
@@ -24,6 +26,10 @@ class Contract(db.Model):
     pricing_method = db.Column(db.String(20), index=True)  # 计价方式
     coefficient = db.Column(db.Float)  # 系数
     status = db.Column(db.String(20), default='执行', index=True)  # 阶段：执行，归档
+    # 新增布尔字段与操作日志（JSON文本）
+    is_tax_inclusive = db.Column(db.Boolean, default=False, nullable=False, index=True)
+    is_invoice_received = db.Column(db.Boolean, default=False, nullable=False, index=True)
+    operation_logs = db.Column(db.Text, default='[]', nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), index=True)
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
     
@@ -60,6 +66,41 @@ class Contract(db.Model):
             return (base_price + self.coefficient) * quantity
         else:
             return base_price * quantity
+    
+    # 操作日志相关方法
+    def _get_logs(self):
+        try:
+            return json.loads(self.operation_logs) if self.operation_logs else []
+        except Exception:
+            return []
+    
+    def _set_logs(self, logs):
+        try:
+            self.operation_logs = json.dumps(logs, ensure_ascii=False)
+        except Exception:
+            # 最差情况下避免因日志序列化影响主流程
+            self.operation_logs = '[]'
+    
+    def append_log(self, action, actor_id=None, details=None):
+        """追加一条操作日志，JSON格式存储在operation_logs
+        action: 字符串，如 create/update/status_change/attachment_upload/attachment_delete
+        actor_id: 执行人的用户ID
+        details: 任意可JSON序列化的dict
+        """
+        entry = {
+            'ts': datetime.utcnow().isoformat() + 'Z',
+            'action': action,
+            'actor_id': actor_id,
+            'details': details or {}
+        }
+        logs = self._get_logs()
+        logs.append(entry)
+        self._set_logs(logs)
+        return entry
+    
+    @property
+    def operation_logs_list(self):
+        return self._get_logs()
 
 class ContractFile(db.Model):
     __tablename__ = 'contract_files'

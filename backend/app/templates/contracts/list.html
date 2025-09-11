@@ -37,9 +37,19 @@
                             <td>{{ contract.responsible.name or contract.responsible.username }}</td>
                             <td>{{ contract.sign_date.strftime('%Y-%m-%d') if contract.sign_date else '未设置' }}</td>
                             <td>{{ contract.pricing_method_display }}</td>
-                            <td>{{ contract.status }}</td>
                             <td>
+                                {% if contract.status == '合同归档' %}
+                                <span class="badge bg-secondary">合同归档</span>
+                                {% else %}
+                                {{ contract.status }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if contract.status == '合同归档' and not current_user.is_superuser %}
+                                <button class="btn btn-sm btn-secondary" disabled>编辑</button>
+                                {% else %}
                                 <a href="{{ url_for('contract.edit_contract', contract_id=contract.id) }}" class="btn btn-sm btn-primary">编辑</a>
+                                {% endif %}
                                 <a href="{{ url_for('contract.upload_contract_file', contract_id=contract.id) }}" class="btn btn-sm btn-secondary">上传文件</a>
                                 <form action="{{ url_for('contract.delete_contract', contract_id=contract.id) }}" method="POST" style="display: inline;">
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除这个合同吗？')">删除</button>
