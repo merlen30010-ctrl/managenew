@@ -92,6 +92,18 @@ export default {
       loading: false
     }
   },
+  
+  onLoad() {
+    // 检查是否已经登录
+    const token = uni.getStorageSync('token')
+    if (token) {
+      // 如果已经登录，直接跳转到仪表盘
+      uni.switchTab({
+        url: '/pages/dashboard/dashboard'
+      })
+    }
+  },
+  
   methods: {
     async handleLogin() {
       // 表单验证
