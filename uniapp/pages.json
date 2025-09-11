@@ -54,8 +54,12 @@
 				"text": "主页"
 			},
 			{
-				"pagePath": "pages/vehicle/vehicle",
-				"text": "用车"
+				"pagePath": "pages/index/index",
+				"text": "资讯"
+			},
+			{
+				"pagePath": "pages/index/index",
+				"text": "通知"
 			},
 			{
 				"pagePath": "pages/profile/profile",

@@ -42,4 +42,45 @@
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 		z-index: 1000;
 	}
+	
+	/* 底部导航栏样式 */
+	.bottom-nav {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 50px;
+		background: #ffffff;
+		border-top: 1px solid #e5e7eb;
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		padding: 5px 0;
+		z-index: 999;
+	}
+	
+	.nav-item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		flex: 1;
+		height: 100%;
+		color: #7A7E83;
+		text-decoration: none;
+	}
+	
+	.nav-item.active {
+		color: #6366f1;
+	}
+	
+	.nav-icon {
+		width: 24px;
+		height: 24px;
+		margin-bottom: 2px;
+	}
+	
+	.nav-text {
+		font-size: 12px;
+	}
 </style>

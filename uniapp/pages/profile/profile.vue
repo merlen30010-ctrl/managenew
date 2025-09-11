@@ -124,6 +124,26 @@
       </view>
     </view>
   </view>
+  
+  <!-- 底部导航栏 -->
+  <view class="bottom-nav">
+    <view class="nav-item" @click="goToPage('dashboard')">
+      <uni-icons type="home" size="24" color="#7A7E83"></uni-icons>
+      <text class="nav-text">主页</text>
+    </view>
+    <view class="nav-item" @click="goToPage('news')">
+      <uni-icons type="flag" size="24" color="#7A7E83"></uni-icons>
+      <text class="nav-text">资讯</text>
+    </view>
+    <view class="nav-item" @click="goToPage('notification')">
+      <uni-icons type="notification" size="24" color="#7A7E83"></uni-icons>
+      <text class="nav-text">通知</text>
+    </view>
+    <view class="nav-item active" @click="goToPage('profile')">
+      <uni-icons type="person" size="24" color="#6366f1"></uni-icons>
+      <text class="nav-text">我的</text>
+    </view>
+  </view>
 </template>
 
 <script>
@@ -176,6 +196,32 @@ export default {
           }
         }
       })
+    },
+    
+    goToPage(page) {
+      // 根据页面名称跳转到相应页面
+      switch(page) {
+        case 'dashboard':
+          uni.switchTab({
+            url: '/pages/dashboard/dashboard'
+          });
+          break;
+        case 'news':
+          uni.switchTab({
+            url: '/pages/index/index'
+          });
+          break;
+        case 'notification':
+          uni.switchTab({
+            url: '/pages/index/index'
+          });
+          break;
+        case 'profile':
+          // 当前页面，无需跳转
+          break;
+        default:
+          break;
+      }
     }
   }
 }
@@ -185,6 +231,7 @@ export default {
 .profile-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+  padding-bottom: 140rpx; /* 为底部导航留出空间 */
 }
 
 /* 个人资料头部 */
@@ -201,11 +248,10 @@ export default {
 }
 
 .avatar-container {
-  width: 160rpx;
-  height: 160rpx;
+  width: 120rpx;
+  height: 120rpx;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
-  border: 8rpx solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -216,57 +262,60 @@ export default {
   font-size: 36rpx;
   font-weight: 600;
   color: #ffffff;
-  margin-bottom: 10rpx;
+  margin-bottom: 8rpx;
 }
 
 .user-role {
-  font-size: 28rpx;
-  color: #e0e7ff;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
   margin-bottom: 30rpx;
 }
 
 .stats {
   display: flex;
   align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20rpx;
+  padding: 16rpx 30rpx;
 }
 
 .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 40rpx;
+  flex: 1;
 }
 
 .stat-value {
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: 600;
   color: #ffffff;
-  margin-bottom: 10rpx;
+  margin-bottom: 4rpx;
 }
 
 .stat-label {
-  font-size: 24rpx;
-  color: #e0e7ff;
+  font-size: 20rpx;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .stat-divider {
   width: 2rpx;
-  height: 60rpx;
+  height: 40rpx;
   background: rgba(255, 255, 255, 0.3);
+  margin: 0 30rpx;
 }
 
 /* 菜单容器 */
 .menu-container {
   padding: 30rpx;
-  padding-bottom: 120rpx; /* 为底部导航栏留出空间 */
 }
 
 .menu-section {
   background: #ffffff;
-  border-radius: 24rpx;
-  overflow: hidden;
+  border-radius: 20rpx;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
   margin-bottom: 30rpx;
+  overflow: hidden;
 }
 
 .menu-item {
@@ -280,14 +329,10 @@ export default {
   border-bottom: none;
 }
 
-.menu-item:active {
-  background: #f9fafb;
-}
-
 .menu-icon {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 16rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -377,5 +422,37 @@ export default {
   font-size: 32rpx;
   font-weight: 500;
   margin-left: 10rpx;
+}
+
+/* 底部导航栏 */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20rpx 0;
+  z-index: 999;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.nav-item.active .nav-text {
+  color: #6366f1;
+}
+
+.nav-text {
+  font-size: 24rpx;
+  color: #7A7E83;
+  margin-top: 4rpx;
 }
 </style>

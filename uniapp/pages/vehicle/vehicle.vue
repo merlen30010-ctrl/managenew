@@ -122,6 +122,26 @@
         </view>
       </view>
     </uni-popup>
+    
+    <!-- 底部导航栏 -->
+    <view class="bottom-nav">
+      <view class="nav-item" @click="goToPage('dashboard')">
+        <uni-icons type="home" size="24" color="#7A7E83"></uni-icons>
+        <text class="nav-text">主页</text>
+      </view>
+      <view class="nav-item" @click="goToPage('news')">
+        <uni-icons type="flag" size="24" color="#7A7E83"></uni-icons>
+        <text class="nav-text">资讯</text>
+      </view>
+      <view class="nav-item" @click="goToPage('notification')">
+        <uni-icons type="notification" size="24" color="#7A7E83"></uni-icons>
+        <text class="nav-text">通知</text>
+      </view>
+      <view class="nav-item" @click="goToPage('profile')">
+        <uni-icons type="person" size="24" color="#7A7E83"></uni-icons>
+        <text class="nav-text">我的</text>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -210,34 +230,39 @@ export default {
     },
     
     submitApplication() {
-      if (!this.startDate || !this.endDate) {
-        uni.showToast({
-          title: '请选择用车时间',
-          icon: 'none'
-        })
-        return
-      }
-      
-      if (!this.applyReason) {
-        uni.showToast({
-          title: '请输入用车事由',
-          icon: 'none'
-        })
-        return
-      }
-      
       uni.showToast({
-        title: '申请提交成功',
-        icon: 'success'
+        title: '提交申请功能待开发',
+        icon: 'none'
       })
-      
       this.closeApplyModal()
-      
-      // 重置表单
-      this.startDate = ''
-      this.endDate = ''
-      this.applyReason = ''
-      this.selectedPriority = 'normal'
+    },
+    
+    goToPage(page) {
+      // 根据页面名称跳转到相应页面
+      switch(page) {
+        case 'dashboard':
+          uni.switchTab({
+            url: '/pages/dashboard/dashboard'
+          });
+          break;
+        case 'news':
+          uni.switchTab({
+            url: '/pages/index/index'
+          });
+          break;
+        case 'notification':
+          uni.switchTab({
+            url: '/pages/index/index'
+          });
+          break;
+        case 'profile':
+          uni.switchTab({
+            url: '/pages/profile/profile'
+          });
+          break;
+        default:
+          break;
+      }
     }
   }
 }
@@ -245,16 +270,16 @@ export default {
 
 <style scoped>
 .vehicle-container {
-  padding: 20rpx;
-  background-color: #f5f7fa;
   min-height: 100vh;
-  padding-bottom: 120rpx; /* 为底部导航栏留出空间 */
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+  padding: 20rpx;
+  padding-bottom: 140rpx; /* 为底部导航留出空间 */
 }
 
 /* 车辆列表 */
 .vehicles-section {
   background: #ffffff;
-  border-radius: 16rpx;
+  border-radius: 20rpx;
   padding: 30rpx;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
   margin-bottom: 30rpx;
@@ -268,7 +293,7 @@ export default {
 }
 
 .section-title {
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: 600;
   color: #1f2937;
 }
@@ -280,7 +305,7 @@ export default {
   border: 2rpx solid #e5e7eb;
   border-radius: 16rpx;
   padding: 0 20rpx;
-  width: 300rpx;
+  width: 280rpx;
 }
 
 .search-input {
@@ -289,40 +314,36 @@ export default {
   font-size: 28rpx;
   color: #1f2937;
   background: transparent;
-}
-
-.placeholder-style {
-  color: #9ca3af;
-  font-size: 28rpx;
+  margin-left: 10rpx;
 }
 
 .vehicle-list {
   display: flex;
   flex-direction: column;
+  gap: 20rpx;
 }
 
 .vehicle-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 30rpx 0;
-  border-bottom: 2rpx solid #f3f4f6;
-}
-
-.vehicle-item:last-child {
-  border-bottom: none;
+  padding: 30rpx;
+  background: #f9fafb;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
 }
 
 .vehicle-info {
   display: flex;
   align-items: center;
+  flex: 1;
 }
 
 .vehicle-icon {
   width: 80rpx;
   height: 80rpx;
-  border-radius: 50%;
-  background: #eef2ff;
+  border-radius: 16rpx;
+  background: #e0e7ff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -335,37 +356,37 @@ export default {
 }
 
 .vehicle-name {
-  font-size: 30rpx;
+  font-size: 32rpx;
   font-weight: 500;
   color: #1f2937;
   margin-bottom: 8rpx;
 }
 
 .vehicle-model {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #6b7280;
   margin-bottom: 8rpx;
 }
 
 .vehicle-status {
-  font-size: 24rpx;
+  font-size: 20rpx;
   padding: 4rpx 12rpx;
   border-radius: 12rpx;
-  display: inline-flex;
-  align-self: flex-start;
+  display: inline-block;
+  width: fit-content;
 }
 
-.available {
+.vehicle-status.available {
   background: #dcfce7;
   color: #10b981;
 }
 
-.in-use {
-  background: #ffe4b5;
-  color: #d97706;
+.vehicle-status.in-use {
+  background: #ffedd5;
+  color: #f59e0b;
 }
 
-.maintenance {
+.vehicle-status.maintenance {
   background: #fee2e2;
   color: #ef4444;
 }
@@ -373,8 +394,9 @@ export default {
 .apply-btn {
   padding: 16rpx 32rpx;
   border-radius: 16rpx;
-  font-size: 26rpx;
+  font-size: 24rpx;
   font-weight: 500;
+  border: none;
 }
 
 .btn-available {
@@ -390,34 +412,37 @@ export default {
 /* 申请用车按钮 */
 .apply-section {
   position: fixed;
-  bottom: 120rpx; /* 调整位置以避免与底部导航栏重叠 */
+  bottom: 120rpx; /* 调整位置，避免与底部导航重叠 */
   right: 30rpx;
-  z-index: 100;
+  z-index: 998;
 }
 
 .apply-main-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 50rpx;
-  padding: 20rpx 30rpx;
   display: flex;
   align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 50rpx;
+  padding: 24rpx 36rpx;
   box-shadow: 0 4rpx 16rpx rgba(99, 102, 241, 0.3);
 }
 
 .apply-btn-text {
-  color: #ffffff;
   font-size: 28rpx;
   font-weight: 500;
   margin-left: 10rpx;
 }
 
-/* 申请用车弹窗 */
+/* 弹窗样式 */
 .apply-popup {
   background: #ffffff;
-  border-top-left-radius: 32rpx;
-  border-top-right-radius: 32rpx;
+  border-top-left-radius: 20rpx;
+  border-top-right-radius: 20rpx;
   padding: 30rpx;
   max-height: 80vh;
+  overflow-y: auto;
 }
 
 .popup-header {
@@ -440,7 +465,7 @@ export default {
 }
 
 .form-group {
-  margin-bottom: 40rpx;
+  margin-bottom: 30rpx;
 }
 
 .form-label {
@@ -540,5 +565,37 @@ export default {
 .submit-btn {
   background: #6366f1;
   color: #ffffff;
+}
+
+/* 底部导航栏 */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20rpx 0;
+  z-index: 999;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.nav-item.active .nav-text {
+  color: #6366f1;
+}
+
+.nav-text {
+  font-size: 24rpx;
+  color: #7A7E83;
+  margin-top: 4rpx;
 }
 </style>
