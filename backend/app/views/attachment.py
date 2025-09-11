@@ -59,6 +59,7 @@ def upload_attachment():
         file = request.files.get('file')
         related_type = request.form.get('related_type')
         related_id = request.form.get('related_id')
+        description = request.form.get('description')
         naming_rule = request.form.get('naming_rule', 'default')  # 命名规则参数
         
         if not file or not file.filename:
@@ -66,6 +67,9 @@ def upload_attachment():
             
         if not related_type or not related_id:
             return jsonify({'error': '缺少关联对象信息'}), 400
+            
+        if not description:
+            return jsonify({'error': '请填写附件说明'}), 400
             
         # 创建上传目录
         upload_dir = create_upload_directory(related_type)
@@ -91,6 +95,7 @@ def upload_attachment():
             stored_name=stored_name,
             file_type=os.path.splitext(file.filename)[1].lower(),
             file_size=os.path.getsize(file_path),
+            description=description,
             created_by=current_user.id
         )
         
@@ -105,6 +110,7 @@ def upload_attachment():
             'original_name': attachment.original_name,
             'file_type': attachment.file_type,
             'file_size': attachment.file_size,
+            'description': attachment.description,
             'created_at': attachment.created_at.isoformat()
         }), 201
         
@@ -269,6 +275,7 @@ def list_attachments(related_type, related_id):
                 'original_name': attachment.original_name,
                 'file_type': attachment.file_type,
                 'file_size': attachment.file_size,
+                'description': attachment.description,
                 'created_at': attachment.created_at.isoformat()
             } for attachment in attachments]
         }), 200

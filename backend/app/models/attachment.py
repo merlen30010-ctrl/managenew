@@ -1,4 +1,5 @@
 from app import db
+from app import db
 from datetime import datetime
 
 class Attachment(db.Model):
@@ -19,6 +20,8 @@ class Attachment(db.Model):
     file_type = db.Column(db.String(10))
     # 文件大小
     file_size = db.Column(db.Integer)
+    # 附件说明
+    description = db.Column(db.String(200))
     # 创建时间
     created_at = db.Column(db.DateTime, default=datetime.now)
     # 创建人
