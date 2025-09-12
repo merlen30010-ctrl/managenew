@@ -4,9 +4,11 @@ from flask_login import LoginManager
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_migrate import Migrate
-from config import Config
+from config import Config, config as config_map
 import os
 from datetime import datetime
+import logging
+from logging.handlers import RotatingFileHandler
 
 # 初始化扩展
 db = SQLAlchemy()
@@ -19,9 +21,19 @@ from app.utils.cache_service import cache_service
 from app.utils.query_monitor import query_monitor
 from app.utils.anti_spam import anti_spam
 
-def create_app():
+def create_app(config_name=None):
     app = Flask(__name__)
-    app.config.from_object(Config)
+    # 允许通过入参或环境变量选择配置，默认使用基础 Config
+    cfg_obj = None
+    if config_name:
+        cfg_obj = config_map.get(config_name, Config)
+    else:
+        env_name = os.environ.get('FLASK_ENV') or os.environ.get('APP_ENV') or 'default'
+        cfg_obj = config_map.get(env_name, Config)
+    app.config.from_object(cfg_obj)
+    
+    # 确保上传目录存在
+    os.makedirs(app.config.get('UPLOAD_FOLDER', os.path.join(os.path.dirname(__file__), 'uploads')), exist_ok=True)
     
     # 初始化扩展
     db.init_app(app)
@@ -31,12 +43,15 @@ def create_app():
     cache_service.init_app(app)
     query_monitor.init_app(app)
     anti_spam.init_app(app)
-    CORS(app)
     
     login_manager.login_view = 'auth.login'
     
-    # 配置CORS
-    CORS(app, origins=['http://localhost:3000'], supports_credentials=True)
+    # 配置CORS（单处配置，支持凭据）
+    CORS(
+        app,
+        resources={r"/*": {"origins": app.config.get('CORS_ORIGINS', ['http://localhost:3000'])}},
+        supports_credentials=True,
+    )
     
     # 用户加载回调函数
     @login_manager.user_loader
@@ -101,7 +116,7 @@ def create_app():
     app.register_blueprint(notification_bp, url_prefix='/notification')
     app.register_blueprint(article_bp)
     app.register_blueprint(superuser_view_bp, url_prefix='/superuser')
-    # 注册API蓝图
+    # 注册API蓝图（保持现有前缀设置，避免破坏现有接口路径）
     app.register_blueprint(api_auth_bp)
     app.register_blueprint(api_user_bp)
     app.register_blueprint(api_material_bp)
@@ -134,5 +149,16 @@ def create_app():
     import atexit
     atexit.register(cleanup_session_manager)
     atexit.register(cleanup_blacklist_manager)
+    
+    # 生产环境日志（旋转文件），开发模式沿用控制台输出
+    if not app.debug:
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        logs_dir = os.path.join(base_dir, 'logs')
+        os.makedirs(logs_dir, exist_ok=True)
+        file_handler = RotatingFileHandler(os.path.join(logs_dir, 'managepro.log'), maxBytes=1_000_000, backupCount=3, encoding='utf-8')
+        file_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(name)s: %(message)s'))
+        file_handler.setLevel(logging.INFO)
+        app.logger.addHandler(file_handler)
+        app.logger.setLevel(logging.INFO)
     
     return app
