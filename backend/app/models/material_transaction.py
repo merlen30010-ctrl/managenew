@@ -24,35 +24,21 @@ class MaterialTransaction(db.Model):
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp(), index=True)  # 创建时间 - 添加索引用于排序
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())  # 更新时间
     
-    # 分工协作支持字段 - 修改状态定义
-    status = db.Column(db.String(20), default='loading')  # 记录状态: loading(装车), arrived(到厂), stored(入库), used(使用)
-    editable = db.Column(db.Boolean, default=True)  # 是否可编辑
-    
-    # 司机信息字段
-    driver_name = db.Column(db.String(50))  # 司机姓名
-    driver_phone = db.Column(db.String(20))  # 司机电话
-    driver_id_card = db.Column(db.String(20))  # 司机身份证
-    
-    # 状态变更记录字段
-    loading_time = db.Column(db.DateTime)  # 装车时间
-    arrival_time = db.Column(db.DateTime)  # 到厂时间
-    storage_time = db.Column(db.DateTime)  # 入库时间
-    usage_time = db.Column(db.DateTime)  # 使用时间
-    
-    # 操作人员字段
+    # 分工协作支持字段
+    status = db.Column(db.String(20), default='draft')  # 记录状态: draft(草稿), weighing(过磅完成), assaying(化验完成), completed(完成)
+    weighing_completed = db.Column(db.Boolean, default=False)  # 过磅数据是否完成
+    assaying_completed = db.Column(db.Boolean, default=False)  # 化验数据是否完成
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))  # 创建人ID
-    loading_by = db.Column(db.Integer, db.ForeignKey('users.id'))  # 装车操作人ID
-    arrival_by = db.Column(db.Integer, db.ForeignKey('users.id'))  # 到厂确认人ID
-    storage_by = db.Column(db.Integer, db.ForeignKey('users.id'))  # 入库操作人ID
-    usage_by = db.Column(db.Integer, db.ForeignKey('users.id'))  # 使用操作人ID
+    completed_by = db.Column(db.Integer, db.ForeignKey('users.id'))  # 完成人ID
+    weighing_by = db.Column(db.Integer, db.ForeignKey('users.id'))  # 过磅操作人ID
+    assaying_by = db.Column(db.Integer, db.ForeignKey('users.id'))  # 化验操作人ID
     
     # 关联关系
     factory = db.relationship('Department', foreign_keys=[factory_id])
     creator = db.relationship('User', foreign_keys=[created_by])
-    loader = db.relationship('User', foreign_keys=[loading_by])
-    arriver = db.relationship('User', foreign_keys=[arrival_by])
-    storer = db.relationship('User', foreign_keys=[storage_by])
-    user = db.relationship('User', foreign_keys=[usage_by])
+    completer = db.relationship('User', foreign_keys=[completed_by])
+    weigher = db.relationship('User', foreign_keys=[weighing_by])
+    assayer = db.relationship('User', foreign_keys=[assaying_by])
     
     def __repr__(self):
         return f'<MaterialTransaction {self.id}: {self.material_name} ({self.transaction_type})>'
