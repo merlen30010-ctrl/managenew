@@ -87,6 +87,15 @@
                         <label for="coefficient" class="form-label">系数</label>
                         <input type="number" class="form-control" id="coefficient" name="coefficient" step="0.01" value="{{ contract.coefficient or '' }}">
                     </div>
+                    <!-- 新增布尔字段：含税计价、已收发票 -->
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" type="checkbox" id="is_tax_inclusive" name="is_tax_inclusive" {% if contract.is_tax_inclusive %}checked{% endif %}>
+                        <label class="form-check-label" for="is_tax_inclusive">含税计价</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" type="checkbox" id="is_invoice_received" name="is_invoice_received" {% if contract.is_invoice_received %}checked{% endif %}>
+                        <label class="form-check-label" for="is_invoice_received">已收发票</label>
+                    </div>
                     <div class="mb-3">
                         <label for="status" class="form-label">状态</label>
                         <select class="form-select" id="status" name="status">

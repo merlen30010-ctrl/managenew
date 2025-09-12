@@ -229,6 +229,9 @@ def create_contract():
         pricing_method = request.form.get('pricing_method')
         coefficient = request.form.get('coefficient')
         status = request.form.get('status') or '草稿'
+        # 读取布尔字段
+        is_tax_inclusive = request.form.get('is_tax_inclusive') == 'on'
+        is_invoice_received = request.form.get('is_invoice_received') == 'on'
         
         # 检查合同编号是否已存在
         if Contract.query.filter_by(contract_number=contract_number).first():
@@ -248,7 +251,9 @@ def create_contract():
             tax_rate=float(tax_rate),
             pricing_method=pricing_method,
             coefficient=float(coefficient) if coefficient else None,
-            status=status
+            status=status,
+            is_tax_inclusive=is_tax_inclusive,
+            is_invoice_received=is_invoice_received
         )
         
         db.session.add(contract)
@@ -373,6 +378,9 @@ def edit_contract(contract_id):
         coefficient = request.form.get('coefficient')
         contract.coefficient = float(coefficient) if coefficient else None
         contract.status = request.form.get('status') or '执行'
+        # 读取布尔字段
+        contract.is_tax_inclusive = request.form.get('is_tax_inclusive') == 'on'
+        contract.is_invoice_received = request.form.get('is_invoice_received') == 'on'
         
         contract.sign_date = datetime.strptime(sign_date, '%Y-%m-%d').date() if sign_date else None
         contract.expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date() if expiry_date else None
